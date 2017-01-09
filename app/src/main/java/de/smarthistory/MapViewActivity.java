@@ -3,11 +3,22 @@ package de.smarthistory;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Build;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import de.smarthistory.data.DataFacade;
@@ -43,6 +54,8 @@ public class MapViewActivity extends AppCompatActivity {
 
     private  static final Logger LOGGER = Logger.getLogger(MapViewActivity.class.getName());
 
+    private DataFacade data;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,12 +69,17 @@ public class MapViewActivity extends AppCompatActivity {
         //important! set your user agent to prevent getting banned from the osm servers
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
 
+        // set up the data facade to use
+        this.data = DataFacade.getInstance();
+
+        // initialize the drawer menu
+        initializeNavDrawerMenu();
+
+        // set up the map to use
         MapView map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
-
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
-
         IMapController mapController = map.getController();
         mapController.setZoom(17);
         // GeoPoint startPoint = new GeoPoint(51.22049, 6.79202);
@@ -185,12 +203,9 @@ public class MapViewActivity extends AppCompatActivity {
     }
 
     private void addPOIs(MapView map) {
-
-        DataFacade facade = DataFacade.getInstance();
-
         List<Marker> markers = new ArrayList<>();
 
-        for (Mapstop mapstop : facade.getMapstops()) {
+        for (Mapstop mapstop : data.getMapstops()) {
             Marker marker = new Marker(map);
             GeoPoint geoPoint = mapstop.getPlace().getLocation();
             marker.setPosition(geoPoint);
@@ -206,5 +221,43 @@ public class MapViewActivity extends AppCompatActivity {
 
         map.getOverlays().addAll(markers);
     }
+
+
+    // START drawer menu
+    private void initializeNavDrawerMenu() {
+        final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+        // set adapter for the list view
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, getNavDrawerTitles()));
+
+        // a click listener, empty for now
+        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+    }
+
+    // The click listner for ListView in the navigation drawer
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            selectItem(position);
+        }
+    }
+
+    private String[] getNavDrawerTitles() {
+        final Resources res = getResources();
+        String[] result = {
+                res.getString(R.string.menu_current_area) + data.getCurrentArea().getName(),
+                res.getString(R.string.menu_current_tour) + data.getCurrentTour().getName(),
+                res.getString(R.string.menu_tours_available),
+                res.getString(R.string.menu_options_general)
+        };
+
+        return result;
+    }
+
+
+    // empty mehtod to be filled with code for when drawer Item is clicked
+    private void selectItem(int position) { }
+    // END drawer menu
 
 }

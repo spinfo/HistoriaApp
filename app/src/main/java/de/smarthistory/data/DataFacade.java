@@ -33,4 +33,8 @@ public class DataFacade {
         return dataProvider.getMapstops();
     }
 
+    public Area getCurrentArea() { return dataProvider.getCurrentArea(); }
+
+    public Tour getCurrentTour() { return dataProvider.getCurrentTour(); }
+
 }

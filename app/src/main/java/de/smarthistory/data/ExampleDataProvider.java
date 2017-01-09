@@ -25,6 +25,10 @@ class ExampleDataProvider {
 
     private List<Mapstop> mapstops = new ArrayList<>();
 
+    private Area currentArea;
+
+    private Tour currentTour;
+
     protected ExampleDataProvider() {
 
         Map<Integer, Place> placeMap = new HashMap<>();
@@ -99,6 +103,9 @@ class ExampleDataProvider {
             e.printStackTrace();
         }
 
+        this.currentArea = areas.get(0);
+
+        this.currentTour = currentArea.getTours().get(0);
 
     }
 
@@ -109,5 +116,9 @@ class ExampleDataProvider {
     protected List<Mapstop> getMapstops() {
         return mapstops;
     }
+
+    protected Area getCurrentArea() { return currentArea; }
+
+    protected Tour getCurrentTour() { return currentTour; }
 
 }
