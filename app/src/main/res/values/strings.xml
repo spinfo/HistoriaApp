@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartHistory</string>
+    <string name="edit_message">Enter a message</string>
+
+    <string name="button_send">Send</string>
+    <string name="button_fragments_example">Frags</string>
+    <string name="button_map">Map</string>
+
+    <string name="test_string">Testing...</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
