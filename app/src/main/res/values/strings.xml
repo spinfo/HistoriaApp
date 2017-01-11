@@ -1,13 +1,5 @@
 <resources>
     <string name="app_name">SmartHistory</string>
-    <string name="edit_message">Enter a message</string>
-
-    <string name="button_send">Send</string>
-    <string name="button_fragments_example">Frags</string>
-    <string name="button_map">Map</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-
 
     <!-- Real string resources start here -->
     <string name="extra_key_mapstop">mapstop</string>

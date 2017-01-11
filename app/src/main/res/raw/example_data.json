@@ -17,26 +17,6 @@
               "location_id": 2
             }
           ]
-        },
-        {
-          "name": "Spaziergang",
-          "mapstops": [
-            {
-              "id": 3,
-              "text": "Hier gibt es Kaffee!",
-              "location_id": 3
-            },
-            {
-              "id": 4,
-              "text": "Hier wohnt Bene",
-              "location_id": 4
-            },
-            {
-              "id": 5,
-              "text": "Hier wohnen Sarah und Moritz",
-              "location_id": 5
-            }
-          ]
         }
       ],
       "places": [
@@ -51,24 +31,6 @@
           "name": "Eine Kreuzung?",
           "lat": 51.22067,
           "lon": 6.78990
-        },
-        {
-          "id": 3,
-          "name": "Degli Amici",
-          "lat": 50.96104,
-          "lon": 6.95257
-        },
-        {
-          "id": 4,
-          "name": "Casa Bene",
-          "lat": 50.95844,
-          "lon": 6.94556
-        },
-        {
-          "id": 5,
-          "name": "Mopspalast",
-          "lat": 50.95973,
-          "lon": 6.95009
         }
       ]
     }
