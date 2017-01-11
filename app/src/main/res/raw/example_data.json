@@ -7,10 +7,12 @@
           "name": "Example Tour",
           "mapstops": [
             {
+              "id": 1,
               "text": "Anscheinend eine Grünfläche nahe des Bahnhofs.",
               "location_id": 1
             },
             {
+              "id": 2,
               "text": "Irgendeine Kreuzung beim Bahnhof?",
               "location_id": 2
             }
@@ -20,14 +22,17 @@
           "name": "Spaziergang",
           "mapstops": [
             {
+              "id": 3,
               "text": "Hier gibt es Kaffee!",
               "location_id": 3
             },
             {
+              "id": 4,
               "text": "Hier wohnt Bene",
               "location_id": 4
             },
             {
+              "id": 5,
               "text": "Hier wohnen Sarah und Moritz",
               "location_id": 5
             }

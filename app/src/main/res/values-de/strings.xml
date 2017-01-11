@@ -3,8 +3,6 @@
     <string name="app_name">SmartHistory</string>
     <string name="button_send">Senden</string>
     <string name="edit_message">Nachricht eingeben</string>
-    <string name="test_string">Teste...</string>
     <string name="button_fragments_example">Frags</string>
     <string name="button_map">Karte</string>
-    <string name="hello_blank_fragment">Hallo leeres Fragment</string>
 </resources>

@@ -6,8 +6,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,9 +25,17 @@ class ExampleDataProvider {
 
     private static final Logger LOGGER = Logger.getLogger(ExampleDataProvider.class.getName());
 
+    private static final String EXAMPLE_DATA_FILE = "res/raw/example_data.json";
+
+    private static final String EXAMPLE_PAGE_FILE_TEMPLATE = "file:///android_asset/mmapstopno_ppageno.html";
+
+    private static final String EXAMPLE_PAGES_ERROR_PAGE = "file:///android_asset/error.html";
+
     private List<Area> areas = new ArrayList<>();
 
     private List<Mapstop> mapstops = new ArrayList<>();
+
+    private Map<Long, Mapstop> mapstopsById = new HashMap<>();
 
     private Area currentArea;
 
@@ -34,8 +46,7 @@ class ExampleDataProvider {
         Map<Integer, Place> placeMap = new HashMap<>();
 
         try {
-            String file = "res/raw/example_data.json";
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream(file);
+            InputStream in = this.getClass().getClassLoader().getResourceAsStream(EXAMPLE_DATA_FILE);
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             StringBuilder json = new StringBuilder();
             String line = null;
@@ -82,10 +93,12 @@ class ExampleDataProvider {
 
                         String text = jMapstop.get("text").getAsString();
                         int pid = jMapstop.get("location_id").getAsInt();
+                        long mid = jMapstop.get("id").getAsLong();
 
-                        Mapstop mapstop = new Mapstop(placeMap.get(pid), text);
+                        Mapstop mapstop = new Mapstop(mid, placeMap.get(pid), text);
                         tourMapstops.add(mapstop);
                         this.mapstops.add(mapstop);
+                        this.mapstopsById.put(mid, mapstop);
 
                         LOGGER.info("Mapstop " + pid + ": " + mapstop.getPlace().getName() + ", " + mapstop.getText());
                     }
@@ -117,8 +130,16 @@ class ExampleDataProvider {
         return mapstops;
     }
 
+    Mapstop getMapstopById(long id) { return mapstopsById.get(id); }
+
     protected Area getCurrentArea() { return currentArea; }
 
     protected Tour getCurrentTour() { return currentTour; }
+
+    protected String getPageUriForMapstop(Mapstop mapstop, Integer pageNo) {
+        String path = EXAMPLE_PAGE_FILE_TEMPLATE.replaceFirst("mapstopno", mapstop.getId().toString());
+        path = path.replaceFirst("pageno", pageNo.toString());
+        return path;
+    }
 
 }

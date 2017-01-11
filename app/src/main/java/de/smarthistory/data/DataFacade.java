@@ -1,5 +1,7 @@
 package de.smarthistory.data;
 
+import java.io.File;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -33,8 +35,14 @@ public class DataFacade {
         return dataProvider.getMapstops();
     }
 
+    public Mapstop getMapstopById(long id) { return dataProvider.getMapstopById(id); }
+
     public Area getCurrentArea() { return dataProvider.getCurrentArea(); }
 
     public Tour getCurrentTour() { return dataProvider.getCurrentTour(); }
+
+    public String getPageUriForMapstop(Mapstop mapstop, Integer pageNo) {
+        return dataProvider.getPageUriForMapstop(mapstop, pageNo);
+    }
 
 }

@@ -2,6 +2,7 @@ package de.smarthistory;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
@@ -14,11 +15,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Build;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewOverlay;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import de.smarthistory.data.DataFacade;
@@ -31,10 +36,13 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -193,7 +201,7 @@ public class MapViewActivity extends AppCompatActivity {
     }
     // END PERMISSION CHECK
 
-
+    // START MAP FUNCTIONS
     private void addCurrentLocation(MapView map) {
         GpsMyLocationProvider locationProvider = new GpsMyLocationProvider(this);
         MyLocationNewOverlay myLocationOverlay = new MyLocationNewOverlay(locationProvider, map);
@@ -205,23 +213,69 @@ public class MapViewActivity extends AppCompatActivity {
     private void addPOIs(MapView map) {
         List<Marker> markers = new ArrayList<>();
 
+        // custom info window for markers
+        MarkerInfoWindow window = new MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
+
         for (Mapstop mapstop : data.getMapstops()) {
             Marker marker = new Marker(map);
             GeoPoint geoPoint = mapstop.getPlace().getLocation();
             marker.setPosition(geoPoint);
             marker.setTitle(mapstop.getPlace().getName());
+            marker.setRelatedObject(mapstop);
 
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             marker.setIcon(ContextCompat.getDrawable(this.getApplicationContext(), R.drawable.map_marker_icon_blue_small));
 
-            markers.add(marker);
+            marker.setInfoWindow(window);
 
-            LOGGER.info("-- Mapstop: " + mapstop.getPlace().getName() + ", " + mapstop.getText() + " (" + mapstop.getPlace().getLocation().getLatitude() + "/" + mapstop.getPlace().getLocation().getLongitude() + ")");
+            markers.add(marker);
         }
 
         map.getOverlays().addAll(markers);
     }
 
+    // TODO extract to own file
+    private class MapstopMarkerInfoWindow extends MarkerInfoWindow {
+
+        private class MapstopMarkerInfoWindowOnclickListner implements View.OnClickListener {
+
+            Mapstop mapstop;
+
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MapViewActivity.this, MapstopActivity.class);
+                intent.putExtra(getResources().getString(R.string.extra_key_mapstop), this.mapstop.getId());
+                startActivity(intent);
+            }
+
+            public void setMapstop(Mapstop mapstop) {
+                this.mapstop = mapstop;
+            }
+        };
+
+        MapstopMarkerInfoWindowOnclickListner onClickListener;
+
+        MapView map;
+
+        public MapstopMarkerInfoWindow(int layoutResId, final MapView mapView) {
+            super(layoutResId, mapView);
+            this.map = mapView;
+            this.onClickListener = new MapstopMarkerInfoWindowOnclickListner();
+        }
+
+        @Override
+        public void onOpen(Object item) {
+            super.onOpen(item);
+            closeAllInfoWindowsOn(this.map);
+
+            LinearLayout layout = (LinearLayout) getView().findViewById(R.id.map_my_bonuspack_bubble);
+            this.onClickListener.setMapstop((Mapstop) getMarkerReference().getRelatedObject());
+            layout.setClickable(true);
+            layout.setOnClickListener(this.onClickListener);
+        }
+    }
+
+    // END MAP FUNCTIONS
 
     // START drawer menu
     private void initializeNavDrawerMenu() {

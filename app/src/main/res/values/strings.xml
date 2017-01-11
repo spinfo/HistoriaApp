@@ -6,21 +6,15 @@
     <string name="button_fragments_example">Frags</string>
     <string name="button_map">Map</string>
 
-    <string name="test_string">Testing...</string>
-
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
     <!-- Real string resources start here -->
+    <string name="extra_key_mapstop">mapstop</string>
 
     <!-- Strings for the menu -->
-    <string name="menu_title">Menu</string>
-    <string name="menu_drawer_open">Open menu</string>
-    <string name="menu_drawer_close">Close menu</string>
     <string name="menu_current_area">Area: </string>
     <string name="menu_current_tour">Tour: </string>
     <string name="menu_tours_available">Download Tours </string>
     <string name="menu_options_general">Options</string>
-    <string name="menu_about">About</string>
 </resources>
