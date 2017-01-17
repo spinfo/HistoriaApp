@@ -9,12 +9,14 @@
             {
               "id": 1,
               "text": "Anscheinend eine Grünfläche nahe des Bahnhofs.",
-              "location_id": 1
+              "location_id": 1,
+              "page_amount": 2
             },
             {
               "id": 2,
               "text": "Irgendeine Kreuzung beim Bahnhof?",
-              "location_id": 2
+              "location_id": 2,
+              "page_amount": 2
             }
           ]
         }

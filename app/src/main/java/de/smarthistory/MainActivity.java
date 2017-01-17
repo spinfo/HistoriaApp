@@ -2,16 +2,17 @@ package de.smarthistory;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -44,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private  static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
     private DataFacade data;
+
+    private Mapstop currentMapstop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,9 +227,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, MapstopActivity.class);
+                /* Intent intent = new Intent(MainActivity.this, MapstopActivity.class);
                 intent.putExtra(getResources().getString(R.string.extra_key_mapstop), this.mapstop.getId());
-                startActivity(intent);
+                startActivity(intent); */
+                showMapstop(this.mapstop);
             }
 
             public void setMapstop(Mapstop mapstop) {
@@ -294,5 +298,14 @@ public class MainActivity extends AppCompatActivity {
     // empty mehtod to be filled with code for when drawer Item is clicked
     private void selectItem(int position) { }
     // END drawer menu
+
+
+    // START mapstop dialog
+    private void showMapstop(Mapstop mapstop) {
+        MapstopDialog dialog = new MapstopDialog(this, mapstop);
+
+        dialog.show();
+    }
+    // END mapstop dialog
 
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mapstop"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="@dimen/activity_vertical_margin">
+
+    <de.smarthistory.MapstopPageView
+        android:id="@+id/mapstop_html_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="6" />
+
+    <TextView
+        android:id="@+id/mapstop_page_indicator_text"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:textSize="21dip"
+        android:gravity="center"
+        android:layout_weight="1"/>
+
+</LinearLayout>

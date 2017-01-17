@@ -94,8 +94,9 @@ class ExampleDataProvider {
                         String text = jMapstop.get("text").getAsString();
                         int pid = jMapstop.get("location_id").getAsInt();
                         long mid = jMapstop.get("id").getAsLong();
+                        int pageAmount = jMapstop.get("page_amount").getAsInt();
 
-                        Mapstop mapstop = new Mapstop(mid, placeMap.get(pid), text);
+                        Mapstop mapstop = new Mapstop(mid, placeMap.get(pid), text, pageAmount);
                         tourMapstops.add(mapstop);
                         this.mapstops.add(mapstop);
                         this.mapstopsById.put(mid, mapstop);

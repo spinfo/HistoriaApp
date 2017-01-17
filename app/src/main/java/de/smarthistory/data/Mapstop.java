@@ -13,10 +13,13 @@ public class Mapstop {
 
     private final String text;
 
-    public Mapstop(long id, Place place, String text) {
+    private int pageAmount;
+
+    public Mapstop(long id, Place place, String text, int pageAmount) {
         this.id = id;
         this.place = place;
         this.text = text;
+        this.pageAmount = pageAmount;
     }
 
     public Long getId() { return id; }
@@ -27,5 +30,11 @@ public class Mapstop {
 
     public String getText() {
         return text;
+    }
+
+    public int getPageAmount() { return pageAmount; }
+
+    public boolean hasPage(int idx) {
+        return (idx <= pageAmount && idx > 0);
     }
 }
