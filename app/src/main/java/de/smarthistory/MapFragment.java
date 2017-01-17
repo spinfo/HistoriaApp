@@ -1,0 +1,198 @@
+package de.smarthistory;
+
+import android.content.Context;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.Mapstop;
+
+
+/**
+ * The fragment handling the map view
+ */
+public class MapFragment extends Fragment {
+
+    private OnMapFragmentInteractionListener mListener;
+
+    private DataFacade data = DataFacade.getInstance();
+
+    public MapFragment() {
+        // Required empty public constructor
+    }
+
+     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        //important! set your user agent to prevent getting banned from the osm servers
+        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
+
+        // Inflate the layout for this fragment
+        View result = inflater.inflate(R.layout.fragment_map, container, false);
+
+        // set up the map to use
+        MapView map = (MapView) result.findViewById(R.id.map);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setBuiltInZoomControls(true);
+        map.setMultiTouchControls(true);
+        IMapController mapController = map.getController();
+        mapController.setZoom(17);
+        GeoPoint startPoint = new GeoPoint(51.22049, 6.79202);
+        // GeoPoint startPoint = new GeoPoint(50.95863, 6.94487);
+        mapController.setCenter(startPoint);
+
+        // add Overlay for POIs
+        addPOIs(map);
+
+        // add Overlay for current location
+        addCurrentLocation(map);
+
+        // return the container for the map view
+        return result;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onMapFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnMapFragmentInteractionListener) {
+            mListener = (OnMapFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnMapFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+
+    private void addCurrentLocation(MapView map) {
+        GpsMyLocationProvider locationProvider = new GpsMyLocationProvider(getContext());
+        MyLocationNewOverlay myLocationOverlay = new MyLocationNewOverlay(locationProvider, map);
+
+        map.getOverlays().add(myLocationOverlay);
+        myLocationOverlay.enableMyLocation();
+    }
+
+    private void addPOIs(MapView map) {
+        List<Marker> markers = new ArrayList<>();
+
+        // custom info window for markers
+        MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
+
+        for (Mapstop mapstop : data.getMapstops()) {
+            Marker marker = new Marker(map);
+            GeoPoint geoPoint = mapstop.getPlace().getLocation();
+            marker.setPosition(geoPoint);
+            marker.setTitle(mapstop.getPlace().getName());
+            marker.setRelatedObject(mapstop);
+
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setIcon(ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.map_marker_icon_blue_small));
+
+            marker.setInfoWindow(window);
+
+            markers.add(marker);
+        }
+
+        map.getOverlays().addAll(markers);
+    }
+
+    /**
+     * A class controlling the behaviour of the bubble appearing above mapstop markers on the map
+     */
+    private class MapstopMarkerInfoWindow extends MarkerInfoWindow {
+
+        private class MapstopMarkerInfoWindowOnclickListner implements View.OnClickListener {
+
+            Mapstop mapstop;
+
+            @Override
+            public void onClick(View view) {
+                /* Intent intent = new Intent(MainActivity.this, MapstopActivity.class);
+                intent.putExtra(getResources().getString(R.string.extra_key_mapstop), this.mapstop.getId());
+                startActivity(intent); */
+                showMapstop(this.mapstop);
+            }
+
+            public void setMapstop(Mapstop mapstop) {
+                this.mapstop = mapstop;
+            }
+        };
+
+        MapFragment.MapstopMarkerInfoWindow.MapstopMarkerInfoWindowOnclickListner onClickListener;
+
+        MapView map;
+
+        public MapstopMarkerInfoWindow(int layoutResId, final MapView mapView) {
+            super(layoutResId, mapView);
+            this.map = mapView;
+            this.onClickListener = new MapFragment.MapstopMarkerInfoWindow.MapstopMarkerInfoWindowOnclickListner();
+        }
+
+        @Override
+        public void onOpen(Object item) {
+            super.onOpen(item);
+            closeAllInfoWindowsOn(this.map);
+
+            LinearLayout layout = (LinearLayout) getView().findViewById(R.id.map_my_bonuspack_bubble);
+            this.onClickListener.setMapstop((Mapstop) getMarkerReference().getRelatedObject());
+            layout.setClickable(true);
+            layout.setOnClickListener(this.onClickListener);
+        }
+    }
+
+    private void showMapstop(Mapstop mapstop) {
+        MapstopDialog dialog = new MapstopDialog(getContext(), mapstop);
+        dialog.show();
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnMapFragmentInteractionListener {
+        // TODO: Update argument type and make useful
+        void onMapFragmentInteraction(Uri uri);
+    }
+}

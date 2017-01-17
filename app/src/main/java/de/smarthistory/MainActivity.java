@@ -4,8 +4,11 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,20 +18,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.modules.SqlTileWriter;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -40,11 +34,11 @@ import java.util.logging.Logger;
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.Mapstop;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MapFragment.OnMapFragmentInteractionListener {
 
     private  static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
-    private DataFacade data;
+    private DataFacade data = DataFacade.getInstance();
 
     private Mapstop currentMapstop;
 
@@ -67,32 +61,34 @@ public class MainActivity extends AppCompatActivity {
             checkPermissions();
         }
 
-        //important! set your user agent to prevent getting banned from the osm servers
-        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
-
-        // set up the data facade to use
-        this.data = DataFacade.getInstance();
-
         // initialize the drawer menu
         initializeNavDrawerMenu();
 
-        // set up the map to use
-        MapView map = (MapView) findViewById(R.id.map);
-        map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setBuiltInZoomControls(true);
-        map.setMultiTouchControls(true);
-        IMapController mapController = map.getController();
-        mapController.setZoom(17);
-        GeoPoint startPoint = new GeoPoint(51.22049, 6.79202);
-        // GeoPoint startPoint = new GeoPoint(50.95863, 6.94487);
-        mapController.setCenter(startPoint);
+        // initialize the main fragment (the map)
+        // make sure, that the fragment container is present
+        if (findViewById(R.id.main_fragment_container) != null) {
 
-        // add Overlay for POIs
-        addPOIs(map);
+            // if we are restored from a previous state, don't initiate a new fragment
+            if (savedInstanceState != null) {
+                return;
+            }
 
-        // add Overlay for current location
-        addCurrentLocation(map);
+            MapFragment mapFragment = new MapFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.main_fragment_container, mapFragment).commit();
+        }
     }
+
+    private void switchMainFragmentTo(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        // replace and ensure that the user can navigate back if she wants to
+        transaction.replace(R.id.main_fragment_container, fragment);
+        transaction.addToBackStack(null);
+
+        transaction.commit();
+    }
+
 
     /**
      * refreshes the current osmdroid cache paths with user preferences plus soe logic to work around
@@ -194,83 +190,6 @@ public class MainActivity extends AppCompatActivity {
     }
     // END PERMISSION CHECK
 
-    // START MAP FUNCTIONS
-    private void addCurrentLocation(MapView map) {
-        GpsMyLocationProvider locationProvider = new GpsMyLocationProvider(this);
-        MyLocationNewOverlay myLocationOverlay = new MyLocationNewOverlay(locationProvider, map);
-
-        map.getOverlays().add(myLocationOverlay);
-        myLocationOverlay.enableMyLocation();
-    }
-
-    private void addPOIs(MapView map) {
-        List<Marker> markers = new ArrayList<>();
-
-        // custom info window for markers
-        MarkerInfoWindow window = new MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
-
-        for (Mapstop mapstop : data.getMapstops()) {
-            Marker marker = new Marker(map);
-            GeoPoint geoPoint = mapstop.getPlace().getLocation();
-            marker.setPosition(geoPoint);
-            marker.setTitle(mapstop.getPlace().getName());
-            marker.setRelatedObject(mapstop);
-
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            marker.setIcon(ContextCompat.getDrawable(this.getApplicationContext(), R.drawable.map_marker_icon_blue_small));
-
-            marker.setInfoWindow(window);
-
-            markers.add(marker);
-        }
-
-        map.getOverlays().addAll(markers);
-    }
-
-    // TODO extract to own file
-    private class MapstopMarkerInfoWindow extends MarkerInfoWindow {
-
-        private class MapstopMarkerInfoWindowOnclickListner implements View.OnClickListener {
-
-            Mapstop mapstop;
-
-            @Override
-            public void onClick(View view) {
-                /* Intent intent = new Intent(MainActivity.this, MapstopActivity.class);
-                intent.putExtra(getResources().getString(R.string.extra_key_mapstop), this.mapstop.getId());
-                startActivity(intent); */
-                showMapstop(this.mapstop);
-            }
-
-            public void setMapstop(Mapstop mapstop) {
-                this.mapstop = mapstop;
-            }
-        };
-
-        MapstopMarkerInfoWindowOnclickListner onClickListener;
-
-        MapView map;
-
-        public MapstopMarkerInfoWindow(int layoutResId, final MapView mapView) {
-            super(layoutResId, mapView);
-            this.map = mapView;
-            this.onClickListener = new MapstopMarkerInfoWindowOnclickListner();
-        }
-
-        @Override
-        public void onOpen(Object item) {
-            super.onOpen(item);
-            closeAllInfoWindowsOn(this.map);
-
-            LinearLayout layout = (LinearLayout) getView().findViewById(R.id.map_my_bonuspack_bubble);
-            this.onClickListener.setMapstop((Mapstop) getMarkerReference().getRelatedObject());
-            layout.setClickable(true);
-            layout.setOnClickListener(this.onClickListener);
-        }
-    }
-
-    // END MAP FUNCTIONS
-
     // START drawer menu
     private void initializeNavDrawerMenu() {
         final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -307,6 +226,12 @@ public class MainActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
         mDrawerToggle.syncState();
+    }
+
+    // Empty method for interaction with the map fragment if needed
+    @Override
+    public void onMapFragmentInteraction(Uri uri) {
+        return;
     }
 
     /** TODO From tutorial. Find an equivalent. Do we need to override something like this?
@@ -357,14 +282,5 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Selected: " + position, Toast.LENGTH_SHORT).show();
     }
     // END drawer menu
-
-
-    // START mapstop dialog
-    private void showMapstop(Mapstop mapstop) {
-        MapstopDialog dialog = new MapstopDialog(this, mapstop);
-
-        dialog.show();
-    }
-    // END mapstop dialog
 
 }
