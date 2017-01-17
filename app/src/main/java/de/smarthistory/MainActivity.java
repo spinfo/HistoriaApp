@@ -8,11 +8,11 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -48,10 +48,19 @@ public class MainActivity extends AppCompatActivity {
 
     private Mapstop currentMapstop;
 
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    // the main toolbar that is set up as the action bar
+    private Toolbar mainToolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // setup main tool bar as action bar
+        this.mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        this.setSupportActionBar(mainToolbar);
 
         // Request permissions to support Android Marshmallow and above devices
         if (Build.VERSION.SDK_INT >= 23) {
@@ -272,7 +281,55 @@ public class MainActivity extends AppCompatActivity {
 
         // a click listener, empty for now
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        // interaction with action bar
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mainToolbar, R.string.menu_title, R.string.app_name) {
+
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
+            }
+
+            public void onDrawerOpened(View view) {
+                super.onDrawerOpened(view);
+                getSupportActionBar().setTitle(getResources().getString(R.string.menu_title));
+            }
+        };
+
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    /** TODO From tutorial. Find an equivalent. Do we need to override something like this?
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+     @Override
+     public boolean onOptionsItemSelected(MenuItem item) {
+     // Pass the event to ActionBarDrawerToggle, if it returns
+     // true, then it has handled the app icon touch event
+     if (mDrawerToggle.onOptionsItemSelected(item)) {
+     return true;
+     }
+     // Handle your other action bar items...
+
+     return super.onOptionsItemSelected(item);
+     }
+
+     **/
+
 
     // The click listner for ListView in the navigation drawer
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -287,16 +344,18 @@ public class MainActivity extends AppCompatActivity {
         String[] result = {
                 res.getString(R.string.menu_current_area) + data.getCurrentArea().getName(),
                 res.getString(R.string.menu_current_tour) + data.getCurrentTour().getName(),
-                res.getString(R.string.menu_tours_available),
-                res.getString(R.string.menu_options_general)
+                res.getString(R.string.menu_all_data),
+                res.getString(R.string.menu_options_general),
+                res.getString(R.string.menu_about)
         };
 
         return result;
     }
 
-
     // empty mehtod to be filled with code for when drawer Item is clicked
-    private void selectItem(int position) { }
+    private void selectItem(int position) {
+        Toast.makeText(this, "Selected: " + position, Toast.LENGTH_SHORT).show();
+    }
     // END drawer menu
 
 
