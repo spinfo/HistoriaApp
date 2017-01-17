@@ -143,9 +143,6 @@ public class MapFragment extends Fragment {
 
             @Override
             public void onClick(View view) {
-                /* Intent intent = new Intent(MainActivity.this, MapstopActivity.class);
-                intent.putExtra(getResources().getString(R.string.extra_key_mapstop), this.mapstop.getId());
-                startActivity(intent); */
                 showMapstop(this.mapstop);
             }
 
@@ -169,8 +166,11 @@ public class MapFragment extends Fragment {
             super.onOpen(item);
             closeAllInfoWindowsOn(this.map);
 
-            LinearLayout layout = (LinearLayout) getView().findViewById(R.id.map_my_bonuspack_bubble);
+            // set the right mapstop to use
             this.onClickListener.setMapstop((Mapstop) getMarkerReference().getRelatedObject());
+
+            // set listener for containing view
+            LinearLayout layout = (LinearLayout) getView().findViewById(R.id.map_my_bonuspack_bubble);
             layout.setClickable(true);
             layout.setOnClickListener(this.onClickListener);
         }
