@@ -34,7 +34,9 @@ import java.util.logging.Logger;
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.Mapstop;
 
-public class MainActivity extends AppCompatActivity implements MapFragment.OnMapFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity
+        implements MapFragment.OnMapFragmentInteractionListener,
+            ExploreDataFragment.OnExploreDataFragmentInteractionListener {
 
     private  static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
@@ -42,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnMap
 
     private Mapstop currentMapstop;
 
+    // variables to interact with the main menu in the navigation drawer
+    private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
 
     // the main toolbar that is set up as the action bar
@@ -192,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnMap
 
     // START drawer menu
     private void initializeNavDrawerMenu() {
-        final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         final ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         // set adapter for the list view
@@ -234,27 +238,11 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnMap
         return;
     }
 
-    /** TODO From tutorial. Find an equivalent. Do we need to override something like this?
+    // Empty method for interaction with the explore data fragment if needed
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
+    public void onExploreDataFragmentInteraction(Uri uri) {
+        return;
     }
-
-     @Override
-     public boolean onOptionsItemSelected(MenuItem item) {
-     // Pass the event to ActionBarDrawerToggle, if it returns
-     // true, then it has handled the app icon touch event
-     if (mDrawerToggle.onOptionsItemSelected(item)) {
-     return true;
-     }
-     // Handle your other action bar items...
-
-     return super.onOptionsItemSelected(item);
-     }
-
-     **/
-
 
     // The click listner for ListView in the navigation drawer
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -267,9 +255,10 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnMap
     private String[] getNavDrawerTitles() {
         final Resources res = getResources();
         String[] result = {
-                res.getString(R.string.menu_current_area) + data.getCurrentArea().getName(),
-                res.getString(R.string.menu_current_tour) + data.getCurrentTour().getName(),
+                res.getString(R.string.menu_current_area) + " " + data.getCurrentArea().getName(),
+                res.getString(R.string.menu_current_tour) + " " + data.getCurrentTour().getName(),
                 res.getString(R.string.menu_all_data),
+                getResources().getString(R.string.menu_download_data),
                 res.getString(R.string.menu_options_general),
                 res.getString(R.string.menu_about)
         };
@@ -279,7 +268,13 @@ public class MainActivity extends AppCompatActivity implements MapFragment.OnMap
 
     // empty mehtod to be filled with code for when drawer Item is clicked
     private void selectItem(int position) {
-        Toast.makeText(this, "Selected: " + position, Toast.LENGTH_SHORT).show();
+        if (position == 2) {
+            Fragment exploreDataFragment = new ExploreDataFragment();
+            switchMainFragmentTo(exploreDataFragment);
+            mDrawerLayout.closeDrawers();
+        } else {
+            Toast.makeText(this, "Selected: " + position, Toast.LENGTH_SHORT).show();
+        }
     }
     // END drawer menu
 

@@ -9,6 +9,7 @@
     <string name="menu_current_area">Gebiet: </string>
     <string name="menu_current_tour">Tour: </string>
     <string name="menu_all_data">Meine Touren und Gebiete </string>
+    <string name="menu_download_data">Touren herunterladen</string>
     <string name="menu_options_general">Optionen</string>
     <string name="menu_about">Über uns</string>
 
