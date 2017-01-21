@@ -7,13 +7,15 @@
     android:minHeight="@dimen/activity_vertical_margin">
 
     <de.smarthistory.MapstopPageView
-        android:id="@+id/mapstop_html_content"
+        android:id="@+id/mapstop_page"
+        android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="6" />
 
     <TextView
-        android:id="@+id/mapstop_page_indicator_text"
+        android:id="@+id/mapstop_page_indicator"
+        android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="50dip"
         android:textSize="21dip"

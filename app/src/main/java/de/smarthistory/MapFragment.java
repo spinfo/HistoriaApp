@@ -5,10 +5,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -22,6 +28,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.Mapstop;
@@ -32,9 +39,20 @@ import de.smarthistory.data.Mapstop;
  */
 public class MapFragment extends Fragment {
 
+    private Logger LOGGER = Logger.getLogger(MapFragment.class.getName());
+
     private OnMapFragmentInteractionListener mListener;
 
     private DataFacade data = DataFacade.getInstance();
+
+    // the view that this will instantiate, has to be a FrameLayout for us to be able to dim
+    // the map on creating a popup
+    private FrameLayout mapFragmentView;
+
+    // dimensions for popups over the map
+    // TODO put in some config for changeability on different screen types
+    private static final float POPUP_WIDTH = 0.85f;
+    private static final float POPUP_HEIGHT = 0.90f;
 
     public MapFragment() {
         // Required empty public constructor
@@ -52,10 +70,14 @@ public class MapFragment extends Fragment {
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
 
         // Inflate the layout for this fragment
-        View result = inflater.inflate(R.layout.fragment_map, container, false);
+        mapFragmentView = (FrameLayout) inflater.inflate(R.layout.fragment_map, container, false);
+
+        // we have a foreground in place to grey out the map if needed. But at first the map should
+        // be fully visible
+        mapFragmentView.getForeground().setAlpha(0);
 
         // set up the map to use
-        MapView map = (MapView) result.findViewById(R.id.map);
+        MapView map = (MapView) mapFragmentView.findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
@@ -72,7 +94,7 @@ public class MapFragment extends Fragment {
         addCurrentLocation(map);
 
         // return the container for the map view
-        return result;
+        return mapFragmentView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -177,9 +199,59 @@ public class MapFragment extends Fragment {
     }
 
     private void showMapstop(Mapstop mapstop) {
-        MapstopDialog dialog = new MapstopDialog(getContext(), mapstop);
-        dialog.show();
+        // Get the mapstop view
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View mapstopLayout = inflater.inflate(R.layout.mapstop, null);
+
+        // Bind mapstop view to a page loader
+        MapstopPageView pageView = (MapstopPageView) mapstopLayout.findViewById(R.id.mapstop_page);
+        TextView pageIndicatorView = (TextView) mapstopLayout.findViewById(R.id.mapstop_page_indicator);
+        MapstopPageLoader pageLoader = new MapstopPageLoader(mapstop, pageView, pageIndicatorView);
+
+        // actually display the mapstop as a popup window
+        showAsPopup(mapstopLayout);
     }
+
+
+    // this displays a view as a popup over the map
+    private void showAsPopup(View view) {
+        // determine size for the popup
+        int width = (int) (mapFragmentView.getWidth() * POPUP_WIDTH);
+        int height = (int) (mapFragmentView.getHeight() * POPUP_HEIGHT);
+
+        // put the supplied view inside the popup view
+        View popupContainer = getActivity().getLayoutInflater().inflate(R.layout.map_popup, null);
+        RelativeLayout popupContent = (RelativeLayout) popupContainer.findViewById(R.id.map_popup_content);
+        popupContent.addView(view);
+
+        // create the popup window
+        final PopupWindow popupWindow = new PopupWindow(popupContainer, width, height, true);
+        popupWindow.showAtLocation(popupContainer, Gravity.CENTER, 0, 0);
+
+        // get the popup window button and set it to dismiss the popup
+        Button button = (Button) popupContainer.findViewById(R.id.map_popup_dismiss);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                popupWindow.dismiss();
+            }
+        });
+
+        // dim the background
+        mapFragmentView.getForeground().setAlpha(200);
+
+        // give the popup window a listener to undim the background if dismissed
+        popupWindow.setOnDismissListener(new MapFragmentPopupOnDismissListener());
+    }
+
+    // a listener to change un-dim the map on dismissing a popup
+    private class MapFragmentPopupOnDismissListener implements PopupWindow.OnDismissListener {
+        public void onDismiss() {
+            mapFragmentView.getForeground().setAlpha(0);
+        }
+    }
+
+
 
     /**
      * This interface must be implemented by activities that contain this
