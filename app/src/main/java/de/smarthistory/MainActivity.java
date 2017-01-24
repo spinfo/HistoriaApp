@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.Mapstop;
+import de.smarthistory.data.Tour;
 
 public class MainActivity extends AppCompatActivity
         implements MapFragment.OnMapFragmentInteractionListener,
@@ -50,6 +51,9 @@ public class MainActivity extends AppCompatActivity
 
     // the main toolbar that is set up as the action bar
     private Toolbar mainToolbar;
+
+    // map fragment that handles the main map displayed on startup
+    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +81,7 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            MapFragment mapFragment = new MapFragment();
+            mapFragment = new MapFragment();
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.main_fragment_container, mapFragment).commit();
         }
@@ -268,7 +272,11 @@ public class MainActivity extends AppCompatActivity
 
     // empty mehtod to be filled with code for when drawer Item is clicked
     private void selectItem(int position) {
-        if (position == 2) {
+        if (position == 1) {
+            switchMainFragmentTo(mapFragment);
+            mapFragment.showTourSelection(data.getCurrentArea());
+            mDrawerLayout.closeDrawers();
+        } else if (position == 2) {
             Fragment exploreDataFragment = new ExploreDataFragment();
             switchMainFragmentTo(exploreDataFragment);
             mDrawerLayout.closeDrawers();

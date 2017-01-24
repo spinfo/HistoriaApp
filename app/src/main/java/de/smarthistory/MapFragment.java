@@ -1,6 +1,7 @@
 package de.smarthistory;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,19 +10,25 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -30,8 +37,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.Mapstop;
+import de.smarthistory.data.Tour;
 
 
 /**
@@ -45,9 +54,15 @@ public class MapFragment extends Fragment {
 
     private DataFacade data = DataFacade.getInstance();
 
+    // the principle map view
+    private MapView map;
+
     // the view that this will instantiate, has to be a FrameLayout for us to be able to dim
     // the map on creating a popup
     private FrameLayout mapFragmentView;
+
+    // the last markers put on the map
+    private List<Marker> tourMarkers;
 
     // dimensions for popups over the map
     // TODO put in some config for changeability on different screen types
@@ -77,18 +92,13 @@ public class MapFragment extends Fragment {
         mapFragmentView.getForeground().setAlpha(0);
 
         // set up the map to use
-        MapView map = (MapView) mapFragmentView.findViewById(R.id.map);
+        map = (MapView) mapFragmentView.findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(true);
         map.setMultiTouchControls(true);
-        IMapController mapController = map.getController();
-        mapController.setZoom(17);
-        GeoPoint startPoint = new GeoPoint(51.22049, 6.79202);
-        // GeoPoint startPoint = new GeoPoint(50.95863, 6.94487);
-        mapController.setCenter(startPoint);
 
         // add Overlay for POIs
-        addPOIs(map);
+        switchTour(map, data.getCurrentTour());
 
         // add Overlay for current location
         addCurrentLocation(map);
@@ -130,13 +140,13 @@ public class MapFragment extends Fragment {
         myLocationOverlay.enableMyLocation();
     }
 
-    private void addPOIs(MapView map) {
+    private List<Marker> makeTourMarkers(MapView map, Tour tour) {
         List<Marker> markers = new ArrayList<>();
 
         // custom info window for markers
         MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
 
-        for (Mapstop mapstop : data.getMapstops()) {
+        for (Mapstop mapstop : tour.getMapstops()) {
             Marker marker = new Marker(map);
             GeoPoint geoPoint = mapstop.getPlace().getLocation();
             marker.setPosition(geoPoint);
@@ -145,13 +155,38 @@ public class MapFragment extends Fragment {
 
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             marker.setIcon(ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.map_marker_icon_blue_small));
-
             marker.setInfoWindow(window);
 
             markers.add(marker);
         }
 
-        map.getOverlays().addAll(markers);
+        return markers;
+    }
+
+    private List<IGeoPoint> getPointsFromMarkers(List<Marker> markers) {
+        final List<IGeoPoint> result = new ArrayList<>();
+        for (Marker marker : markers) {
+            result.add((marker.getPosition()));
+        }
+        return result;
+    }
+
+    private void updateTourMarkers(MapView map, List<Marker> newMarkers) {
+        if (tourMarkers != null) {
+            map.getOverlays().removeAll(tourMarkers);
+        }
+
+        tourMarkers = newMarkers;
+        map.getOverlays().addAll(tourMarkers);
+    }
+
+    private void switchTour(MapView map, Tour tour) {
+        List<Marker> markers = makeTourMarkers(map, tour);
+        updateTourMarkers(map, markers);
+        BoundingBox box = BoundingBox.fromGeoPoints(getPointsFromMarkers(markers));
+        IMapController mapController = map.getController();
+        mapController.setCenter(box.getCenter());
+        mapController.setZoom(17);
     }
 
     /**
@@ -212,9 +247,25 @@ public class MapFragment extends Fragment {
         showAsPopup(mapstopLayout);
     }
 
+    public void showTourSelection(Area area) {
+        ListView listView = (ListView) getActivity().getLayoutInflater().inflate(R.layout.tour_list, null);
+        List<Tour> tourData = area.getTours();
+        Tour[] tours = tourData.toArray(new Tour[tourData.size()]);
+        TourArrayAdapter toursAdapter = new TourArrayAdapter(getContext(), tours);
+        listView.setAdapter(toursAdapter);
+        final PopupWindow popupWindow = showAsPopup(listView);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Tour tour = (Tour) parent.getItemAtPosition(position);
+                switchTour(map, tour);
+                popupWindow.dismiss();
+            }
+        });
+    }
 
     // this displays a view as a popup over the map
-    private void showAsPopup(View view) {
+    private PopupWindow showAsPopup(View view) {
         // determine size for the popup
         int width = (int) (mapFragmentView.getWidth() * POPUP_WIDTH);
         int height = (int) (mapFragmentView.getHeight() * POPUP_HEIGHT);
@@ -242,6 +293,7 @@ public class MapFragment extends Fragment {
 
         // give the popup window a listener to undim the background if dismissed
         popupWindow.setOnDismissListener(new MapFragmentPopupOnDismissListener());
+        return popupWindow;
     }
 
     // a listener to change un-dim the map on dismissing a popup
@@ -250,8 +302,6 @@ public class MapFragment extends Fragment {
             mapFragmentView.getForeground().setAlpha(0);
         }
     }
-
-
 
     /**
      * This interface must be implemented by activities that contain this

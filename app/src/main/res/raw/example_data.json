@@ -12,7 +12,7 @@
           "tag_when": "2017",
           "tag_where": "Hauptbahnhof",
           "created_at": 1484092800,
-          "accessibility": "unklar",
+          "accessibility": "nicht barrierefrei",
           "author": "David Neugebauer",
           "mapstops": [
             {
@@ -41,6 +41,24 @@
           "accessibility": "barrierefrei",
           "author": "Jan Niko Kirschbaum",
           "mapstops": [
+            {
+              "id": 31,
+              "text": "Ein Posten ist vakant",
+              "location_id": 31,
+              "page_amount": 3
+            },
+            {
+              "id": 32,
+              "text": "Heine-Denkmal (2012)",
+              "location_id": 32,
+              "page_amount": 1
+            },
+            {
+              "id": 33,
+              "text": "Ein nachdenklicher Mann",
+              "location_id": 33,
+              "page_amount": 2
+            }
           ]
         }
       ],
@@ -56,6 +74,24 @@
           "name": "Eine Kreuzung?",
           "lat": 51.22067,
           "lon": 6.78990
+        },
+        {
+          "id": 31,
+          "name": "Ort an der Uni 1",
+          "lat": 51.191180,
+          "lon": 6.793582
+        },
+        {
+          "id": 32,
+          "name": "Ort an der Uni 2",
+          "lat": 51.190430,
+          "lon": 6.793775
+        },
+        {
+          "id": 33,
+          "name": "Ort an der Uni 3",
+          "lat": 51.188801,
+          "lon": 6.794488
         }
       ]
     }
