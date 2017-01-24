@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,7 +34,6 @@ import java.util.logging.Logger;
 
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.Mapstop;
-import de.smarthistory.data.Tour;
 
 public class MainActivity extends AppCompatActivity
         implements MapFragment.OnMapFragmentInteractionListener,
@@ -45,15 +45,15 @@ public class MainActivity extends AppCompatActivity
 
     private Mapstop currentMapstop;
 
+    private static final String MAP_FRAGMENT_TAG = "map_fragment";
+    private static final String EXPLORE_FRAGMENT_TAG = "explore_data_fragment";
+
     // variables to interact with the main menu in the navigation drawer
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
 
     // the main toolbar that is set up as the action bar
     private Toolbar mainToolbar;
-
-    // map fragment that handles the main map displayed on startup
-    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,20 +81,46 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            mapFragment = new MapFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.main_fragment_container, mapFragment).commit();
+            switchMainFragmentToMap();
         }
     }
 
-    private void switchMainFragmentTo(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+    private MapFragment switchMainFragmentToMap() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-        // replace and ensure that the user can navigate back if she wants to
-        transaction.replace(R.id.main_fragment_container, fragment);
+        // look, if there is a main map fragment already, create a new one if there isn't
+        MapFragment mapFragment = (MapFragment) fragmentManager.findFragmentByTag(MAP_FRAGMENT_TAG);
+        if (mapFragment == null) {
+            mapFragment = new MapFragment();
+        }
+
+        // replace the fragment and add to the transaction to the back stack to be able to switch
+        // to it later
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.main_fragment_container, mapFragment, MAP_FRAGMENT_TAG);
         transaction.addToBackStack(null);
-
         transaction.commit();
+
+        return mapFragment;
+    }
+
+    private ExploreDataFragment switchMainFragmentToExploreData() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        // look, if there is a main map fragment already, create a new one if there isn't
+        ExploreDataFragment exploreFragment = (ExploreDataFragment) fragmentManager.findFragmentByTag(EXPLORE_FRAGMENT_TAG);
+        if (exploreFragment == null) {
+            exploreFragment = new ExploreDataFragment();
+        }
+
+        // replace the fragment and add to the transaction to the back stack to be able to switch
+        // to it later
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.main_fragment_container, exploreFragment, EXPLORE_FRAGMENT_TAG);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+        return exploreFragment;
     }
 
 
@@ -273,12 +299,12 @@ public class MainActivity extends AppCompatActivity
     // empty mehtod to be filled with code for when drawer Item is clicked
     private void selectItem(int position) {
         if (position == 1) {
-            switchMainFragmentTo(mapFragment);
+            MapFragment mapFragment = switchMainFragmentToMap();
             mapFragment.showTourSelection(data.getCurrentArea());
             mDrawerLayout.closeDrawers();
         } else if (position == 2) {
             Fragment exploreDataFragment = new ExploreDataFragment();
-            switchMainFragmentTo(exploreDataFragment);
+            switchMainFragmentToExploreData();
             mDrawerLayout.closeDrawers();
         } else {
             Toast.makeText(this, "Selected: " + position, Toast.LENGTH_SHORT).show();
