@@ -7,8 +7,15 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.Tour;
 
 
 /**
@@ -16,31 +23,15 @@ import android.widget.TabHost.TabSpec;
  * Activities that contain this fragment must implement the
  * {@link OnExploreDataFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link ExploreDataFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class ExploreDataFragment extends Fragment {
 
-    class TabConfig {
-        String name;
-        int viewId;
-
-        TabConfig(String name, int viewId) {
-            this.name = name;
-            this.viewId = viewId;
-        }
-    }
-
-    private TabConfig[] tabConfigs = {
-            new TabConfig("Touren", R.id.tab1),
-            new TabConfig("Mapstops A-Z", R.id.tab2),
-            new TabConfig("Lexikon", R.id.tab3)
-    };
+    private DataFacade data;
 
     private OnExploreDataFragmentInteractionListener mListener;
 
     public ExploreDataFragment() {
-        // Required empty public constructor
+        this.data = DataFacade.getInstance();
     }
 
     @Override
@@ -54,15 +45,33 @@ public class ExploreDataFragment extends Fragment {
         // inflate the layout for this fragment
         View result = inflater.inflate(R.layout.fragment_explore_data, container, false);
 
+        // setup the tab host
         TabHost tabHost = (TabHost) result.findViewById(R.id.tabHost);
         tabHost.setup();
 
-        for (TabConfig tabConfig : tabConfigs) {
-            TabSpec tabSpec = tabHost.newTabSpec(tabConfig.name);
-            tabSpec.setContent(tabConfig.viewId);
-            tabSpec.setIndicator(tabConfig.name);
-            tabHost.addTab(tabSpec);
-        }
+        // Tab1: Lexikon
+        TabSpec tabSpec1 = tabHost.newTabSpec("Lexikon");
+        tabSpec1.setContent(R.id.tab1);
+        tabSpec1.setIndicator("Lexikon");
+        tabHost.addTab(tabSpec1);
+
+        // Tab2: Lesezeichen
+        TabSpec tabSpec2 = tabHost.newTabSpec("Lesezeichen");
+        tabSpec2.setContent(R.id.tab2);
+        tabSpec2.setIndicator("Lesezeichen");
+        tabHost.addTab(tabSpec2);
+
+        // Tab3: Touren
+        TabSpec tabSpec3 = tabHost.newTabSpec("Touren");
+        tabSpec3.setContent(R.id.tab3);
+        tabSpec3.setIndicator("Touren");
+        tabHost.addTab(tabSpec3);
+
+        List<Tour> tourData = data.getCurrentArea().getTours();
+        Tour[] tours = tourData.toArray(new Tour[tourData.size()]);
+        TourArrayAdapter toursAdapter = new TourArrayAdapter(getContext(), tours);
+        ListView tourList = (ListView) result.findViewById(R.id.tour_list);
+        tourList.setAdapter(toursAdapter);
 
         return result;
     }

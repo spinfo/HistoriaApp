@@ -5,6 +5,15 @@
       "tours": [
         {
           "name": "Example Tour",
+          "type": "Rundgang",
+          "walk_length": 350,
+          "duration": 20,
+          "tag_what": "Examples",
+          "tag_when": "2017",
+          "tag_where": "Hauptbahnhof",
+          "created_at": 1484092800,
+          "accessibility": "unklar",
+          "author": "David Neugebauer",
           "mapstops": [
             {
               "id": 1,
@@ -18,6 +27,20 @@
               "location_id": 2,
               "page_amount": 2
             }
+          ]
+        },
+        {
+          "name": "Heinrich-Heine-Denkmäler der Universität Düsseldorf",
+          "type": "Spaziergang",
+          "walk_length": 280,
+          "duration": 10,
+          "tag_what": "Heinrich Heine",
+          "tag_when": "1994-2012",
+          "tag_where": "Campus Universität",
+          "created_at": 1485820800,
+          "accessibility": "barrierefrei",
+          "author": "Jan Niko Kirschbaum",
+          "mapstops": [
           ]
         }
       ],

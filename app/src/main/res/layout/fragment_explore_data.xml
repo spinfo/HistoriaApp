@@ -52,11 +52,10 @@
             android:orientation="vertical"
             android:paddingTop="60dp"
             >
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="100dp"
-                android:id="@+id/txt3"
-                />
+            <ListView
+                android:id="@+id/tour_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
         </LinearLayout>
     </FrameLayout>

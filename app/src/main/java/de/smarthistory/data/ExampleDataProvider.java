@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +86,17 @@ class ExampleDataProvider {
                     JsonObject jTour = jTours.get(j).getAsJsonObject();
 
                     List<Mapstop> tourMapstops = new ArrayList<>();
-
                     JsonArray jMapstops = jTour.getAsJsonArray("mapstops");
+
+                    Tour.Type tourType = Tour.Type.valueOf(jTour.get("type").getAsString());
+                    int walkLength = jTour.get("walk_length").getAsInt();
+                    int duration = jTour.get("duration").getAsInt();
+                    String tagWhat = jTour.get("tag_what").getAsString();
+                    String tagWhen = jTour.get("tag_when").getAsString();
+                    String tagWhere = jTour.get("tag_where").getAsString();
+                    Date createdAt = new Date(jTour.get("created_at").getAsLong());
+                    String accessibility = jTour.get("accessibility").getAsString();
+                    String author = jTour.get("author").getAsString();
 
                     for (int k = 0; k < jMapstops.size(); k++) {
                         JsonObject jMapstop = jMapstops.get(k).getAsJsonObject();
@@ -104,7 +114,7 @@ class ExampleDataProvider {
                         LOGGER.info("Mapstop " + pid + ": " + mapstop.getPlace().getName() + ", " + mapstop.getText());
                     }
 
-                    Tour tour = new Tour(jTour.get("name").getAsString(), tourMapstops);
+                    Tour tour = new Tour(jTour.get("name").getAsString(), tourMapstops, tourType, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author);
                     tours.add(tour);
                 }
 

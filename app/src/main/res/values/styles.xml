@@ -12,4 +12,12 @@
         <item name="android:textColorPrimary">#FFFFFF</item>
         <item name="android:textColorSecondary">#EEEEEE</item>
     </style>
+
+    <!-- Style for text views in lists -->
+    <style name="listViewTextItem">
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingRight">6dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+    </style>
 </resources>
