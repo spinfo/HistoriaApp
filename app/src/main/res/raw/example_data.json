@@ -6,6 +6,7 @@
         {
           "name": "Example Tour",
           "type": "Rundgang",
+          "id": 1,
           "walk_length": 350,
           "duration": 20,
           "tag_what": "Examples",
@@ -32,6 +33,7 @@
         {
           "name": "Heinrich-Heine-Denkmäler der Universität Düsseldorf",
           "type": "Spaziergang",
+          "id": 2,
           "walk_length": 280,
           "duration": 10,
           "tag_what": "Heinrich Heine",

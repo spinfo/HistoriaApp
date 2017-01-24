@@ -38,6 +38,8 @@ class ExampleDataProvider {
 
     private Map<Long, Mapstop> mapstopsById = new HashMap<>();
 
+    private Map<Long, Tour> toursById = new HashMap<>();
+
     private Area currentArea;
 
     private Tour currentTour;
@@ -89,6 +91,7 @@ class ExampleDataProvider {
                     JsonArray jMapstops = jTour.getAsJsonArray("mapstops");
 
                     Tour.Type tourType = Tour.Type.valueOf(jTour.get("type").getAsString());
+                    long tourId = jTour.get("id").getAsLong();
                     int walkLength = jTour.get("walk_length").getAsInt();
                     int duration = jTour.get("duration").getAsInt();
                     String tagWhat = jTour.get("tag_what").getAsString();
@@ -114,8 +117,9 @@ class ExampleDataProvider {
                         LOGGER.info("Mapstop " + pid + ": " + mapstop.getPlace().getName() + ", " + mapstop.getText());
                     }
 
-                    Tour tour = new Tour(jTour.get("name").getAsString(), tourMapstops, tourType, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author);
+                    Tour tour = new Tour(jTour.get("name").getAsString(), tourMapstops, tourType, tourId, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author);
                     tours.add(tour);
+                    toursById.put(tourId, tour);
                 }
 
                 Area area = new Area(jArea.get("name").getAsString(), tours);
@@ -146,6 +150,10 @@ class ExampleDataProvider {
     protected Area getCurrentArea() { return currentArea; }
 
     protected Tour getCurrentTour() { return currentTour; }
+
+    protected Tour getTourById(long id) {
+        return toursById.get(id);
+    }
 
     protected String getPageUriForMapstop(Mapstop mapstop, Integer pageNo) {
         String path = EXAMPLE_PAGE_FILE_TEMPLATE.replaceFirst("mapstopno", mapstop.getId().toString());

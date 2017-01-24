@@ -45,4 +45,6 @@ public class DataFacade {
         return dataProvider.getPageUriForMapstop(mapstop, pageNo);
     }
 
+    public Tour getTourById(long id) { return dataProvider.getTourById(id); }
+
 }

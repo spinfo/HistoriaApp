@@ -1,7 +1,7 @@
 package de.smarthistory;
 
 import android.content.Context;
-import android.graphics.Canvas;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,26 +19,22 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.BoundingBox;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Overlay;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.MapUtil;
 import de.smarthistory.data.Mapstop;
 import de.smarthistory.data.Tour;
 
@@ -54,15 +50,15 @@ public class MapFragment extends Fragment {
 
     private DataFacade data = DataFacade.getInstance();
 
-    // the principle map view
-    private MapView map;
+    // the state of the map this fragment handles can be saved/restored via this object
+    private MapStatePersistence.MapState state;
 
     // the view that this will instantiate, has to be a FrameLayout for us to be able to dim
     // the map on creating a popup
     private FrameLayout mapFragmentView;
 
-    // the last markers put on the map
-    private List<Marker> tourMarkers;
+    // a simple cache for tour markers used by this map
+    private Map<Tour, List<Marker>> tourMarkerCache = new HashMap<>();
 
     // dimensions for popups over the map
     // TODO put in some config for changeability on different screen types
@@ -91,20 +87,35 @@ public class MapFragment extends Fragment {
         // be fully visible
         mapFragmentView.getForeground().setAlpha(0);
 
-        // set up the map to use
-        map = (MapView) mapFragmentView.findViewById(R.id.map);
-        map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setBuiltInZoomControls(true);
-        map.setMultiTouchControls(true);
+        // initialize the state of this fragment with a new map
+        // TODO: save some of these in bundle if possible
+        state = new MapStatePersistence.MapState();
+        state.map = (MapView) mapFragmentView.findViewById(R.id.map);
+        tourMarkerCache = new HashMap<>();
+        MapUtil.setMapDefaults(state.map);
 
-        // add Overlay for POIs
-        switchTour(map, data.getCurrentTour());
+        // initialize from saved preferences or else start with the default tour
+        try {
+            MapStatePersistence.load(state, getPrefs());
+            switchTour(state.map, state.currentTour);
+            LOGGER.info("Loaded state from prefs.");
+        } catch (MapStatePersistence.InconsistentMapStateException e) {
+            LOGGER.info("Could not load map state. Will use defaults. Message: " + e.message);
+            switchTour(state.map, data.getCurrentTour());
+            MapUtil.zoomToMarkers(state.map, tourMarkerCache.get(data.getCurrentTour()));
+        }
 
         // add Overlay for current location
-        addCurrentLocation(map);
+        addCurrentLocation(state.map);
 
         // return the container for the map view
         return mapFragmentView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MapStatePersistence.save(state, getPrefs());
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -131,6 +142,11 @@ public class MapFragment extends Fragment {
         mListener = null;
     }
 
+    // Convenience method to get SharedPreferences in a standard way
+    private SharedPreferences getPrefs() {
+        return getActivity().getPreferences(Context.MODE_PRIVATE);
+    }
+
 
     private void addCurrentLocation(MapView map) {
         GpsMyLocationProvider locationProvider = new GpsMyLocationProvider(getContext());
@@ -140,16 +156,19 @@ public class MapFragment extends Fragment {
         myLocationOverlay.enableMyLocation();
     }
 
-    private List<Marker> makeTourMarkers(MapView map, Tour tour) {
+    private List<Marker> getOrMakeTourMarkers(MapView map, Tour tour) {
+        if (tourMarkerCache.containsKey(tour)) {
+            return tourMarkerCache.get(tour);
+        }
         List<Marker> markers = new ArrayList<>();
 
-        // custom info window for markers
+        // markers have a custom info window
         MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
 
         for (Mapstop mapstop : tour.getMapstops()) {
             Marker marker = new Marker(map);
-            GeoPoint geoPoint = mapstop.getPlace().getLocation();
-            marker.setPosition(geoPoint);
+
+            marker.setPosition(mapstop.getPlace().getLocation());
             marker.setTitle(mapstop.getPlace().getName());
             marker.setRelatedObject(mapstop);
 
@@ -159,34 +178,26 @@ public class MapFragment extends Fragment {
 
             markers.add(marker);
         }
-
+        tourMarkerCache.put(tour, markers);
         return markers;
     }
 
-    private List<IGeoPoint> getPointsFromMarkers(List<Marker> markers) {
-        final List<IGeoPoint> result = new ArrayList<>();
-        for (Marker marker : markers) {
-            result.add((marker.getPosition()));
-        }
-        return result;
-    }
+    // switch the current tour by getting/creating markers. Return those markers.
+    private List<Marker> switchTour(MapView map, Tour tour) {
+        List<Marker> markers;
 
-    private void updateTourMarkers(MapView map, List<Marker> newMarkers) {
-        if (tourMarkers != null) {
-            map.getOverlays().removeAll(tourMarkers);
+        // remove old markers
+        if (state.currentTour != null) {
+            markers = getOrMakeTourMarkers(state.map, state.currentTour);
+            map.getOverlays().removeAll(markers);
         }
 
-        tourMarkers = newMarkers;
-        map.getOverlays().addAll(tourMarkers);
-    }
+        // add new markers
+        markers = getOrMakeTourMarkers(state.map, tour);
+        map.getOverlays().addAll(markers);
+        state.currentTour = tour;
 
-    private void switchTour(MapView map, Tour tour) {
-        List<Marker> markers = makeTourMarkers(map, tour);
-        updateTourMarkers(map, markers);
-        BoundingBox box = BoundingBox.fromGeoPoints(getPointsFromMarkers(markers));
-        IMapController mapController = map.getController();
-        mapController.setCenter(box.getCenter());
-        mapController.setZoom(17);
+        return markers;
     }
 
     /**
@@ -258,7 +269,8 @@ public class MapFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Tour tour = (Tour) parent.getItemAtPosition(position);
-                switchTour(map, tour);
+                List<Marker> markers = switchTour(state.map, tour);
+                MapUtil.zoomToMarkers(state.map, markers);
                 popupWindow.dismiss();
             }
         });

@@ -10,6 +10,8 @@ public class Tour {
 
     public enum Type { Rundgang, Spaziergang };
 
+    private long id;
+
     private String name;
 
     private List<Mapstop> mapstops;
@@ -28,10 +30,11 @@ public class Tour {
 
     private String author;
 
-    public Tour(String name, List<Mapstop> mapstops, Type type, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author) {
+    public Tour(String name, List<Mapstop> mapstops, Type type, long id, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author) {
         this.name = name;
         this.mapstops = mapstops;
         this.type = type;
+        this.id = id;
         this.walkLength = walkLength;
         this.duration = duration;
         this.tagWhat = tagWhat;
@@ -52,6 +55,10 @@ public class Tour {
 
     public Type getType() {
         return type;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public int getWalkLength() {
