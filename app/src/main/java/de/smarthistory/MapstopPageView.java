@@ -2,13 +2,18 @@
 package de.smarthistory;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.webkit.WebView;
-import android.widget.Toast;
+import android.webkit.WebViewClient;
+
+import de.smarthistory.data.UrlSchemes;
 
 public class MapstopPageView extends WebView {
+
+    private boolean showsLexiconArticle = false;
 
     interface PageChangeListener {
         void changePage(int offset);
@@ -38,6 +43,20 @@ public class MapstopPageView extends WebView {
     private void init(Context context) {
         this.context = context;
         this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
+        this.setWebViewClient(new WebViewClient() {
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url != null && url.startsWith(UrlSchemes.LEXICON)) {
+                    String newUrl = url.replace(UrlSchemes.LEXICON, UrlSchemes.PREFIX_FILES);
+                    Intent intent = new Intent(getContext(), SimpleWebViewActivity.class);
+                    intent.putExtra(getResources().getString(R.string.extra_key_url), newUrl);
+                    getContext().startActivity(intent);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override

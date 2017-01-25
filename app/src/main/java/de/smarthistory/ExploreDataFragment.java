@@ -1,20 +1,24 @@
 package de.smarthistory;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.LexiconEntry;
 import de.smarthistory.data.Tour;
 
 
@@ -54,6 +58,25 @@ public class ExploreDataFragment extends Fragment {
         tabSpec1.setContent(R.id.tab1);
         tabSpec1.setIndicator("Lexikon");
         tabHost.addTab(tabSpec1);
+
+        ArrayList<Object> lexData = LexiconAdapter.makeData(data.getLexicon());
+        LexiconAdapter lexiconAdapter = new LexiconAdapter(getContext(), lexData);
+        ListView lexiconList = (ListView) result.findViewById(R.id.lexicon_list);
+        lexiconList.setAdapter(lexiconAdapter);
+        lexiconList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object obj = parent.getItemAtPosition(position);
+                // only react to click on lexicon entries by showing the activity, else do nothing
+                if (LexiconEntry.class.equals(obj.getClass())) {
+                    Intent intent = new Intent(getActivity(), SimpleWebViewActivity.class);
+                    final long entryId = ((LexiconEntry) obj).getId();
+                    final String url = data.getLexiconEntryUri(entryId);
+                    intent.putExtra(getResources().getString(R.string.extra_key_url), url);
+                    getActivity().startActivity(intent);
+                }
+            }
+        });
 
         // Tab2: Lesezeichen
         TabSpec tabSpec2 = tabHost.newTabSpec("Lesezeichen");

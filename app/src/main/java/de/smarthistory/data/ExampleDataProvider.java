@@ -6,12 +6,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,9 +24,9 @@ class ExampleDataProvider {
 
     private static final String EXAMPLE_DATA_FILE = "res/raw/example_data.json";
 
-    private static final String EXAMPLE_PAGE_FILE_TEMPLATE = "file:///android_asset/mmapstopno_ppageno.html";
+    private static final String EXAMPLE_PAGE_FILE_TEMPLATE = UrlSchemes.PREFIX_FILES + "/mmapstopno_ppageno.html";
 
-    private static final String EXAMPLE_PAGES_ERROR_PAGE = "file:///android_asset/error.html";
+    private static final String EXAMPLE_LEXENTRY_FILE_TEMPLATE = UrlSchemes.PREFIX_FILES + "/llexentryno.html";
 
     private List<Area> areas = new ArrayList<>();
 
@@ -43,6 +39,12 @@ class ExampleDataProvider {
     private Area currentArea;
 
     private Tour currentTour;
+
+    private Lexicon lexicon = new Lexicon();
+
+    private List<LexiconEntry> lexiconEntries = new ArrayList<>();
+
+    private Map<Long, LexiconEntry> lexiconEntriesById = new HashMap<>();
 
     protected ExampleDataProvider() {
 
@@ -126,6 +128,19 @@ class ExampleDataProvider {
                 this.areas.add(area);
             }
 
+
+            JsonArray jLexiconEntries = data.getAsJsonArray("lexicon");
+            for (int i = 0; i < jLexiconEntries.size(); i++) {
+                JsonObject jLexiconEntry = jLexiconEntries.get(i).getAsJsonObject();
+                long id = jLexiconEntry.get("id").getAsLong();
+                String entryTitle = jLexiconEntry.get("title").getAsString();
+
+                LexiconEntry entry = new LexiconEntry(id, entryTitle);
+                lexiconEntries.add(entry);
+                lexicon.addEntry(entry);
+                lexiconEntriesById.put(id, entry);
+            }
+
         } catch(Exception e) {
             LOGGER.severe("Error while reading example data: " + e.getLocalizedMessage());
             e.printStackTrace();
@@ -155,10 +170,25 @@ class ExampleDataProvider {
         return toursById.get(id);
     }
 
+    protected Lexicon getLexicon() {
+        return lexicon;
+    }
+
+    protected List<LexiconEntry> getLexiconEntries() {
+        return lexiconEntries;
+    }
+
+    protected LexiconEntry getLexiconEntryById(long id) {
+        return lexiconEntriesById.get(id);
+    }
+
     protected String getPageUriForMapstop(Mapstop mapstop, Integer pageNo) {
         String path = EXAMPLE_PAGE_FILE_TEMPLATE.replaceFirst("mapstopno", mapstop.getId().toString());
         path = path.replaceFirst("pageno", pageNo.toString());
         return path;
     }
 
+    public String getLexiconEntryUri(long lexiconEntryId) {
+        return EXAMPLE_LEXENTRY_FILE_TEMPLATE.replaceFirst("lexentryno", "" + lexiconEntryId);
+    }
 }

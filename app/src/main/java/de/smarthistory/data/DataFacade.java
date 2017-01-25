@@ -45,6 +45,21 @@ public class DataFacade {
         return dataProvider.getPageUriForMapstop(mapstop, pageNo);
     }
 
+    public String getLexiconEntryUri(long lexiconEntryId) {
+        return dataProvider.getLexiconEntryUri(lexiconEntryId);
+    }
+
     public Tour getTourById(long id) { return dataProvider.getTourById(id); }
 
+    public Lexicon getLexicon() {
+        return dataProvider.getLexicon();
+    }
+
+    public List<LexiconEntry> getLexiconEntries() {
+        return dataProvider.getLexiconEntries();
+    }
+
+    public LexiconEntry getLexiconEntryById(long id) {
+        return dataProvider.getLexiconEntryById(id);
+    }
 }

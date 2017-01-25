@@ -3,6 +3,7 @@
 
     <!-- Real string resources start here -->
     <string name="extra_key_mapstop">mapstop</string>
+    <string name="extra_key_url">url</string>
 
     <!-- Strings for the menu -->
     <string name="menu_title">Menü</string>
