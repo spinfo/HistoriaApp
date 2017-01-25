@@ -18,13 +18,15 @@
           "mapstops": [
             {
               "id": 1,
-              "text": "Anscheinend eine Grünfläche nahe des Bahnhofs.",
+              "title": "Grünfläche",
+              "short_description": "Anscheinend eine Grünfläche",
               "location_id": 1,
               "page_amount": 2
             },
             {
               "id": 2,
-              "text": "Irgendeine Kreuzung beim Bahnhof?",
+              "title": "Kreuzung",
+              "short_description": "Irgendeine Kreuzung ...",
               "location_id": 2,
               "page_amount": 2
             }
@@ -45,19 +47,22 @@
           "mapstops": [
             {
               "id": 31,
-              "text": "Ein Posten ist vakant",
+              "title": "Ein Posten ist vakant",
+              "short_description": "Gedenksteine Heinrich Heine",
               "location_id": 31,
               "page_amount": 3
             },
             {
               "id": 32,
-              "text": "Heine-Denkmal (2012)",
+              "title": "Heine-Denkmal (2012)",
+              "short_description": "Das Heine-Denkmal des ...",
               "location_id": 32,
               "page_amount": 1
             },
             {
               "id": 33,
-              "text": "Ein nachdenklicher Mann",
+              "title": "Heinrich-Heine-Denkmal (1994)",
+              "short_description": "Ein nachdenklicher Mann",
               "location_id": 33,
               "page_amount": 2
             }

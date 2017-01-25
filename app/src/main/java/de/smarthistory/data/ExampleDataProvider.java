@@ -106,17 +106,16 @@ class ExampleDataProvider {
                     for (int k = 0; k < jMapstops.size(); k++) {
                         JsonObject jMapstop = jMapstops.get(k).getAsJsonObject();
 
-                        String text = jMapstop.get("text").getAsString();
+                        String mapstopTitle = jMapstop.get("title").getAsString();
+                        String mapstopDesc = jMapstop.get("short_description").getAsString();
                         int pid = jMapstop.get("location_id").getAsInt();
                         long mid = jMapstop.get("id").getAsLong();
                         int pageAmount = jMapstop.get("page_amount").getAsInt();
 
-                        Mapstop mapstop = new Mapstop(mid, placeMap.get(pid), text, pageAmount);
+                        Mapstop mapstop = new Mapstop(mid, placeMap.get(pid), mapstopTitle, mapstopDesc, pageAmount);
                         tourMapstops.add(mapstop);
                         this.mapstops.add(mapstop);
                         this.mapstopsById.put(mid, mapstop);
-
-                        LOGGER.info("Mapstop " + pid + ": " + mapstop.getPlace().getName() + ", " + mapstop.getText());
                     }
 
                     Tour tour = new Tour(jTour.get("name").getAsString(), tourMapstops, tourType, tourId, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author);

@@ -1,7 +1,5 @@
 package de.smarthistory.data;
 
-import java.io.Serializable;
-
 /**
  * Data object for a Mapstop which is part of a Tour and has a place.
  */
@@ -11,14 +9,17 @@ public class Mapstop {
 
     private final Place place;
 
-    private final String text;
+    private final String title;
+
+    private final String shortDescription;
 
     private int pageAmount;
 
-    public Mapstop(long id, Place place, String text, int pageAmount) {
+    public Mapstop(long id, Place place, String title, String shortDescription, int pageAmount) {
         this.id = id;
         this.place = place;
-        this.text = text;
+        this.title = title;
+        this.shortDescription = shortDescription;
         this.pageAmount = pageAmount;
     }
 
@@ -28,8 +29,12 @@ public class Mapstop {
         return place;
     }
 
-    public String getText() {
-        return text;
+    public String getTitle() {
+        return title;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
     }
 
     public int getPageAmount() { return pageAmount; }
