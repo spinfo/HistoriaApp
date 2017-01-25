@@ -285,10 +285,9 @@ public class MainActivity extends AppCompatActivity
     private String[] getNavDrawerTitles() {
         final Resources res = getResources();
         String[] result = {
-                res.getString(R.string.menu_current_area) + " " + data.getCurrentArea().getName(),
-                res.getString(R.string.menu_current_tour) + " " + data.getCurrentTour().getName(),
-                res.getString(R.string.menu_all_data),
-                getResources().getString(R.string.menu_download_data),
+                res.getString(R.string.menu_select_area),
+                res.getString(R.string.menu_select_tour),
+                res.getString(R.string.menu_explore_data),
                 res.getString(R.string.menu_options_general),
                 res.getString(R.string.menu_about)
         };

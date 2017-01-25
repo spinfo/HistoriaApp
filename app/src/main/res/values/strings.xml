@@ -7,13 +7,10 @@
 
     <!-- Strings for the menu -->
     <string name="menu_title">Menü</string>
-    <string name="menu_current_area">Gebiet: </string>
-    <string name="menu_current_tour">Tour: </string>
-    <string name="menu_all_data">Meine Touren und Gebiete </string>
-    <string name="menu_download_data">Touren herunterladen</string>
+    <string name="menu_select_area">Karte wechseln</string>
+    <string name="menu_select_tour">Touren wählen</string>
+    <string name="menu_explore_data">Lesemodus</string>
     <string name="menu_options_general">Optionen</string>
     <string name="menu_about">Über uns</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
