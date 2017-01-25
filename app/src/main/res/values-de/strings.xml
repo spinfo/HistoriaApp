@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">SmartHistory</string>
-    <string name="button_send">Senden</string>
-    <string name="edit_message">Nachricht eingeben</string>
-    <string name="button_fragments_example">Frags</string>
-    <string name="button_map">Karte</string>
-</resources>
