@@ -16,11 +16,6 @@ public abstract class MapStatePersistence {
 
     private static final Logger LOGGER = Logger.getLogger(MapStatePersistence.class.getName());
 
-    public static class MapState {
-        MapView map;
-        Tour currentTour;
-    }
-
     private static final String K_CENTER_LAT = "centerLat";
     private static final String K_CENTER_LON = "centerLon";
     private static final String K_ZOOM = "zoom";
@@ -28,7 +23,7 @@ public abstract class MapStatePersistence {
 
     private static final String[] KEYS = { K_CENTER_LAT, K_CENTER_LON, K_ZOOM, K_TOUR_ID };
 
-    public static void save(MapState state, SharedPreferences prefs) {
+    public static void save(MapFragment.MapState state, SharedPreferences prefs) {
         IGeoPoint center = state.map.getMapCenter();
 
         SharedPreferences.Editor editor = prefs.edit();
@@ -42,7 +37,7 @@ public abstract class MapStatePersistence {
     }
 
     // restores a MapState, will complain with an InconsistentMapStateException if a value is missing
-    public static void load(MapState state, SharedPreferences prefs) {
+    public static void load(MapFragment.MapState state, SharedPreferences prefs) {
         for (String key : KEYS) {
             if (!prefs.contains(key)) {
                 throw new InconsistentMapStateException("Map state without key '" + key + "'");

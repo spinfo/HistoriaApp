@@ -2,12 +2,15 @@ package de.smarthistory;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,6 +25,8 @@ import android.widget.TextView;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -44,6 +49,11 @@ import de.smarthistory.data.Tour;
  */
 public class MapFragment extends Fragment {
 
+    public static class MapState {
+        MapView map;
+        Tour currentTour;
+    }
+
     private Logger LOGGER = Logger.getLogger(MapFragment.class.getName());
 
     private OnMapFragmentInteractionListener mListener;
@@ -51,7 +61,7 @@ public class MapFragment extends Fragment {
     private DataFacade data = DataFacade.getInstance();
 
     // the state of the map this fragment handles can be saved/restored via this object
-    private MapStatePersistence.MapState state;
+    private MapState state;
 
     // the view that this will instantiate, has to be a FrameLayout for us to be able to dim
     // the map on creating a popup
@@ -89,10 +99,24 @@ public class MapFragment extends Fragment {
 
         // initialize the state of this fragment with a new map
         // TODO: save some of these in bundle if possible
-        state = new MapStatePersistence.MapState();
+        state = new MapState();
         state.map = (MapView) mapFragmentView.findViewById(R.id.map);
         tourMarkerCache = new HashMap<>();
         MapUtil.setMapDefaults(state.map);
+
+        // set the map up to close all info windows on a click by providing a custom touch overlay
+        Overlay touchOverlay = new Overlay() {
+            @Override
+            public void draw(Canvas c, MapView osmv, boolean shadow) {
+                // do nothing
+            }
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e, MapView mapView) {
+                InfoWindow.closeAllInfoWindowsOn(state.map);
+                return super.onSingleTapConfirmed(e, mapView);
+            }
+        };
+        state.map.getOverlays().add(touchOverlay);
 
         // initialize from saved preferences or else start with the default tour
         try {
