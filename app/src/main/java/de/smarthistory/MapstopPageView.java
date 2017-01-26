@@ -3,11 +3,19 @@ package de.smarthistory;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import de.smarthistory.data.UrlSchemes;
 

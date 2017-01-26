@@ -1,6 +1,8 @@
 package de.smarthistory;
 
 
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.widget.TextView;
 
 import java.util.Map;
@@ -42,8 +44,11 @@ public class MapstopPageLoader implements MapstopPageView.PageChangeListener {
 
     private void loadPage(int pageNo) {
         if (mapstop.hasPage(pageNo) && pageNo != currentPage) {
+            pageView.setWebChromeClient(new WebChromeClient());
+
             String url = DataFacade.getInstance().getPageUriForMapstop(mapstop, pageNo);
             pageView.loadUrl(url);
+
             currentPage = pageNo;
             pageIndicatorTextView.setText(currentPage + "/" + mapstop.getPageAmount());
         }
