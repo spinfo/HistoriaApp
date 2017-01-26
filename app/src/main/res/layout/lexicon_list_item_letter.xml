@@ -5,5 +5,4 @@
     android:layout_height="wrap_content"
     android:textColor="@android:color/holo_blue_dark"
     style="@style/listViewTextItem">
-
 </TextView>

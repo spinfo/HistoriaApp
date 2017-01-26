@@ -6,24 +6,15 @@
     style="@style/listViewTopItem">
 
     <TextView
-        android:id="@+id/tour_meta_name"
+        android:id="@+id/mapstop_meta_title_line"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:textColor="@android:color/holo_blue_dark"
         style="@style/listViewTextItem"
         />
 
     <TextView
-        android:id="@+id/tour_meta_essentials"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="italic"
-        style="@style/listViewTextItem"
-        />
-
-    <TextView
-        android:id="@+id/tour_meta_tags"
+        android:id="@+id/mapstop_meta_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/listViewTextItem"

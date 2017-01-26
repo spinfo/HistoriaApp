@@ -16,7 +16,7 @@ import de.smarthistory.data.Tour;
 
 public class TourArrayAdapter extends ArrayAdapter<Tour> {
 
-    Context context;
+    private final Context context;
 
     public TourArrayAdapter(Context context, Tour[] data) {
         super(context, 0, data);

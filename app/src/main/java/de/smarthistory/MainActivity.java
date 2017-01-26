@@ -41,9 +41,7 @@ import java.util.logging.Logger;
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.Mapstop;
 
-public class MainActivity extends AppCompatActivity
-        implements MapFragment.OnMapFragmentInteractionListener,
-            ExploreDataFragment.OnExploreDataFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity {
 
     private  static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
 
@@ -60,6 +58,11 @@ public class MainActivity extends AppCompatActivity
 
     // the main toolbar that is set up as the action bar
     private Toolbar mainToolbar;
+
+    // an interface for the Fragments created by this class
+    interface MainActivityFragment {
+        boolean reactToBackButtonPressed();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -271,18 +274,6 @@ public class MainActivity extends AppCompatActivity
         mDrawerToggle.syncState();
     }
 
-    // Empty method for interaction with the map fragment if needed
-    @Override
-    public void onMapFragmentInteraction(Uri uri) {
-        return;
-    }
-
-    // Empty method for interaction with the explore data fragment if needed
-    @Override
-    public void onExploreDataFragmentInteraction(Uri uri) {
-        return;
-    }
-
     // The click listner for ListView in the navigation drawer
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
@@ -319,6 +310,28 @@ public class MainActivity extends AppCompatActivity
         }
     }
     // END drawer menu
+
+    @Override
+    public void onBackPressed() {
+        // inform the current fragment of the back press and only get active if it wasn't handled
+        MainActivityFragment fragment = (MainActivityFragment) getVisibleFragment();
+        boolean fragmentReacted = fragment.reactToBackButtonPressed();
+        if (!fragmentReacted) {
+            super.onBackPressed();
+        }
+    }
+
+    public Fragment getVisibleFragment(){
+        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if(fragments != null){
+            for(Fragment fragment : fragments){
+                if(fragment != null && fragment.isVisible())
+                    return fragment;
+            }
+        }
+        return null;
+    }
 
     private void copyAssets() {
         AssetManager assetManager = getAssets();

@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -47,7 +46,7 @@ import de.smarthistory.data.Tour;
 /**
  * The fragment handling the map view
  */
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements MainActivity.MainActivityFragment {
 
     public static class MapState {
         MapView map;
@@ -55,8 +54,6 @@ public class MapFragment extends Fragment {
     }
 
     private Logger LOGGER = Logger.getLogger(MapFragment.class.getName());
-
-    private OnMapFragmentInteractionListener mListener;
 
     private DataFacade data = DataFacade.getInstance();
 
@@ -140,30 +137,6 @@ public class MapFragment extends Fragment {
     public void onPause() {
         super.onPause();
         MapStatePersistence.save(state, getPrefs());
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onMapFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnMapFragmentInteractionListener) {
-            mListener = (OnMapFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnMapFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     // Convenience method to get SharedPreferences in a standard way
@@ -284,7 +257,7 @@ public class MapFragment extends Fragment {
     }
 
     public void showTourSelection(Area area) {
-        ListView listView = (ListView) getActivity().getLayoutInflater().inflate(R.layout.tour_list, null);
+        ListView listView = (ListView) getActivity().getLayoutInflater().inflate(R.layout.tour_or_mapstop_list, null);
         List<Tour> tourData = area.getTours();
         Tour[] tours = tourData.toArray(new Tour[tourData.size()]);
         TourArrayAdapter toursAdapter = new TourArrayAdapter(getContext(), tours);
@@ -340,18 +313,9 @@ public class MapFragment extends Fragment {
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnMapFragmentInteractionListener {
-        // TODO: Update argument type and make useful
-        void onMapFragmentInteraction(Uri uri);
+
+    @Override
+    public boolean reactToBackButtonPressed() {
+        return false;
     }
 }
