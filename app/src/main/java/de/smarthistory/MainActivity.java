@@ -321,6 +321,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // TODO this will need changing once we have more than one visible fragment (e.g. on bigger devices)
     public Fragment getVisibleFragment(){
         FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
         List<Fragment> fragments = fragmentManager.getFragments();

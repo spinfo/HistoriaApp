@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- basic info on the tour -->
+    <include layout="@layout/tour_meta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- divider -->
+    <View
+        android:layout_height="1dp"
+        android:layout_width="match_parent"
+        android:background="@color/dividerColor" />
+
+    <!-- Mapstops as list with heading -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/name_mapstops"
+        style="@style/listViewTextItem"/>
+    <ListView
+        android:id="@+id/tour_intro_mapstop_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- divider -->
+    <View
+        android:layout_height="1dp"
+        android:layout_width="match_parent"
+        android:background="@color/dividerColor" />
+
+    <!-- Author and creation date -->
+    <TextView
+        android:id="@+id/tour_intro_from"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/listViewTextItem" />
+
+</LinearLayout>

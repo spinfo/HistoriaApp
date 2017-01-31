@@ -118,11 +118,11 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // initialize from saved preferences or else start with the default tour
         try {
             MapStatePersistence.load(state, getPrefs());
-            switchTour(state.map, state.currentTour);
+            switchTour(state.currentTour);
             LOGGER.info("Loaded state from prefs.");
         } catch (MapStatePersistence.InconsistentMapStateException e) {
             LOGGER.info("Could not load map state. Will use defaults. Message: " + e.message);
-            switchTour(state.map, data.getCurrentTour());
+            switchTour(data.getCurrentTour());
             MapUtil.zoomToMarkers(state.map, tourMarkerCache.get(data.getCurrentTour()));
         }
 
@@ -181,18 +181,18 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     // switch the current tour by getting/creating markers. Return those markers.
-    private List<Marker> switchTour(MapView map, Tour tour) {
+    private List<Marker> switchTour(Tour tour) {
         List<Marker> markers;
 
         // remove old markers
         if (state.currentTour != null) {
             markers = getOrMakeTourMarkers(state.map, state.currentTour);
-            map.getOverlays().removeAll(markers);
+            state.map.getOverlays().removeAll(markers);
         }
 
         // add new markers
         markers = getOrMakeTourMarkers(state.map, tour);
-        map.getOverlays().addAll(markers);
+        state.map.getOverlays().addAll(markers);
         state.currentTour = tour;
 
         return markers;
@@ -253,7 +253,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         MapstopPageLoader pageLoader = new MapstopPageLoader(mapstop, pageView, pageIndicatorView);
 
         // actually display the mapstop as a popup window
-        showAsPopup(mapstopLayout);
+        showAsPopup(mapstopLayout, false);
     }
 
     public void showTourSelection(Area area) {
@@ -262,26 +262,64 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         Tour[] tours = tourData.toArray(new Tour[tourData.size()]);
         TourArrayAdapter toursAdapter = new TourArrayAdapter(getContext(), tours);
         listView.setAdapter(toursAdapter);
-        final PopupWindow popupWindow = showAsPopup(listView);
+        final PopupWindow popupWindow = showAsPopup(listView, false);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Tour tour = (Tour) parent.getItemAtPosition(position);
-                List<Marker> markers = switchTour(state.map, tour);
-                MapUtil.zoomToMarkers(state.map, markers);
                 popupWindow.dismiss();
+                showTourIntro(tour);
+            }
+        });
+    }
+
+    public void showTourIntro(final Tour tour) {
+        View tourIntroView = getActivity().getLayoutInflater().inflate(R.layout.tour_intro, null, false);
+
+        // the tour intro reuses the tour meta view
+        View tourMetaView = tourIntroView.findViewById(R.id.tour_meta);
+        TourViewsHelper.injectTourDataIntoTourMetaView(tourMetaView, tour);
+
+        // the other two views are found and filled by the helper
+        TourViewsHelper.setMapstopMiniInfoAdapterForTourIntro(tourIntroView, tour);
+        TourViewsHelper.setFromTextInTourIntro(tourIntroView, tour);
+
+        // the whole introduction is shown as a dialog popup
+        final PopupWindow window = showAsPopup(tourIntroView, true);
+
+        // the ok buttons of the dialog popup switches to the selected tour
+        Button buttonOk = (Button) window.getContentView().findViewById(R.id.map_popup_dialog_button_ok);
+        buttonOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Marker> markers = switchTour(tour);
+                MapUtil.zoomToMarkers(state.map, markers);
+                window.dismiss();
+            }
+        });
+
+        // the cancel button opens the tour selection again
+        Button buttonCancel = (Button) window.getContentView().findViewById(R.id.map_popup_dialog_button_cancel);
+        buttonCancel.setText(getString(R.string.dialog_popup_back));
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                window.dismiss();
+                showTourSelection(data.getCurrentArea());
             }
         });
     }
 
     // this displays a view as a popup over the map
-    private PopupWindow showAsPopup(View view) {
+    private PopupWindow showAsPopup(View view, boolean asDialog) {
         // determine size for the popup
         int width = (int) (mapFragmentView.getWidth() * POPUP_WIDTH);
         int height = (int) (mapFragmentView.getHeight() * POPUP_HEIGHT);
 
-        // put the supplied view inside the popup view
+
         View popupContainer = getActivity().getLayoutInflater().inflate(R.layout.map_popup, null);
+
+        // put the supplied view inside the popup view
         RelativeLayout popupContent = (RelativeLayout) popupContainer.findViewById(R.id.map_popup_content);
         popupContent.addView(view);
 
@@ -303,6 +341,13 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // give the popup window a listener to undim the background if dismissed
         popupWindow.setOnDismissListener(new MapFragmentPopupOnDismissListener());
+
+        // remove dialog buttons if this is not supposed to be a dialog
+        if (!asDialog) {
+            View dialogButtonBar = popupContainer.findViewById(R.id.map_popup_dialog_buttons_bar);
+            ((ViewGroup)dialogButtonBar.getParent()).removeView(dialogButtonBar);
+        }
+
         return popupWindow;
     }
 

@@ -1,9 +1,13 @@
 <resources>
     <string name="app_name">SmartHistory</string>
 
-    <!-- Real string resources start here -->
+    <!-- Strings for bundle extra keys -->
     <string name="extra_key_mapstop_id">mapstop_id</string>
     <string name="extra_key_url">url</string>
+
+    <!-- General names -->
+    <string name="name_mapstop">Station</string>
+    <string name="name_mapstops">Stationen</string>
 
     <!-- Strings for the menu -->
     <string name="menu_title">Menü</string>
@@ -13,4 +17,8 @@
     <string name="menu_options_general">Optionen</string>
     <string name="menu_about">Über uns</string>
 
+    <!-- Strings for the dialog popup -->
+    <string name="dialog_popup_ok">OK</string>
+    <string name="dialog_popup_cancel">Abbrechen</string>
+    <string name="dialog_popup_back">Zurück</string>
 </resources>

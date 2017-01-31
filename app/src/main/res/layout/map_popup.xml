@@ -20,6 +20,36 @@
         android:id="@+id/map_popup_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/map_popup_dismiss" />
+        android:layout_below="@+id/map_popup_dismiss"
+        android:layout_above="@+id/map_popup_dialog_buttons_bar"/>
+
+    <!-- This dialog bar with two buttons is programmatically removed if the popup is not a dialog style popup -->
+    <LinearLayout
+        android:id="@+id/map_popup_dialog_buttons_bar"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        style="?android:attr/buttonBarStyle">
+
+        <Button
+            android:id="@+id/map_popup_dialog_button_cancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="@string/dialog_popup_cancel"
+            style="?android:attr/buttonBarButtonStyle"/>
+
+        <Button
+            android:id="@+id/map_popup_dialog_button_ok"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="@string/dialog_popup_ok"
+            style="?android:attr/buttonBarButtonStyle"/>
+
+    </LinearLayout>
 
 </RelativeLayout>
