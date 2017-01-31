@@ -102,6 +102,7 @@ class ExampleDataProvider {
                     Date createdAt = new Date(jTour.get("created_at").getAsLong());
                     String accessibility = jTour.get("accessibility").getAsString();
                     String author = jTour.get("author").getAsString();
+                    String introduction = jTour.get("introduction").getAsString();
 
                     for (int k = 0; k < jMapstops.size(); k++) {
                         JsonObject jMapstop = jMapstops.get(k).getAsJsonObject();
@@ -118,7 +119,7 @@ class ExampleDataProvider {
                         this.mapstopsById.put(mid, mapstop);
                     }
 
-                    Tour tour = new Tour(jTour.get("name").getAsString(), tourMapstops, tourType, tourId, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author);
+                    Tour tour = new Tour(jTour.get("name").getAsString(), tourMapstops, tourType, tourId, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author, introduction);
                     tours.add(tour);
                     toursById.put(tourId, tour);
                 }

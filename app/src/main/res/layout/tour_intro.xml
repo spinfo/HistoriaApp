@@ -9,11 +9,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- divider -->
-    <View
-        android:layout_height="1dp"
+    <include layout="@layout/divider" />
+
+    <!-- introductory text -->
+    <TextView
+        android:id="@+id/tour_intro_introduction"
         android:layout_width="match_parent"
-        android:background="@color/dividerColor" />
+        android:layout_height="wrap_content"
+        style="@style/listViewTextItem"/>
+
+    <include layout="@layout/divider" />
 
     <!-- Mapstops as list with heading -->
     <TextView
@@ -21,16 +26,13 @@
         android:layout_height="wrap_content"
         android:text="@string/name_mapstops"
         style="@style/listViewTextItem"/>
+
     <ListView
         android:id="@+id/tour_intro_mapstop_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- divider -->
-    <View
-        android:layout_height="1dp"
-        android:layout_width="match_parent"
-        android:background="@color/dividerColor" />
+    <include layout="@layout/divider" />
 
     <!-- Author and creation date -->
     <TextView

@@ -30,7 +30,9 @@ public class Tour {
 
     private String author;
 
-    public Tour(String name, List<Mapstop> mapstops, Type type, long id, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author) {
+    private String introduction;
+
+    public Tour(String name, List<Mapstop> mapstops, Type type, long id, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author, String introduction) {
         this.name = name;
         this.mapstops = mapstops;
         this.type = type;
@@ -43,6 +45,7 @@ public class Tour {
         this.createdAt = createdAt;
         this.accessibility = accessibility;
         this.author = author;
+        this.introduction = introduction;
     }
 
     public String getName() {
@@ -91,5 +94,9 @@ public class Tour {
 
     public String getAuthor() {
         return author;
+    }
+
+    public String getIntroduction() {
+        return introduction;
     }
 }

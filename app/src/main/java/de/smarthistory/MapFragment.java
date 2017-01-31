@@ -280,9 +280,10 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         View tourMetaView = tourIntroView.findViewById(R.id.tour_meta);
         TourViewsHelper.injectTourDataIntoTourMetaView(tourMetaView, tour);
 
-        // the other two views are found and filled by the helper
+        // the other three views are filled as well as found by the helper
         TourViewsHelper.setMapstopMiniInfoAdapterForTourIntro(tourIntroView, tour);
         TourViewsHelper.setFromTextInTourIntro(tourIntroView, tour);
+        TourViewsHelper.setIntroductionTextInTourIntro(tourIntroView, tour);
 
         // the whole introduction is shown as a dialog popup
         final PopupWindow window = showAsPopup(tourIntroView, true);
@@ -298,7 +299,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             }
         });
 
-        // the cancel button opens the tour selection again
+        // the cancel button returns to the tour selection
         Button buttonCancel = (Button) window.getContentView().findViewById(R.id.map_popup_dialog_button_cancel);
         buttonCancel.setText(getString(R.string.dialog_popup_back));
         buttonCancel.setOnClickListener(new View.OnClickListener() {
@@ -315,7 +316,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // determine size for the popup
         int width = (int) (mapFragmentView.getWidth() * POPUP_WIDTH);
         int height = (int) (mapFragmentView.getHeight() * POPUP_HEIGHT);
-
 
         View popupContainer = getActivity().getLayoutInflater().inflate(R.layout.map_popup, null);
 

@@ -15,6 +15,7 @@
           "created_at": 1484092800,
           "accessibility": "nicht barrierefrei",
           "author": "David Neugebauer",
+          "introduction": "Sie stehen tagein tagaus unbeweglich an der selben Stelle. Jeden Tag gehen wir an ihnen vorbei, bis wir sie kaum noch wahrnehmen, wie ein Sitzbank, eine Mauer oder ein Hinweisschild. Dabei haben Denkmäler allerhand zu erzählen: über die Geschichte der Heinrich-Heine-Universität und die Person, der sie gewidmet sind. Diese Tour zeigt Dir, was Du sonst jeden Tag übersiehst.",
           "mapstops": [
             {
               "id": 1,
@@ -44,6 +45,7 @@
           "created_at": 1485820800,
           "accessibility": "barrierefrei",
           "author": "Jan Niko Kirschbaum",
+          "introduction": "Eine simple Beispiel-Tour mit zufällig ausgewählten Orten, die sich vermutlich vor allem durch Abwesenheit historischer Signifikanz auszeichnen.",
           "mapstops": [
             {
               "id": 31,

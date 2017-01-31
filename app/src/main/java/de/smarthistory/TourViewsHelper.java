@@ -58,6 +58,12 @@ public abstract class TourViewsHelper {
         textView.setText(text);
     }
 
+    // set the introductory text in a tour introduction
+    public static void setIntroductionTextInTourIntro(View tourIntro, Tour tour) {
+        final TextView textView = (TextView) tourIntro.findViewById(R.id.tour_intro_introduction);
+        textView.setText(tour.getIntroduction());
+    }
+
 
     public static void setMapstopMiniInfoAdapterForTourIntro(final View tourIntro, final Tour tour) {
         final ListView mapstopListView =
