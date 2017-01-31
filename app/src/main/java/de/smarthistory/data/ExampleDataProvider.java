@@ -99,7 +99,7 @@ class ExampleDataProvider {
                     String tagWhat = jTour.get("tag_what").getAsString();
                     String tagWhen = jTour.get("tag_when").getAsString();
                     String tagWhere = jTour.get("tag_where").getAsString();
-                    Date createdAt = new Date(jTour.get("created_at").getAsLong());
+                    Date createdAt = new Date(jTour.get("created_at").getAsLong() * 1000);
                     String accessibility = jTour.get("accessibility").getAsString();
                     String author = jTour.get("author").getAsString();
                     String introduction = jTour.get("introduction").getAsString();

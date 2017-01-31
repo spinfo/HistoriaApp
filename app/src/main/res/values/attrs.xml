@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- attributes needed to reference styles as attributes, used e.g. in view constructors -->
+    <attr name="listViewTextItemStyle" format="reference"/>
+</resources>

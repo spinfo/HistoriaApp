@@ -2,10 +2,12 @@ package de.smarthistory;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -54,7 +56,7 @@ public abstract class TourViewsHelper {
 
         final String text = String.format(Locale.getDefault(), "Von: %s, %02d.%02d.%d",
                 tour.getAuthor(),
-                cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH), cal.get(Calendar.YEAR));
+                cal.get(Calendar.DAY_OF_MONTH), cal.get(Calendar.MONTH) + 1, cal.get(Calendar.YEAR));
         textView.setText(text);
     }
 
@@ -64,45 +66,23 @@ public abstract class TourViewsHelper {
         textView.setText(tour.getIntroduction());
     }
 
+    // create the mapstop list in the tour intro view by adding a text view to the list for each
+    // mapstop
+    public static void setMapstopsInTourIntro(final View tourIntro, final Tour tour) {
+        final LinearLayout mapstopList =
+                (LinearLayout) tourIntro.findViewById(R.id.tour_intro_mapstop_list);
 
-    public static void setMapstopMiniInfoAdapterForTourIntro(final View tourIntro, final Tour tour) {
-        final ListView mapstopListView =
-                (ListView) tourIntro.findViewById(R.id.tour_intro_mapstop_list);
+        TextView textView;
+        String text;
+        int position = 1;
+        for (final Mapstop mapstop : tour.getMapstops()) {
+            textView = new TextView(tourIntro.getContext(), null, R.attr.listViewTextItemStyle);
 
-        final ArrayList<Mapstop> mapstops = new ArrayList<>(tour.getMapstops());
-
-        final MapstopMiniInfoAdaper adapter =
-                new MapstopMiniInfoAdaper(mapstopListView.getContext(), mapstops);
-        mapstopListView.setAdapter(adapter);
-    }
-
-
-    // an ArrayAdapter for a short list of tours shown in a tour introduction
-    private static class MapstopMiniInfoAdaper extends ArrayAdapter<Mapstop> {
-
-        private final Context context;
-
-        private MapstopMiniInfoAdaper(final Context context, final ArrayList<Mapstop> mapstops) {
-            super(context, 0, mapstops);
-            this.context = context;
-        }
-
-        @NonNull
-        @Override
-        public View getView(final int position, View convertView, final ViewGroup parent) {
-            Mapstop mapstop = getItem(position);
-
-            if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.mapstop_mini_info, null);
-            }
-
-            TextView textView = (TextView) convertView;
-            String text = String.format(Locale.getDefault(), "%02d. %s",
-                position + 1, mapstop.getTitle());
+            text = String.format(Locale.getDefault(), "%2d. %s", position, mapstop.getTitle());
             textView.setText(text);
 
-            return textView;
+            mapstopList.addView(textView);
+            position += 1;
         }
     }
-
 }
