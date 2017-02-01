@@ -154,6 +154,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     private List<Overlay> getOrMakeTourOverlays(MapView map, Tour tour) {
+        // return the cached overly if one has been constructed previously
         if (tourOverlayCache.containsKey(tour)) {
             return tourOverlayCache.get(tour);
         }
@@ -161,25 +162,16 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // the tour's track is drawn with a polyline
         // add this first for it to be drawn before the markers
-        Polyline line = MapUtil.makeEmptyTourTrackPolyline(getContext());
+        final Polyline line = MapUtil.makeEmptyTourTrackPolyline(getContext());
         line.setPoints(tour.getTrack());
         overlays.add(line);
 
-        // markers for mapstops have a custom info window
-        MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
-
-        for (Mapstop mapstop : tour.getMapstops()) {
-            Marker marker = new Marker(map);
-
-            marker.setPosition(mapstop.getPlace().getLocation());
-            marker.setTitle(mapstop.getTitle());
-            marker.setSubDescription(mapstop.getShortDescription());
-            marker.setRelatedObject(mapstop);
-
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            marker.setIcon(ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.map_marker_icon_blue_small));
+        // markers for mapstops share a custom info window
+        final MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
+        Marker marker;
+        for (final Mapstop mapstop : tour.getMapstops()) {
+            marker = MapUtil.makeMapstopMarker(getContext(), state.map, mapstop);
             marker.setInfoWindow(window);
-
             overlays.add(marker);
         }
 

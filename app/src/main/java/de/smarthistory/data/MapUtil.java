@@ -3,6 +3,7 @@ package de.smarthistory.data;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.DashPathEffect;
+import android.support.v4.content.ContextCompat;
 
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
@@ -58,6 +59,18 @@ public abstract class MapUtil {
         line.getPaint().setPathEffect(new DashPathEffect(dashIntervalls, 0));
 
         return line;
+    }
+
+    // A marker representing a mapstop on the map
+    public static Marker makeMapstopMarker(Context context, MapView map, Mapstop mapstop) {
+        Marker marker = new Marker(map);
+        marker.setPosition(mapstop.getPlace().getLocation());
+        marker.setTitle(mapstop.getTitle());
+        marker.setSubDescription(mapstop.getShortDescription());
+        marker.setRelatedObject(mapstop);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setIcon(ContextCompat.getDrawable(context, R.drawable.map_marker_icon_blue_small));
+        return marker;
     }
 
     // TODO: This is messy especially for Polyline that does not actually save points as GeoPoints. The results of this should probably be cached somewhere
