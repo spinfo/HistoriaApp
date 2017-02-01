@@ -16,6 +16,7 @@
           "accessibility": "nicht barrierefrei",
           "author": "David Neugebauer",
           "introduction": "Eine simple Beispiel-Tour mit zufällig ausgewählten Orten, die sich vermutlich vor allem durch Abwesenheit historischer Signifikanz auszeichnen.",
+          "track": [ [ 51.22139, 6.79203 ], [ 51.22067, 6.78990 ] ],
           "mapstops": [
             {
               "id": 1,
@@ -46,6 +47,7 @@
           "accessibility": "barrierefrei",
           "author": "Jan Niko Kirschbaum",
           "introduction": "Sie stehen tagein tagaus unbeweglich an der selben Stelle. Jeden Tag gehen wir an ihnen vorbei, bis wir sie kaum noch wahrnehmen, wie ein Sitzbank, eine Mauer oder ein Hinweisschild. Dabei haben Denkmäler allerhand zu erzählen: über die Geschichte der Heinrich-Heine-Universität und die Person, der sie gewidmet sind. Diese Tour zeigt Dir, was Du sonst jeden Tag übersiehst.",
+          "track": [ [ 51.188801, 6.794488 ], [ 51.189071, 6.794514 ], [ 51.189433, 6.794360 ], [ 51.189768, 6.794192 ], [ 51.190129, 6.794021 ], [ 51.190454, 6.793881 ], [ 51.190663, 6.793877 ], [ 51.190947, 6.793751 ], [ 51.191180, 6.793582 ] ],
           "mapstops": [
             {
               "id": 31,
@@ -86,19 +88,19 @@
         },
         {
           "id": 31,
-          "name": "Ort an der Uni 1",
+          "name": "HHU-Campus 1",
           "lat": 51.191180,
           "lon": 6.793582
         },
         {
           "id": 32,
-          "name": "Ort an der Uni 2",
+          "name": "HHU-Campus 2",
           "lat": 51.190430,
           "lon": 6.793775
         },
         {
           "id": 33,
-          "name": "Ort an der Uni 3",
+          "name": "HHU-Campus 3",
           "lat": 51.188801,
           "lon": 6.794488
         }

@@ -1,9 +1,13 @@
 package de.smarthistory.data;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import org.osmdroid.util.GeoPoint;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -92,6 +96,9 @@ class ExampleDataProvider {
                     List<Mapstop> tourMapstops = new ArrayList<>();
                     JsonArray jMapstops = jTour.getAsJsonArray("mapstops");
 
+                    List<GeoPoint> track = new ArrayList<>();
+                    JsonArray jTrack = jTour.getAsJsonArray("track");
+
                     Tour.Type tourType = Tour.Type.valueOf(jTour.get("type").getAsString());
                     long tourId = jTour.get("id").getAsLong();
                     int walkLength = jTour.get("walk_length").getAsInt();
@@ -119,7 +126,14 @@ class ExampleDataProvider {
                         this.mapstopsById.put(mid, mapstop);
                     }
 
-                    Tour tour = new Tour(jTour.get("name").getAsString(), tourMapstops, tourType, tourId, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author, introduction);
+                    for (int k = 0; k < jTrack.size(); k++) {
+                        JsonArray jCoords = jTrack.get(k).getAsJsonArray();
+                        GeoPoint point = new GeoPoint(jCoords.get(0).getAsDouble(), jCoords.get(1).getAsDouble());
+                        Log.i("edp", "new point: " + point.getLatitude() + "," + point.getLongitude());
+                        track.add(point);
+                    }
+
+                    Tour tour = new Tour(jTour.get("name").getAsString(), tourMapstops, tourType, tourId, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author, introduction, track);
                     tours.add(tour);
                     toursById.put(tourId, tour);
                 }

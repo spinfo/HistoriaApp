@@ -1,5 +1,7 @@
 package de.smarthistory.data;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.util.Date;
 import java.util.List;
 
@@ -32,7 +34,9 @@ public class Tour {
 
     private String introduction;
 
-    public Tour(String name, List<Mapstop> mapstops, Type type, long id, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author, String introduction) {
+    private List<GeoPoint> track;
+
+    public Tour(String name, List<Mapstop> mapstops, Type type, long id, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author, String introduction, List<GeoPoint> track) {
         this.name = name;
         this.mapstops = mapstops;
         this.type = type;
@@ -46,6 +50,7 @@ public class Tour {
         this.accessibility = accessibility;
         this.author = author;
         this.introduction = introduction;
+        this.track = track;
     }
 
     public String getName() {
@@ -98,5 +103,9 @@ public class Tour {
 
     public String getIntroduction() {
         return introduction;
+    }
+
+    public List<GeoPoint> getTrack() {
+        return track;
     }
 }

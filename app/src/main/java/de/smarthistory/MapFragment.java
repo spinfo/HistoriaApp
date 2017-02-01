@@ -24,6 +24,7 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
@@ -63,8 +64,8 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     // the map on creating a popup
     private FrameLayout mapFragmentView;
 
-    // a simple cache for tour markers used by this map
-    private Map<Tour, List<Marker>> tourMarkerCache = new HashMap<>();
+    // a simple cache for tour overlays used by this map
+    private Map<Tour, List<Overlay>> tourOverlayCache = new HashMap<>();
 
     // dimensions for popups over the map
     // TODO put in some config for changeability on different screen types
@@ -97,7 +98,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // TODO: save some of these in bundle if possible
         state = new MapState();
         state.map = (MapView) mapFragmentView.findViewById(R.id.map);
-        tourMarkerCache = new HashMap<>();
+        tourOverlayCache = new HashMap<>();
         MapUtil.setMapDefaults(state.map);
 
         // set the map up to close all info windows on a click by providing a custom touch overlay
@@ -122,7 +123,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         } catch (MapStatePersistence.InconsistentMapStateException e) {
             LOGGER.info("Could not load map state. Will use defaults. Message: " + e.message);
             switchTour(data.getCurrentTour());
-            MapUtil.zoomToMarkers(state.map, tourMarkerCache.get(data.getCurrentTour()));
+            MapUtil.zoomToOverlays(state.map, tourOverlayCache.get(data.getCurrentTour()));
         }
 
         // add Overlay for current location
@@ -152,13 +153,19 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         myLocationOverlay.enableMyLocation();
     }
 
-    private List<Marker> getOrMakeTourMarkers(MapView map, Tour tour) {
-        if (tourMarkerCache.containsKey(tour)) {
-            return tourMarkerCache.get(tour);
+    private List<Overlay> getOrMakeTourOverlays(MapView map, Tour tour) {
+        if (tourOverlayCache.containsKey(tour)) {
+            return tourOverlayCache.get(tour);
         }
-        List<Marker> markers = new ArrayList<>();
+        List<Overlay> overlays = new ArrayList<>();
 
-        // markers have a custom info window
+        // the tour's track is drawn with a polyline
+        // add this first for it to be drawn before the markers
+        Polyline line = MapUtil.makeEmptyTourTrackPolyline(getContext());
+        line.setPoints(tour.getTrack());
+        overlays.add(line);
+
+        // markers for mapstops have a custom info window
         MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
 
         for (Mapstop mapstop : tour.getMapstops()) {
@@ -173,24 +180,25 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             marker.setIcon(ContextCompat.getDrawable(getContext().getApplicationContext(), R.drawable.map_marker_icon_blue_small));
             marker.setInfoWindow(window);
 
-            markers.add(marker);
+            overlays.add(marker);
         }
-        tourMarkerCache.put(tour, markers);
-        return markers;
+
+        tourOverlayCache.put(tour, overlays);
+        return overlays;
     }
 
     // switch the current tour by getting/creating markers. Return those markers.
-    private List<Marker> switchTour(Tour tour) {
-        List<Marker> markers;
+    private List<Overlay> switchTour(Tour tour) {
+        List<Overlay> markers;
 
         // remove old markers
         if (state.currentTour != null) {
-            markers = getOrMakeTourMarkers(state.map, state.currentTour);
+            markers = getOrMakeTourOverlays(state.map, state.currentTour);
             state.map.getOverlays().removeAll(markers);
         }
 
         // add new markers
-        markers = getOrMakeTourMarkers(state.map, tour);
+        markers = getOrMakeTourOverlays(state.map, tour);
         state.map.getOverlays().addAll(markers);
         state.currentTour = tour;
 
@@ -292,8 +300,8 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         buttonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<Marker> markers = switchTour(tour);
-                MapUtil.zoomToMarkers(state.map, markers);
+                List<Overlay> overlays = switchTour(tour);
+                MapUtil.zoomToOverlays(state.map, overlays);
                 window.dismiss();
             }
         });

@@ -3,4 +3,9 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <!-- Defines measurements of the track line drawn for a tour on the map -->
+    <dimen name="tour_track_line_width">4dp</dimen>
+    <dimen name="tour_track_dash_on">8dp</dimen>
+    <dimen name="tour_track_dash_off">7dp</dimen>
+
 </resources>
