@@ -11,7 +11,8 @@
         android:background="@android:color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="6" />
+        android:layout_weight="6"
+        android:fadeScrollbars="false" />
 
     <TextView
         android:id="@+id/mapstop_page_indicator"
