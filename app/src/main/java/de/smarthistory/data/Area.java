@@ -11,9 +11,12 @@ public class Area {
 
     private final List<Tour> tours;
 
-    public Area(String name, List<Tour> tours) {
+    private final long id;
+
+    public Area(final String name, final List<Tour> tours, final long id) {
         this.name = name;
         this.tours = tours;
+        this.id = id;
     }
 
     public String getName() {
@@ -22,5 +25,9 @@ public class Area {
 
     public List<Tour> getTours() {
         return tours;
+    }
+
+    public long getId() {
+        return id;
     }
 }

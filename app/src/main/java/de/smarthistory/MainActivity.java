@@ -47,8 +47,6 @@ public class MainActivity extends AppCompatActivity {
 
     private DataFacade data = DataFacade.getInstance();
 
-    private Mapstop currentMapstop;
-
     private static final String MAP_FRAGMENT_TAG = "map_fragment";
     private static final String EXPLORE_FRAGMENT_TAG = "explore_data_fragment";
 
@@ -348,11 +346,10 @@ public class MainActivity extends AppCompatActivity {
             try {
                 in = assetManager.open(filename);
                 File outFile = new File(getExternalFilesDir(null), filename);
-                LOGGER.info("--- copied to: " + outFile.getAbsolutePath());
                 out = new FileOutputStream(outFile);
                 copyFile(in, out);
             } catch(IOException e) {
-                Log.e("tag", "Failed to copy asset file: " + filename, e);
+                // NOOP
             }
             finally {
                 if (in != null) {

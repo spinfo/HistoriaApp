@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -46,19 +46,21 @@ import de.smarthistory.data.Tour;
 /**
  * The fragment handling the map view
  */
-public class MapFragment extends Fragment implements MainActivity.MainActivityFragment {
+public class MapFragment extends Fragment implements MainActivity.MainActivityFragment, MapPopupManager.OnTourSelectionListener {
 
+    private Logger LOGGER = Logger.getLogger(MapFragment.class.getName());
+
+    // the state of the map view that will be persisted even after closing the app
     public static class MapState {
         MapView map;
         Tour currentTour;
     }
-
-    private Logger LOGGER = Logger.getLogger(MapFragment.class.getName());
-
-    private DataFacade data = DataFacade.getInstance();
-
-    // the state of the map this fragment handles can be saved/restored via this object
     private MapState state;
+
+    private MapPopupManager popupManager;
+
+    // the interface to retrieve all actual data from
+    private DataFacade data = DataFacade.getInstance();
 
     // the view that this will instantiate, has to be a FrameLayout for us to be able to dim
     // the map on creating a popup
@@ -66,11 +68,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
     // a simple cache for tour overlays used by this map
     private Map<Tour, List<Overlay>> tourOverlayCache = new HashMap<>();
-
-    // dimensions for popups over the map
-    // TODO put in some config for changeability on different screen types
-    private static final float POPUP_WIDTH = 0.85f;
-    private static final float POPUP_HEIGHT = 0.90f;
 
     public MapFragment() {
         // Required empty public constructor
@@ -90,16 +87,14 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // Inflate the layout for this fragment
         mapFragmentView = (FrameLayout) inflater.inflate(R.layout.fragment_map, container, false);
 
-        // we have a foreground in place to grey out the map if needed. But at first the map should
-        // be fully visible
-        mapFragmentView.getForeground().setAlpha(0);
-
         // initialize the state of this fragment with a new map
-        // TODO: save some of these in bundle if possible
         state = new MapState();
         state.map = (MapView) mapFragmentView.findViewById(R.id.map);
         tourOverlayCache = new HashMap<>();
         MapUtil.setMapDefaults(state.map);
+
+        // the object that will manage all popups on this map
+        this.popupManager = new MapPopupManager(mapFragmentView);
 
         // set the map up to close all info windows on a click by providing a custom touch overlay
         Overlay touchOverlay = new Overlay() {
@@ -126,6 +121,11 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             MapUtil.zoomToOverlays(state.map, tourOverlayCache.get(data.getCurrentTour()));
         }
 
+        // recreate popup from bundle if needed
+        if (savedInstanceState != null) {
+            popupManager.restorePopupStateFrom(savedInstanceState, this);
+        }
+
         // add Overlay for current location
         addCurrentLocation(state.map);
 
@@ -133,10 +133,20 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         return mapFragmentView;
     }
 
+    // Permanently save the basic map view on pause
     @Override
     public void onPause() {
         super.onPause();
         MapStatePersistence.save(state, getPrefs());
+    }
+
+    // temporarily save an open popup view in the preferences
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        popupManager.savePopupStateTo(outState);
+        // dismiss the active popup, else it will be memory-leaked
+        popupManager.dismissActivePopup();
     }
 
     // Convenience method to get SharedPreferences in a standard way
@@ -208,7 +218,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
             @Override
             public void onClick(View view) {
-                showMapstop(this.mapstop);
+                popupManager.showMapstop(this.mapstop);
             }
 
             public void setMapstop(Mapstop mapstop) {
@@ -241,122 +251,15 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         }
     }
 
-    private void showMapstop(Mapstop mapstop) {
-        // Get the mapstop view
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        View mapstopLayout = inflater.inflate(R.layout.mapstop, null);
-
-        // Bind mapstop view to a page loader
-        MapstopPageView pageView = (MapstopPageView) mapstopLayout.findViewById(R.id.mapstop_page);
-        TextView pageIndicatorView = (TextView) mapstopLayout.findViewById(R.id.mapstop_page_indicator);
-        MapstopPageLoader pageLoader = new MapstopPageLoader(mapstop, pageView, pageIndicatorView);
-
-        // actually display the mapstop as a popup window
-        showAsPopup(mapstopLayout, false);
-    }
-
     public void showTourSelection(Area area) {
-        ListView listView = (ListView) getActivity().getLayoutInflater().inflate(R.layout.tour_or_mapstop_list, null);
-        List<Tour> tourData = area.getTours();
-        Tour[] tours = tourData.toArray(new Tour[tourData.size()]);
-        TourArrayAdapter toursAdapter = new TourArrayAdapter(getContext(), tours);
-        listView.setAdapter(toursAdapter);
-        final PopupWindow popupWindow = showAsPopup(listView, false);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Tour tour = (Tour) parent.getItemAtPosition(position);
-                popupWindow.dismiss();
-                showTourIntro(tour);
-            }
-        });
+        popupManager.showTourSelection(area, this);
     }
 
-    public void showTourIntro(final Tour tour) {
-        View tourIntroView = getActivity().getLayoutInflater().inflate(R.layout.tour_intro, null, false);
-
-        // the tour intro reuses the tour meta view
-        View tourMetaView = tourIntroView.findViewById(R.id.tour_meta);
-        TourViewsHelper.injectTourDataIntoTourMetaView(tourMetaView, tour);
-
-        // the other three views are filled as well as found by the helper
-        TourViewsHelper.setMapstopsInTourIntro(tourIntroView, tour);
-        TourViewsHelper.setFromTextInTourIntro(tourIntroView, tour);
-        TourViewsHelper.setIntroductionTextInTourIntro(tourIntroView, tour);
-
-        // the whole introduction is shown as a dialog popup
-        final PopupWindow window = showAsPopup(tourIntroView, true);
-
-        // the ok buttons of the dialog popup switches to the selected tour
-        Button buttonOk = (Button) window.getContentView().findViewById(R.id.map_popup_dialog_button_ok);
-        buttonOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<Overlay> overlays = switchTour(tour);
-                MapUtil.zoomToOverlays(state.map, overlays);
-                window.dismiss();
-            }
-        });
-
-        // the cancel button returns to the tour selection
-        Button buttonCancel = (Button) window.getContentView().findViewById(R.id.map_popup_dialog_button_cancel);
-        buttonCancel.setText(getString(R.string.dialog_popup_back));
-        buttonCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                window.dismiss();
-                showTourSelection(data.getCurrentArea());
-            }
-        });
+    @Override
+    public void OnTourSelected(Tour tour) {
+        List<Overlay> overlays = switchTour(tour);
+        MapUtil.zoomToOverlays(state.map, overlays);
     }
-
-    // this displays a view as a popup over the map
-    private PopupWindow showAsPopup(View view, boolean asDialog) {
-        // determine size for the popup
-        int width = (int) (mapFragmentView.getWidth() * POPUP_WIDTH);
-        int height = (int) (mapFragmentView.getHeight() * POPUP_HEIGHT);
-
-        View popupContainer = getActivity().getLayoutInflater().inflate(R.layout.map_popup, null);
-
-        // put the supplied view inside the popup view
-        RelativeLayout popupContent = (RelativeLayout) popupContainer.findViewById(R.id.map_popup_content);
-        popupContent.addView(view);
-
-        // create the popup window
-        final PopupWindow popupWindow = new PopupWindow(popupContainer, width, height, true);
-        popupWindow.showAtLocation(popupContainer, Gravity.CENTER, 0, 0);
-
-        // get the popup window button and set it to dismiss the popup
-        Button button = (Button) popupContainer.findViewById(R.id.map_popup_dismiss);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-            }
-        });
-
-        // dim the background
-        mapFragmentView.getForeground().setAlpha(200);
-
-        // give the popup window a listener to undim the background if dismissed
-        popupWindow.setOnDismissListener(new MapFragmentPopupOnDismissListener());
-
-        // remove dialog buttons if this is not supposed to be a dialog
-        if (!asDialog) {
-            View dialogButtonBar = popupContainer.findViewById(R.id.map_popup_dialog_buttons_bar);
-            ((ViewGroup)dialogButtonBar.getParent()).removeView(dialogButtonBar);
-        }
-
-        return popupWindow;
-    }
-
-    // a listener to change un-dim the map on dismissing a popup
-    private class MapFragmentPopupOnDismissListener implements PopupWindow.OnDismissListener {
-        public void onDismiss() {
-            mapFragmentView.getForeground().setAlpha(0);
-        }
-    }
-
 
     @Override
     public boolean reactToBackButtonPressed() {

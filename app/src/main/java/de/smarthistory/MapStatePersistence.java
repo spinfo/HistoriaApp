@@ -14,8 +14,6 @@ import de.smarthistory.data.Tour;
 
 public abstract class MapStatePersistence {
 
-    private static final Logger LOGGER = Logger.getLogger(MapStatePersistence.class.getName());
-
     private static final String K_CENTER_LAT = "centerLat";
     private static final String K_CENTER_LON = "centerLon";
     private static final String K_ZOOM = "zoom";
@@ -32,8 +30,6 @@ public abstract class MapStatePersistence {
         editor.putInt(K_ZOOM, state.map.getZoomLevel(false));
         editor.putLong(K_TOUR_ID, state.currentTour.getId());
         editor.apply();
-
-        LOGGER.info("Saved instance state: " + center.getLatitude() + "/" + center.getLongitude() + ", " + state.map.getZoomLevel() + ", tour: " + state.currentTour.getId());
     }
 
     // restores a MapState, will complain with an InconsistentMapStateException if a value is missing
@@ -54,7 +50,6 @@ public abstract class MapStatePersistence {
 
         MapUtil.zoomTo(state.map, lat, lon, zoom);
         state.currentTour = DataFacade.getInstance().getTourById(tourId);
-        LOGGER.info("Restored instance state: " + lat + "/" + lon + ", " + zoom + ", tour: " + state.currentTour.getId());
     }
 
     // since shared prefs can't store doubles we need to store as long to not loose precision

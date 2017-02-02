@@ -42,6 +42,8 @@ class ExampleDataProvider {
 
     private Area currentArea;
 
+    private Map<Long, Area> areasById = new HashMap<>();
+
     private Tour currentTour;
 
     private Lexicon lexicon = new Lexicon();
@@ -71,6 +73,7 @@ class ExampleDataProvider {
                 JsonObject jArea = jAreas.get(i).getAsJsonObject();
 
                 JsonArray jPlaces = jArea.get("places").getAsJsonArray();
+                long areaId = jArea.get("id").getAsLong();
 
                 for (int j = 0; j < jPlaces.size(); j++) {
                     JsonObject jPlace = jPlaces.get(j).getAsJsonObject();
@@ -138,8 +141,9 @@ class ExampleDataProvider {
                     toursById.put(tourId, tour);
                 }
 
-                Area area = new Area(jArea.get("name").getAsString(), tours);
+                Area area = new Area(jArea.get("name").getAsString(), tours, areaId);
                 this.areas.add(area);
+                this.areasById.put(area.getId(), area);
             }
 
 
@@ -168,6 +172,10 @@ class ExampleDataProvider {
 
     protected List<Area> getAreas() {
         return areas;
+    }
+
+    protected Area getAreaById(long id) {
+        return areasById.get(id);
     }
 
     protected List<Mapstop> getMapstops() {

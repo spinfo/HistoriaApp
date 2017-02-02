@@ -1,6 +1,7 @@
 {
   "areas": [
     {
+      "id": 1,
       "name": "Düsseldorf",
       "tours": [
         {

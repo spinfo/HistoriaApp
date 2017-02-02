@@ -26,6 +26,9 @@ public class DataFacade {
         return instance;
     }
 
+    public Area getAreaById(long id) {
+        return dataProvider.getAreaById(id);
+    }
 
     public List<Area> getAreas() {
         return dataProvider.getAreas();
