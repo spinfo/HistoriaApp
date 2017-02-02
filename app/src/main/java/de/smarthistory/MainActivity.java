@@ -85,17 +85,17 @@ public class MainActivity extends AppCompatActivity {
         // initialize the main fragment (the map)
         // make sure, that the fragment container is present
         if (findViewById(R.id.main_fragment_container) != null) {
-
             // if we are restored from a previous state, don't initiate a new fragment
             if (savedInstanceState != null) {
                 return;
             }
-
-            switchMainFragmentToMap();
+            // initialize the fragment not adding it to the back stack
+            // TODO: 'switch' is the wrong verb here, 'initOrSwitch'?
+            switchMainFragmentToMap(false);
         }
     }
 
-    private MapFragment switchMainFragmentToMap() {
+    private MapFragment switchMainFragmentToMap(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         // look, if there is a main map fragment already, create a new one if there isn't
@@ -108,13 +108,15 @@ public class MainActivity extends AppCompatActivity {
         // to it later
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main_fragment_container, mapFragment, MAP_FRAGMENT_TAG);
-        transaction.addToBackStack(null);
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
+        }
         transaction.commit();
 
         return mapFragment;
     }
 
-    private ExploreDataFragment switchMainFragmentToExploreData() {
+    private ExploreDataFragment switchMainFragmentToExploreData(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         // look, if there is a main map fragment already, create a new one if there isn't
@@ -127,7 +129,9 @@ public class MainActivity extends AppCompatActivity {
         // to it later
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main_fragment_container, exploreFragment, EXPLORE_FRAGMENT_TAG);
-        transaction.addToBackStack(null);
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
+        }
         transaction.commit();
 
         return exploreFragment;
@@ -296,12 +300,12 @@ public class MainActivity extends AppCompatActivity {
     // empty mehtod to be filled with code for when drawer Item is clicked
     private void selectItem(int position) {
         if (position == 1) {
-            MapFragment mapFragment = switchMainFragmentToMap();
+            MapFragment mapFragment = switchMainFragmentToMap(true);
             mapFragment.showTourSelection(data.getCurrentArea());
             mDrawerLayout.closeDrawers();
         } else if (position == 2) {
             Fragment exploreDataFragment = new ExploreDataFragment();
-            switchMainFragmentToExploreData();
+            switchMainFragmentToExploreData(true);
             mDrawerLayout.closeDrawers();
         } else {
             Toast.makeText(this, "Selected: " + position, Toast.LENGTH_SHORT).show();
