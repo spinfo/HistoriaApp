@@ -12,8 +12,12 @@ public abstract class MapStatePersistence {
     private static final String K_CENTER_LON = "centerLon";
     private static final String K_ZOOM = "zoom";
     private static final String K_TOUR_ID = "tourId";
+    private static final String K_MAPSTOP_TAPPED_ID = "mapstopTappedId";
 
-    private static final String[] KEYS = { K_CENTER_LAT, K_CENTER_LON, K_ZOOM, K_TOUR_ID };
+    private static final long NO_OBJECT = -1;
+
+    private static final String[] KEYS = { K_CENTER_LAT, K_CENTER_LON, K_ZOOM,
+            K_TOUR_ID, K_MAPSTOP_TAPPED_ID };
 
     public static void save(MapFragment.MapState state, SharedPreferences prefs) {
         IGeoPoint center = state.map.getMapCenter();
@@ -23,6 +27,12 @@ public abstract class MapStatePersistence {
         writeDouble(editor, K_CENTER_LON, center.getLongitude());
         editor.putInt(K_ZOOM, state.map.getZoomLevel(false));
         editor.putLong(K_TOUR_ID, state.currentTour.getId());
+        // there might be no mapstopped tapped at the moment
+        if (state.mapstopTapped != null) {
+            editor.putLong(K_MAPSTOP_TAPPED_ID, state.mapstopTapped.getId());
+        } else {
+            editor.putLong(K_MAPSTOP_TAPPED_ID, NO_OBJECT);
+        }
         editor.apply();
     }
 
@@ -40,10 +50,21 @@ public abstract class MapStatePersistence {
         double lat = readDouble(prefs, K_CENTER_LAT, 0.0);
         double lon = readDouble(prefs, K_CENTER_LON, 0.0);
         int zoom = prefs.getInt(K_ZOOM, 16);
-        long tourId = prefs.getLong(K_TOUR_ID, -1);
+        long tourId = prefs.getLong(K_TOUR_ID, NO_OBJECT);
+        long mapstopTappedId = prefs.getLong(K_MAPSTOP_TAPPED_ID, NO_OBJECT);
 
         MapUtil.zoomTo(state.map, lat, lon, zoom);
-        state.currentTour = DataFacade.getInstance().getTourById(tourId);
+        // a tour is always specified
+        if (tourId != NO_OBJECT) {
+            state.currentTour = DataFacade.getInstance().getTourById(tourId);
+        } else {
+            throw new InconsistentMapStateException("Tour id not specified.");
+        }
+        // a mapstop doesn't have to be specified
+        if (mapstopTappedId != NO_OBJECT) {
+            state.mapstopTapped = DataFacade.getInstance().getMapstopById(mapstopTappedId);
+        }
+
     }
 
     // since shared prefs can't store doubles we need to store as long to not loose precision

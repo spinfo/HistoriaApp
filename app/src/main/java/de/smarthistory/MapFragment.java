@@ -41,10 +41,11 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
     private Logger LOGGER = Logger.getLogger(MapFragment.class.getName());
 
-    // the state of the map view that will be persisted even after closing the app
+    // the state of the map view that will be persisted on view destruction/after closing the app
     public static class MapState {
         MapView map;
         Tour currentTour;
+        Mapstop mapstopTapped;
     }
     private MapState state;
 
@@ -105,6 +106,9 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         try {
             MapStatePersistence.load(state, getPrefs());
             switchTour(state.currentTour);
+            if (state.mapstopTapped != null) {
+                openInfoWindowFor(state.mapstopTapped);
+            }
             LOGGER.info("Loaded state from prefs.");
         } catch (MapStatePersistence.InconsistentMapStateException e) {
             LOGGER.info("Could not load map state. Will use defaults. Message: " + e.message);
@@ -185,6 +189,8 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         List<Overlay> markers;
 
         // remove old markers
+        // we cannot clear() the whole list because of the touch overlay registering general clicks
+        // to the map.
         if (state.currentTour != null) {
             markers = getOrMakeTourOverlays(state.map, state.currentTour);
             state.map.getOverlays().removeAll(markers);
@@ -196,6 +202,22 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         state.currentTour = tour;
 
         return markers;
+    }
+
+    // opens the info window belonging to a mapstop marker if the map contains a marker that
+    // has the provided mapstop as a related object
+    private void openInfoWindowFor(Mapstop mapstop) {
+        // TODO: there might be a better way to do this, e.g. taking note of related objects custom service etc.
+        Marker marker;
+        for (Overlay overlay : state.map.getOverlays()) {
+            if (overlay instanceof Marker) {
+                marker = (Marker) overlay;
+                if (mapstop.equals(marker.getRelatedObject())) {
+                    marker.showInfoWindow();
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -230,15 +252,30 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         @Override
         public void onOpen(Object item) {
             super.onOpen(item);
-            closeAllInfoWindowsOn(this.map);
+            //opening one window closes all others on the map
+            InfoWindow.closeAllInfoWindowsOn(this.map);
 
-            // set the right mapstop to use
-            this.onClickListener.setMapstop((Mapstop) getMarkerReference().getRelatedObject());
+            // the mapstap this window refers to is saved as a related object of the marker
+            final Mapstop mapstop = (Mapstop) getMarkerReference().getRelatedObject();
 
-            // set listener for containing view
+            // set the right mapstop to use for the onclick listener
+            this.onClickListener.setMapstop(mapstop);
+
+            // mark the mapstop infowindow as opened in map state for persistence
+            MapFragment.this.state.mapstopTapped = mapstop;
+
+            // set on click listener for the bubble/infowindow
             LinearLayout layout = (LinearLayout) getView().findViewById(R.id.map_my_bonuspack_bubble);
             layout.setClickable(true);
             layout.setOnClickListener(this.onClickListener);
+        }
+
+        @Override
+        public void onClose() {
+            super.onClose();
+
+            // tell the map state that no mapstop is opened atm
+            MapFragment.this.state.mapstopTapped = null;
         }
     }
 
