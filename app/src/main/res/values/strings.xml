@@ -10,6 +10,7 @@
     <!-- General names -->
     <string name="name_mapstop">Station</string>
     <string name="name_mapstops">Stationen</string>
+    <string name="action_test">Testen</string>
 
     <!-- Strings for the menu -->
     <string name="menu_title">Menü</string>
@@ -23,4 +24,7 @@
     <string name="dialog_popup_ok">OK</string>
     <string name="dialog_popup_cancel">Abbrechen</string>
     <string name="dialog_popup_back">Zurück</string>
+
+    <!-- A string explaining permissions -->
+    <string name="permissions_required_explanation">Um die Karte anzuzeigen sind weitere Berechtigungen von Nöten.</string>
 </resources>

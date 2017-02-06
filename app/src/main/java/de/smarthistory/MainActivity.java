@@ -2,10 +2,9 @@ package de.smarthistory;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -18,9 +17,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -28,10 +30,6 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.modules.SqlTileWriter;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +37,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import de.smarthistory.data.DataFacade;
-import de.smarthistory.data.Mapstop;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,30 +66,47 @@ public class MainActivity extends AppCompatActivity {
         // prepare the asset files if neccessary
         data.prepareAssets(getAssets(), getExternalFilesDir(null));
 
-        setContentView(R.layout.activity_main);
+        // This checks and requests permissions to support the map on Marshmallow and above devices
+        boolean hasPermissions = checkMapPermissions();
+        Log.d("main", "Permission check shows: " + hasPermissions);
+        if (hasPermissions) {
+            setContentView(R.layout.activity_main);
 
-        // setup main tool bar as action bar
-        this.mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        this.setSupportActionBar(mainToolbar);
+            // setup main tool bar as action bar
+            this.mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
+            this.setSupportActionBar(mainToolbar);
 
-        // Request permissions to support Android Marshmallow and above devices
-        if (Build.VERSION.SDK_INT >= 23) {
-            checkPermissions();
-        }
+            // initialize the drawer menu
+            initializeNavDrawerMenu();
 
-        // initialize the drawer menu
-        initializeNavDrawerMenu();
+            // initialize the main fragment (the map)
+            // make sure, that the fragment container is present
+            if (findViewById(R.id.main_fragment_container) != null) {
+                // if we are not restored from a previous state, or t"afterPermissionsGrantedToken"his is a restart after a per-
+                // mission granting, create a new map fragment
+                Log.d("main", "savedInstanceState: " + savedInstanceState);
+                if (savedInstanceState == null) {
+                    // TODO: 'switch' is the wrong verb here, 'initOrSwitch'?
+                    switchMainFragmentToMap(false);
+                }
+                // check if this is a restart after a permission grant
+                else if (getIntent().getBooleanExtra("afterPermissionsGrantedToken", false)) {
+                    getIntent().removeExtra("afterPermissionsGrantedToken");
+                }
 
-        // initialize the main fragment (the map)
-        // make sure, that the fragment container is present
-        if (findViewById(R.id.main_fragment_container) != null) {
-            // if we are restored from a previous state, don't initiate a new fragment
-            if (savedInstanceState != null) {
-                return;
             }
-            // initialize the fragment not adding it to the back stack
-            // TODO: 'switch' is the wrong verb here, 'initOrSwitch'?
-            switchMainFragmentToMap(false);
+        } else {
+            // set the content to a message indicating the need for further permissions
+            setContentView(R.layout.permissions_required);
+
+            // a re-check of permissions is triggered by just recreating the whole MainActivity
+            Button checkAgainButton = (Button) findViewById(R.id.trigger_permission_check);
+            checkAgainButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MainActivity.this.recreate();
+                }
+            });
         }
     }
 
@@ -166,22 +180,22 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * gets storage state and current cache size
+     * sets storage state and current cache size
      */
     private void updateStorageInfo(){
-
         long cacheSize = updateStoragePrefreneces(this);
-        //cache management ends here
-
-        // Original method cut of. Compare: https://github.com/osmdroid/osmdroid/blob/master/OpenStreetMapViewer/src/main/java/org/osmdroid/MainActivity.java#L168
-        // TODO: Check if we should include something like that here
     }
 
-
     // START PERMISSION CHECK
-    final private int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
+    // TODO: The whole permission code could go to the map fragment probably
+    private static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
 
-    private void checkPermissions() {
+    private boolean checkMapPermissions() {
+        if (Build.VERSION.SDK_INT < 23) {
+            // if we we are below API Level 23, permissions have been granted on installation
+            return true;
+        }
+
         List<String> permissions = new ArrayList<>();
         String message = "osmdroid permissions:";
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -196,16 +210,20 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             String[] params = permissions.toArray(new String[permissions.size()]);
             // the if condition silences an android studio warning. Actual version check is done
-            // when calling checkPermissions()
-            if (Build.VERSION.SDK_INT >= 23) {
-                requestPermissions(params, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
-            }
-        } // else: We already have permissions, so handle as normal
+            // when calling checkMapPermissions()
+            requestPermissions(params, REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS);
+            // return false to indicate that additional permissions are needed/asked for
+            return false;
+        }
+        // else: We have permissions
+        return true;
     }
 
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        boolean allGranted = false;
+
         switch (requestCode) {
             case REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS: {
                 Map<String, Integer> perms = new HashMap<>();
@@ -221,20 +239,25 @@ public class MainActivity extends AppCompatActivity {
                 if (location && storage) {
                     // All Permissions Granted
                     Toast.makeText(MainActivity.this, "All permissions granted", Toast.LENGTH_SHORT).show();
-                } else if (location) {
-                    Toast.makeText(this, "Storage permission is required to store map tiles to reduce data usage and for offline usage.", Toast.LENGTH_LONG).show();
-                } else if (storage) {
-                    Toast.makeText(this, "Location permission is required to show the user's location on map.", Toast.LENGTH_LONG).show();
-                } else { // !location && !storage case
-                    // Permission Denied
-                    Toast.makeText(MainActivity.this, "Storage permission is required to store map tiles to reduce data usage and for offline usage." +
-                            "\nLocation permission is required to show the user's location on map.", Toast.LENGTH_SHORT).show();
+
+                    // TODO is this still needed?
+                    updateStorageInfo();
+
+                    allGranted = true;
                 }
-                updateStorageInfo();
+                // TODO Handle the case when location is not granted but external storage is. (Map may be shown but without location)
             }
             break;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        // Recreate activity to show the default map view
+        if (allGranted) {
+            Intent intent = new Intent();
+            intent.putExtra("afterPermissionsGrantedToken", true);
+            MainActivity.this.finish();
+            MainActivity.this.startActivity(getIntent());
         }
     }
     // END PERMISSION CHECK
@@ -274,7 +297,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
+        if (mDrawerToggle != null) {
+            mDrawerToggle.syncState();
+        }
     }
 
     // The click listner for ListView in the navigation drawer
