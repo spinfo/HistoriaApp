@@ -1,5 +1,7 @@
 package de.smarthistory.data;
 
+import android.content.res.AssetManager;
+
 import java.io.File;
 import java.net.URL;
 import java.util.List;
@@ -64,5 +66,9 @@ public class DataFacade {
 
     public LexiconEntry getLexiconEntryById(long id) {
         return dataProvider.getLexiconEntryById(id);
+    }
+
+    public void prepareAssets(AssetManager assetManager, File externalDir) {
+        dataProvider.prepareAssets(assetManager, externalDir);
     }
 }
