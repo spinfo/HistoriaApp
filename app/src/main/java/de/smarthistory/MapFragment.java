@@ -5,20 +5,12 @@ import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.views.MapView;
@@ -38,7 +30,6 @@ import java.util.logging.Logger;
 
 import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
-import de.smarthistory.data.MapUtil;
 import de.smarthistory.data.Mapstop;
 import de.smarthistory.data.Tour;
 

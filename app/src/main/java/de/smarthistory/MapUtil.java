@@ -1,4 +1,4 @@
-package de.smarthistory.data;
+package de.smarthistory;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import de.smarthistory.R;
+import de.smarthistory.data.Mapstop;
 
 public abstract class MapUtil {
 

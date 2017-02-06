@@ -3,14 +3,8 @@ package de.smarthistory;
 import android.content.SharedPreferences;
 
 import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.api.IMapController;
-import org.osmdroid.views.MapView;
-
-import java.util.logging.Logger;
 
 import de.smarthistory.data.DataFacade;
-import de.smarthistory.data.MapUtil;
-import de.smarthistory.data.Tour;
 
 public abstract class MapStatePersistence {
 
