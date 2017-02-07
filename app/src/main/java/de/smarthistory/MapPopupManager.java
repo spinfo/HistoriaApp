@@ -2,7 +2,6 @@ package de.smarthistory;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +31,7 @@ public class MapPopupManager {
 
     // an interface for listening on tour selections triggered by popups
     interface OnTourSelectionListener {
-        void OnTourSelected(Tour tour);
+        void onTourSelected(Tour tour);
     }
 
     // a data provider
@@ -50,9 +49,12 @@ public class MapPopupManager {
 
     // the state needed to save/recreate a popup: The popup's type and the id of the
     // object in question (either Mapstop, Area or Tour)
-    private PopupWindow activePopup;
     private MapPopupType activePopupType;
     private long activeObjId = NO_ACTIVE_OBJ;
+
+    // the currently active popup if there is one
+    // TODO: It might be safer to have a promise for a popup here or something deferred
+    private PopupWindow activePopup;
 
     // a check value to indicate that there is no active object
     private static long NO_ACTIVE_OBJ = -1;
@@ -68,6 +70,21 @@ public class MapPopupManager {
 
     // this displays a view as a popup over the surface
     private PopupWindow showAsPopup(final View view, final MapPopupType type, final long objId, final boolean asDialog) {
+        // if there already is an active popup window, just switch that windows content
+        if (activePopupType != MapPopupType.NONE) {
+            Log.d(getClass().getName(), "Switching popup: " + activePopupType + " -> " + type);
+            final ViewGroup container = (ViewGroup) activePopup.getContentView().findViewById(R.id.map_popup);
+            final ViewGroup content = (ViewGroup) container.findViewById(R.id.map_popup_content);
+            content.removeAllViews();
+            content.addView(view);
+            if (asDialog) {
+                layoutInflater.inflate(R.layout.map_popup_dialog_buttons_bar, container);
+            } else {
+                container.removeView(container.findViewById(R.id.map_popup_dialog_buttons_bar));
+            }
+            setSaveState(type, objId, activePopup);
+            return activePopup;
+        }
         // add comment explaining null
         final View popupContainer = layoutInflater.inflate(R.layout.map_popup, null);
 
@@ -152,7 +169,7 @@ public class MapPopupManager {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Tour tour = (Tour) parent.getItemAtPosition(position);
-                popup.dismiss();
+                // popup.dismiss();
                 showTourIntro(tour, listener);
             }
         });
@@ -180,7 +197,7 @@ public class MapPopupManager {
         buttonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.OnTourSelected(tour);
+                listener.onTourSelected(tour);
                 popup.dismiss();
             }
         });
@@ -191,7 +208,7 @@ public class MapPopupManager {
         buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                popup.dismiss();
+                // popup.dismiss();
                 showTourSelection(data.getCurrentArea(), listener);
             }
         });

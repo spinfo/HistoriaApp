@@ -284,7 +284,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     @Override
-    public void OnTourSelected(Tour tour) {
+    public void onTourSelected(Tour tour) {
         List<Overlay> overlays = switchTour(tour);
         MapUtil.zoomToOverlays(state.map, overlays);
     }
