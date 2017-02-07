@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".SimpleWebViewActivity" />
-        <activity android:name=".MapstopPageViewActivity"></activity>
+        <activity android:name=".MapstopPageViewActivity" />
     </application>
 
 </manifest>
