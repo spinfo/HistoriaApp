@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.FilesDataProvider;
 import de.smarthistory.data.Mapstop;
 import de.smarthistory.data.Tour;
 
@@ -123,6 +124,9 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // add Overlay for current location
         addCurrentLocation(state.map);
+
+        // TODO: Remove the next line
+        FilesDataProvider.testRun(getContext());
 
         // return the container for the map view
         return mapFragmentView;

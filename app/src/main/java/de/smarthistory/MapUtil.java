@@ -17,9 +17,7 @@ import org.osmdroid.views.overlay.Polyline;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
 
-import de.smarthistory.R;
 import de.smarthistory.data.Mapstop;
 
 public abstract class MapUtil {
@@ -66,8 +64,8 @@ public abstract class MapUtil {
     public static Marker makeMapstopMarker(Context context, MapView map, Mapstop mapstop) {
         Marker marker = new Marker(map);
         marker.setPosition(mapstop.getPlace().getLocation());
-        marker.setTitle(mapstop.getTitle());
-        marker.setSubDescription(mapstop.getShortDescription());
+        marker.setTitle(mapstop.getName());
+        marker.setSubDescription(mapstop.getDescription());
         marker.setRelatedObject(mapstop);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setIcon(ContextCompat.getDrawable(context, R.drawable.map_marker_icon_blue_small));

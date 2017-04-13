@@ -211,7 +211,7 @@ class ExampleDataProvider {
     }
 
     protected String getPageUriForMapstop(Mapstop mapstop, Integer pageNo) {
-        String path = EXAMPLE_PAGE_FILE_TEMPLATE.replaceFirst("mapstopno", mapstop.getId().toString());
+        String path = EXAMPLE_PAGE_FILE_TEMPLATE.replaceFirst("mapstopno", "" + mapstop.getId());
         path = path.replaceFirst("pageno", pageNo.toString());
         return path;
     }

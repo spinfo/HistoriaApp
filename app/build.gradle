@@ -22,6 +22,8 @@ android {
 repositories {
     // allow maven dependencise
     mavenCentral()
+    // jitpack for snake yaml
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -40,4 +42,7 @@ dependencies {
 
     // Gson json deserialization for example data
     compile 'com.google.code.gson:gson:2.7'
+
+    // snake yaml for yaml deserialization
+    compile 'com.github.bmoliveira:snake-yaml:v1.18-android'
 }

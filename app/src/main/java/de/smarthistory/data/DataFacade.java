@@ -36,10 +36,6 @@ public class DataFacade {
         return dataProvider.getAreas();
     }
 
-    public List<Mapstop> getMapstops() {
-        return dataProvider.getMapstops();
-    }
-
     public Mapstop getMapstopById(long id) { return dataProvider.getMapstopById(id); }
 
     public Area getCurrentArea() { return dataProvider.getCurrentArea(); }

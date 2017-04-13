@@ -1,21 +1,10 @@
 package de.smarthistory;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 import de.smarthistory.data.Mapstop;
@@ -63,7 +52,7 @@ public abstract class TourViewsHelper {
     // set the introductory text in a tour introduction
     public static void setIntroductionTextInTourIntro(View tourIntro, Tour tour) {
         final TextView textView = (TextView) tourIntro.findViewById(R.id.tour_intro_introduction);
-        textView.setText(tour.getIntroduction());
+        textView.setText(tour.getIntro());
     }
 
     // create the mapstop list in the tour intro view by adding a text view to the list for each
@@ -78,7 +67,7 @@ public abstract class TourViewsHelper {
         for (final Mapstop mapstop : tour.getMapstops()) {
             textView = new TextView(tourIntro.getContext(), null, R.attr.listViewTextItemStyle);
 
-            text = String.format(Locale.getDefault(), "%2d. %s", position, mapstop.getTitle());
+            text = String.format(Locale.getDefault(), "%2d. %s", position, mapstop.getName());
             textView.setText(text);
 
             mapstopList.addView(textView);

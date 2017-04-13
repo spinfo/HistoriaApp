@@ -1,5 +1,6 @@
 package de.smarthistory.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,11 +8,15 @@ import java.util.List;
  */
 public class Area {
 
-    private final String name;
+    private String name;
 
-    private final List<Tour> tours;
+    private List<Tour> tours;
 
-    private final long id;
+    private long id;
+
+    public Area() {
+        this.tours = new ArrayList<>();
+    }
 
     public Area(final String name, final List<Tour> tours, final long id) {
         this.name = name;

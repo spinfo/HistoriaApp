@@ -43,15 +43,15 @@ public class MapstopArrayAdapter extends ArrayAdapter<Mapstop> {
         // set title
         String posString = (new Integer(position + 1)).toString();
         String titleLine = String.format(Locale.getDefault(), "%s. %s (%s)",
-                posString, mapstop.getTitle(), mapstop.getPlace().getName());
+                posString, mapstop.getName(), mapstop.getPlace().getName());
         SpannableStringBuilder sb = new SpannableStringBuilder(titleLine);
         StyleSpan bold = new StyleSpan(Typeface.BOLD);
-        int titleEnd = posString.length() + 2 + mapstop.getTitle().length();
+        int titleEnd = posString.length() + 2 + mapstop.getName().length();
         sb.setSpan(bold, 0, titleEnd, Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         titleLineView.setText(sb);
 
         // set description
-        descriptionView.setText(mapstop.getShortDescription());
+        descriptionView.setText(mapstop.getDescription());
 
         return convertView;
     }

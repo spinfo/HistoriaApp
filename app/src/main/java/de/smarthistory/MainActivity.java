@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.FilesDataProvider;
 
 public class MainActivity extends AppCompatActivity {
 

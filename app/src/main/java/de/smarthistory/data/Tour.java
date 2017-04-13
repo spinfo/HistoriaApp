@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class Tour {
 
-    public enum Type { Rundgang, Spaziergang };
+    public enum Type {Rundgang, Spaziergang};
 
     private long id;
 
@@ -32,9 +32,12 @@ public class Tour {
 
     private String author;
 
-    private String introduction;
+    private String intro;
 
     private List<GeoPoint> track;
+
+    // empty constructor needed for YAML parsing
+    protected Tour() {}
 
     public Tour(String name, List<Mapstop> mapstops, Type type, long id, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author, String introduction, List<GeoPoint> track) {
         this.name = name;
@@ -49,7 +52,7 @@ public class Tour {
         this.createdAt = createdAt;
         this.accessibility = accessibility;
         this.author = author;
-        this.introduction = introduction;
+        this.intro = introduction;
         this.track = track;
     }
 
@@ -101,8 +104,8 @@ public class Tour {
         return author;
     }
 
-    public String getIntroduction() {
-        return introduction;
+    public String getIntro() {
+        return intro;
     }
 
     public List<GeoPoint> getTrack() {
