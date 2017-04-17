@@ -1,5 +1,6 @@
 package de.smarthistory;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import org.osmdroid.api.IGeoPoint;
@@ -37,7 +38,7 @@ public abstract class MapStatePersistence {
     }
 
     // restores a MapState, will complain with an InconsistentMapStateException if a value is missing
-    public static void load(MapFragment.MapState state, SharedPreferences prefs) {
+    public static void load(MapFragment.MapState state, SharedPreferences prefs, Context context) {
         for (String key : KEYS) {
             if (!prefs.contains(key)) {
                 throw new InconsistentMapStateException("Map state without key '" + key + "'");
@@ -54,15 +55,15 @@ public abstract class MapStatePersistence {
         long mapstopTappedId = prefs.getLong(K_MAPSTOP_TAPPED_ID, NO_OBJECT);
 
         MapUtil.zoomTo(state.map, lat, lon, zoom);
-        // a tour is always specified
         if (tourId != NO_OBJECT) {
-            state.currentTour = DataFacade.getInstance().getTourById(tourId);
+            state.currentTour = DataFacade.getInstance(context).getTourById(tourId);
         } else {
+            // a tour is always specified
             throw new InconsistentMapStateException("Tour id not specified.");
         }
-        // a mapstop doesn't have to be specified
+        // a mapstop doesn't have to be specified, so don't throw an exception
         if (mapstopTappedId != NO_OBJECT) {
-            state.mapstopTapped = DataFacade.getInstance().getMapstopById(mapstopTappedId);
+            state.mapstopTapped = DataFacade.getInstance(context).getMapstopById(mapstopTappedId);
         }
 
     }

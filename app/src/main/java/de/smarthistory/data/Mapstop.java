@@ -1,5 +1,12 @@
 package de.smarthistory.data;
 
+import com.j256.ormlite.dao.ForeignCollection;
+import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -8,33 +15,31 @@ import java.util.List;
 public class Mapstop {
 
     // server id of the mapstop
+    @DatabaseField(columnName = "id", id = true, dataType = DataType.LONG)
     private long id;
 
     // the place the mapstop is displayed on
+    @DatabaseField(columnName = "place", foreign = true, foreignAutoRefresh = true)
     private Place place;
 
+    // the tour the mapstop belongs to
+    @DatabaseField(columnName = "tour", foreign = true, foreignAutoRefresh = true)
+    private Tour tour;
+
     // the mapstops name as shown to the user
+    @DatabaseField(columnName = "name")
     private String name;
 
     // a short description of the mapstop shown to the user
+    @DatabaseField(columnName = "description")
     private String description;
 
-    // TODO: remove
-    private int pageAmount;
-
     // the mapstop's main content: (html) pages
-    private List<Page> pages;
+    @ForeignCollectionField(columnName = "pages", eager = true)
+    private Collection<Page> pages;
 
     // empty constructor needed for YAML parsing
     protected Mapstop() {}
-
-    public Mapstop(long id, Place place, String title, String shortDescription, int pageAmount) {
-        this.id = id;
-        this.place = place;
-        this.name = title;
-        this.description = shortDescription;
-        this.pageAmount = pageAmount;
-    }
 
     public long getId() {
         return id;
@@ -50,6 +55,14 @@ public class Mapstop {
 
     public void setPlace(Place place) {
         this.place = place;
+    }
+
+    public Tour getTour() {
+        return tour;
+    }
+
+    public void setTour(Tour tour) {
+        this.tour = tour;
     }
 
     public String getName() {
@@ -69,15 +82,11 @@ public class Mapstop {
     }
 
     public int getPageAmount() {
-        return pageAmount;
-    }
-
-    public void setPageAmount(int pageAmount) {
-        this.pageAmount = pageAmount;
+        return this.pages.size();
     }
 
     public List<Page> getPages() {
-        return pages;
+        return new ArrayList<>(pages);
     }
 
     public void setPages(List<Page> pages) {
@@ -85,6 +94,6 @@ public class Mapstop {
     }
 
     public boolean hasPage(int idx) {
-        return (idx <= pageAmount && idx > 0);
+        return (idx <= this.getPageAmount() && idx > 0);
     }
 }

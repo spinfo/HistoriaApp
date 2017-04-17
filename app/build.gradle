@@ -45,4 +45,7 @@ dependencies {
 
     // snake yaml for yaml deserialization
     compile 'com.github.bmoliveira:snake-yaml:v1.18-android'
+
+    // ormlite for persistence
+    compile 'com.j256.ormlite:ormlite-android:5.0'
 }

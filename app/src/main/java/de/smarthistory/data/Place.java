@@ -1,5 +1,8 @@
 package de.smarthistory.data;
 
+import com.j256.ormlite.field.DataType;
+import com.j256.ormlite.field.DatabaseField;
+
 import org.osmdroid.util.GeoPoint;
 
 /**
@@ -7,27 +10,22 @@ import org.osmdroid.util.GeoPoint;
  */
 public class Place {
 
+    @DatabaseField(columnName = "id", id = true, dataType = DataType.LONG)
     private long id;
 
+    @DatabaseField(columnName = "lat")
     private double lat;
 
+    @DatabaseField(columnName = "lon")
     private double lon;
 
+    @DatabaseField(columnName = "name")
     private String name;
 
+    @DatabaseField(columnName = "area", foreign = true, foreignAutoRefresh = true)
+    private Area area;
+
     public Place() {}
-
-    public Place(String name, GeoPoint location) {
-        this.name = name;
-        this.lat = location.getLatitude();
-        this.lon = location.getLongitude();
-    }
-
-    public Place(String name, double lat, double lon) {
-        this.name = name;
-        this.lat = lat;
-        this.lon = lon;
-    }
 
     public GeoPoint getLocation() {
         return  new GeoPoint(this.lat, this.lon);
@@ -63,5 +61,13 @@ public class Place {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Area getArea() {
+        return area;
+    }
+
+    public void setArea(Area area) {
+        this.area = area;
     }
 }

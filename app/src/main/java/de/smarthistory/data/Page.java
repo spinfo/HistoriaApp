@@ -1,6 +1,10 @@
 package de.smarthistory.data;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
+
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -8,17 +12,29 @@ import java.util.List;
  */
 public class Page {
 
-    // the page's position in a series of pages
-    private int pos;
+    // the server's id value for this page
+    @DatabaseField(columnName = "id", id = true)
+    private long id;
 
-    // the unique url that identifies this page on the server
+    // the unique url (wordpress guid) that identifies this page on the server
+    @DatabaseField(columnName = "guid")
     private String guid;
 
+    // the page's position in a series of pages
+    @DatabaseField(columnName = "pos")
+    private int pos;
+
     // the page's html content
+    @DatabaseField(columnName = "content")
     private String content;
 
     // a list of guids (server urls) of the page's media items
-    private List<String> media = new ArrayList<String>();
+    @ForeignCollectionField(columnName = "media", eager = true)
+    private Collection<Mediaitem> media = new ArrayList<>();
+
+    // the mapstop this page is meant for
+    @DatabaseField(columnName = "mapstop", foreign = true)
+    private Mapstop mapstop;
 
     // empty constructor needed for YAML parsing
     protected Page() {}
@@ -47,11 +63,19 @@ public class Page {
         this.content = content;
     }
 
-    public List<String> getMedia() {
-        return media;
+    public Mapstop getMapstop() {
+        return mapstop;
     }
 
-    public void setMedia(List<String> media) {
+    public void setMapstop(Mapstop mapstop) {
+        this.mapstop = mapstop;
+    }
+
+    public List<Mediaitem> getMedia() {
+        return new ArrayList<>(media);
+    }
+
+    public void setMedia(List<Mediaitem> media) {
         this.media = media;
     }
 }

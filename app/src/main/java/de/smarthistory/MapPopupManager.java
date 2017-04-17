@@ -35,7 +35,7 @@ public class MapPopupManager {
     }
 
     // a data provider
-    private final DataFacade data = DataFacade.getInstance();
+    private final DataFacade data;
 
     // the surface that the popup is shown on
     private final FrameLayout surface;
@@ -60,6 +60,7 @@ public class MapPopupManager {
     private static long NO_ACTIVE_OBJ = -1;
 
     public MapPopupManager(FrameLayout surface) {
+        this.data = DataFacade.getInstance(surface.getContext());
         this.surface = surface;
         this.layoutInflater = LayoutInflater.from(surface.getContext());
 
@@ -169,7 +170,6 @@ public class MapPopupManager {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Tour tour = (Tour) parent.getItemAtPosition(position);
-                // popup.dismiss();
                 showTourIntro(tour, listener);
             }
         });
@@ -208,8 +208,7 @@ public class MapPopupManager {
         buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // popup.dismiss();
-                showTourSelection(data.getCurrentArea(), listener);
+                showTourSelection(tour.getArea(), listener);
             }
         });
     }

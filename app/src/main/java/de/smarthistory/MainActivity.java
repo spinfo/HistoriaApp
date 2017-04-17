@@ -17,9 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -34,16 +32,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import de.smarthistory.data.DataFacade;
-import de.smarthistory.data.FilesDataProvider;
+import de.smarthistory.data.FileService;
 
 public class MainActivity extends AppCompatActivity {
 
-    private  static final Logger LOGGER = Logger.getLogger(MainActivity.class.getName());
+    private DataFacade data;
 
-    private DataFacade data = DataFacade.getInstance();
+    private FileService fileService;
 
     private static final String MAP_FRAGMENT_TAG = "map_fragment";
     private static final String EXPLORE_FRAGMENT_TAG = "explore_data_fragment";
@@ -63,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.data = DataFacade.getInstance(this);
+        this.fileService = new FileService(this);
 
         // prepare the asset files if neccessary
         data.prepareAssets(getAssets(), getExternalFilesDir(null));
@@ -324,11 +324,11 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
-    // empty mehtod to be filled with code for when drawer Item is clicked
+    // Ract to a click on a nav drawer item
     private void selectItem(int position) {
         if (position == 1) {
             MapFragment mapFragment = switchMainFragmentToMap(true);
-            mapFragment.showTourSelection(data.getCurrentArea());
+            mapFragment.showTourSelection(data.getDefaultArea());
             mDrawerLayout.closeDrawers();
         } else if (position == 2) {
             Fragment exploreDataFragment = new ExploreDataFragment();

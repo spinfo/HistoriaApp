@@ -47,6 +47,7 @@ class TourDeserialiser {
         String accessibility = (String) map.get("accessibility");
         String author = (String) map.get("author");
 
+        // TODO: Snake yaml should be able to handle this correctly, without int casting
         Long id = Long.valueOf((int) map.get("id"));
 
         Integer walkLength = (Integer) map.get("walkLength");
@@ -67,10 +68,10 @@ class TourDeserialiser {
 
         // handle the tour track
         List trackPoints = (List) map.get("track");
-        List<GeoPoint> track = new ArrayList<>();
+        List<PersistentGeoPoint> track = new ArrayList<>();
         for(Object elem : trackPoints) {
-            List coords = (List) elem;
-            GeoPoint point = new GeoPoint((Double) coords.get(0), (Double) coords.get(1));
+            List<Double> coords = (List<Double>) elem;
+            PersistentGeoPoint point = new PersistentGeoPoint(coords.get(0), coords.get(1));
             track.add(point);
         }
 
@@ -83,6 +84,17 @@ class TourDeserialiser {
             mapstops.add(mapstop);
         }
 
+        // handle the Area
+        Area area = new Area();
+        Map<String, Object> areaInput = (Map) map.get("area");
+        // TODO: Snake yaml should be able to handle this correctly, without int casting
+        area.setId(Long.valueOf((int) areaInput.get(("id"))));
+        area.setName((String) areaInput.get("name"));
+        List<Double> coords = (List<Double>) areaInput.get("point1");
+        area.setPoint1(new PersistentGeoPoint(coords.get(0), coords.get(1)));
+        coords = (List<Double>) areaInput.get("point2");
+        area.setPoint2(new PersistentGeoPoint(coords.get(0), coords.get(1)));
+
         // handle the creation timestamp
         Date createdAt = null;
         try {
@@ -93,6 +105,12 @@ class TourDeserialiser {
         }
 
         Tour result = new Tour(name, mapstops, tourType, id, walkLength, duration, tagWhat, tagWhen.toString(), tagWhere, createdAt, accessibility, author, intro, track);
+
+        // set area for the tour and the tour's places
+        result.setArea(area);
+        for(Mapstop mapstop : result.getMapstops()) {
+            mapstop.getPlace().setArea(area);
+        }
 
         return result;
     }

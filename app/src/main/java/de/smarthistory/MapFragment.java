@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 
 import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
-import de.smarthistory.data.FilesDataProvider;
 import de.smarthistory.data.Mapstop;
 import de.smarthistory.data.Tour;
 
@@ -53,7 +52,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     private MapPopupManager popupManager;
 
     // the interface to retrieve all actual data from
-    private DataFacade data = DataFacade.getInstance();
+    private DataFacade data = DataFacade.getInstance(getContext());
 
     // the view that this will instantiate, has to be a FrameLayout for us to be able to dim
     // the map on creating a popup
@@ -83,6 +82,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // initialize the state of this fragment with a new map
         state = new MapState();
         state.map = (MapView) mapFragmentView.findViewById(R.id.map);
+
         tourOverlayCache = new HashMap<>();
         MapUtil.setMapDefaults(state.map);
 
@@ -105,7 +105,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // initialize from saved preferences or else start with the default tour
         try {
-            MapStatePersistence.load(state, getPrefs());
+            MapStatePersistence.load(state, getPrefs(), this.getContext());
             switchTour(state.currentTour);
             if (state.mapstopTapped != null) {
                 openInfoWindowFor(state.mapstopTapped);
@@ -113,8 +113,8 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             LOGGER.info("Loaded state from prefs.");
         } catch (MapStatePersistence.InconsistentMapStateException e) {
             LOGGER.info("Could not load map state. Will use defaults. Message: " + e.message);
-            switchTour(data.getCurrentTour());
-            MapUtil.zoomToOverlays(state.map, tourOverlayCache.get(data.getCurrentTour()));
+            List<Overlay> overlays = switchTour(data.getDefaultTour());
+            MapUtil.zoomToOverlays(state.map, overlays);
         }
 
         // recreate popup from bundle if needed
@@ -124,9 +124,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // add Overlay for current location
         addCurrentLocation(state.map);
-
-        // TODO: Remove the next line
-        FilesDataProvider.testRun(getContext());
 
         // return the container for the map view
         return mapFragmentView;
@@ -172,7 +169,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // the tour's track is drawn with a polyline
         // add this first for it to be drawn before the markers
         final Polyline line = MapUtil.makeEmptyTourTrackPolyline(getContext());
-        line.setPoints(tour.getTrack());
+        line.setPoints(tour.getTrackAsGeoPoints());
         overlays.add(line);
 
         // markers for mapstops share a custom info window

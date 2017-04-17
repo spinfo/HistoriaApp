@@ -1,16 +1,12 @@
 package de.smarthistory;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TabHost;
@@ -36,7 +32,7 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
     private static final int TAB_POS_TOURS = 2;
 
     public ExploreDataFragment() {
-        this.data = DataFacade.getInstance();
+        this.data = DataFacade.getInstance(this.getContext());
     }
 
     // these allow to navigate back to tour list from mapstop list
@@ -116,7 +112,7 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
         };
 
         // setup the list view with tours initially
-        List<Tour> tourData = data.getCurrentArea().getTours();
+        List<Tour> tourData = data.getDefaultArea().getTours();
         Tour[] tours = tourData.toArray(new Tour[tourData.size()]);
         tourAdapter = new TourArrayAdapter(getContext(), tours);
         tourOrMapstopList.setAdapter(tourAdapter);

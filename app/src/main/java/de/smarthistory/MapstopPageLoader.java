@@ -46,7 +46,7 @@ public class MapstopPageLoader implements MapstopPageView.PageChangeListener {
         if (mapstop.hasPage(pageNo) && pageNo != currentPage) {
             pageView.setWebChromeClient(new WebChromeClient());
 
-            String url = DataFacade.getInstance().getPageUriForMapstop(mapstop, pageNo);
+            String url = DataFacade.getPageUriForMapstop(mapstop, pageNo);
             pageView.loadUrl(url);
 
             currentPage = pageNo;

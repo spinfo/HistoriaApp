@@ -24,7 +24,7 @@ public class MapstopPageViewActivity extends AppCompatActivity {
             Log.e(this.getClass().getName(), "Could not retrieve mapstop id.");
             return;
         }
-        Mapstop mapstop = DataFacade.getInstance().getMapstopById(mapstopId);
+        Mapstop mapstop = DataFacade.getInstance(this).getMapstopById(mapstopId);
 
         // Get the mapstop view
         View mapstopLayout = getLayoutInflater().inflate(R.layout.mapstop, null);
