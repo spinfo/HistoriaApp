@@ -93,7 +93,8 @@ public class Mapstop {
         this.pages = pages;
     }
 
-    public boolean hasPage(int idx) {
-        return (idx <= this.getPageAmount() && idx > 0);
+    // pages are 1-indexed in the views. Check that the page exists
+    public boolean hasPage(int pageNo) {
+        return (pageNo <= this.getPageAmount() && pageNo > 0);
     }
 }

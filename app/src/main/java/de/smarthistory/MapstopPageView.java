@@ -3,25 +3,21 @@ package de.smarthistory;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
+import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.LexiconEntry;
+import de.smarthistory.data.Mapstop;
 import de.smarthistory.data.UrlSchemes;
 
 public class MapstopPageView extends WebView {
 
-    private boolean showsLexiconArticle = false;
+    private static final String LOG_TAG = MapstopPageView.class.getSimpleName();
 
     interface PageChangeListener {
         void changePage(int offset);
@@ -48,7 +44,7 @@ public class MapstopPageView extends WebView {
         init(context);
     }
 
-    private void init(Context context) {
+    private void init(final Context context) {
         this.context = context;
         this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
         this.setWebViewClient(new WebViewClient() {
@@ -56,11 +52,20 @@ public class MapstopPageView extends WebView {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (url != null && url.startsWith(UrlSchemes.LEXICON)) {
-                    String newUrl = url.replace(UrlSchemes.LEXICON, UrlSchemes.PREFIX_FILES);
-                    Intent intent = new Intent(getContext(), SimpleWebViewActivity.class);
-                    intent.putExtra(getResources().getString(R.string.extra_key_url), newUrl);
-                    getContext().startActivity(intent);
-                    return true;
+                    Long id = UrlSchemes.parseLexiconEntryIdFromUrl(url);
+                    if(id != 0L) {
+                        LexiconEntry entry = DataFacade.getInstance(context).getLexiconEntryById(id);
+                        if(entry != null) {
+                            Intent intent = new Intent(getContext(), SimpleWebViewActivity.class);
+                            intent.putExtra(getResources().getString(R.string.extra_key_simple_web_view_data), entry.getContent());
+                            getContext().startActivity(intent);
+                            return true;
+                        } else {
+                            ErrUtil.failInDebug("No lexicon article for id: " + id);
+                        }
+                    } else {
+                        ErrUtil.failInDebug("Cannot load lexicon article from invalid url: " + url);
+                    }
                 }
                 return false;
             }

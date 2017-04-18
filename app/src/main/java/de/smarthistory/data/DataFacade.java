@@ -68,14 +68,4 @@ public class DataFacade {
     public void prepareAssets(AssetManager assetManager, File externalDir) {
         exampleDataProvider.prepareAssets(assetManager, externalDir);
     }
-
-    // TODO: Move to a service of some kind
-    public static String getPageUriForMapstop(Mapstop mapstop, Integer pageNo) {
-        return ExampleDataProvider.getPageUriForMapstop(mapstop, pageNo);
-    }
-
-    // TODO: Move to a service of some kind
-    public static String getLexiconEntryUri(long lexiconEntryId) {
-        return ExampleDataProvider.getLexiconEntryUri(lexiconEntryId);
-    }
 }

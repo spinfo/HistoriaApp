@@ -33,10 +33,6 @@ class ExampleDataProvider {
 
     private static final String EXAMPLE_DATA_FILE = "res/raw/example_data.json";
 
-    private static final String EXAMPLE_PAGE_FILE_TEMPLATE = UrlSchemes.PREFIX_FILES + "/mmapstopno_ppageno.html";
-
-    private static final String EXAMPLE_LEXENTRY_FILE_TEMPLATE = UrlSchemes.PREFIX_FILES + "/llexentryno.html";
-
     private Lexicon lexicon = new Lexicon();
 
     private List<LexiconEntry> lexiconEntries = new ArrayList<>();
@@ -45,9 +41,7 @@ class ExampleDataProvider {
 
     private boolean assetsPrepared = false;
 
-    protected ExampleDataProvider() {
-
-        Map<Integer, Place> placeMap = new HashMap<>();
+    ExampleDataProvider() {
 
         try {
             InputStream in = this.getClass().getClassLoader().getResourceAsStream(EXAMPLE_DATA_FILE);
@@ -66,8 +60,9 @@ class ExampleDataProvider {
                 JsonObject jLexiconEntry = jLexiconEntries.get(i).getAsJsonObject();
                 long id = jLexiconEntry.get("id").getAsLong();
                 String entryTitle = jLexiconEntry.get("title").getAsString();
+                String content = jLexiconEntry.get("content").getAsString();
 
-                LexiconEntry entry = new LexiconEntry(id, entryTitle);
+                LexiconEntry entry = new LexiconEntry(id, entryTitle, content);
                 lexiconEntries.add(entry);
                 lexicon.addEntry(entry);
                 lexiconEntriesById.put(id, entry);
@@ -91,17 +86,6 @@ class ExampleDataProvider {
     protected LexiconEntry getLexiconEntryById(long id) {
         return lexiconEntriesById.get(id);
     }
-
-    protected static String getPageUriForMapstop(Mapstop mapstop, Integer pageNo) {
-        String path = EXAMPLE_PAGE_FILE_TEMPLATE.replaceFirst("mapstopno", "" + mapstop.getId());
-        path = path.replaceFirst("pageno", pageNo.toString());
-        return path;
-    }
-
-    protected static String getLexiconEntryUri(long lexiconEntryId) {
-        return EXAMPLE_LEXENTRY_FILE_TEMPLATE.replaceFirst("lexentryno", "" + lexiconEntryId);
-    }
-
 
     // This is a temporary hack
     // moving assets to the external dir to get video/audio to play (uris to external dir are

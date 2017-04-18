@@ -43,6 +43,7 @@ class TourDeserialiser {
         String name = (String) map.get("name");
         String intro = (String) map.get("intro");
         String tagWhat = (String) map.get("tagWhat");
+        String tagWhen = (String) map.get("tagWhen");
         String tagWhere = (String) map.get("tagWhere");
         String accessibility = (String) map.get("accessibility");
         String author = (String) map.get("author");
@@ -52,10 +53,6 @@ class TourDeserialiser {
 
         Integer walkLength = (Integer) map.get("walkLength");
         Integer duration = (Integer) map.get("duration");
-
-        // handle the julian date
-        List range = (List) map.get("tagWhen");
-        Date tagWhen = JulianDate.julianToDate((Double) range.get(0));
 
         // handle the type
         String type = (String) map.get("type");
@@ -104,12 +101,20 @@ class TourDeserialiser {
             Log.e(LOG_TAG, "Could not parse creation date: " + e.getMessage());
         }
 
-        Tour result = new Tour(name, mapstops, tourType, id, walkLength, duration, tagWhat, tagWhen.toString(), tagWhere, createdAt, accessibility, author, intro, track);
+        Tour result = new Tour(name, mapstops, tourType, id, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author, intro, track);
 
         // set area for the tour and the tour's places
         result.setArea(area);
         for(Mapstop mapstop : result.getMapstops()) {
             mapstop.getPlace().setArea(area);
+        }
+
+        // if there is a version timestamp, set it, else default to zero
+        long version = Long.valueOf((int) map.get("version"));
+        if(map.get("version") == null) {
+            result.setVersion(0l);
+        } else {
+            result.setVersion(version);
         }
 
         return result;

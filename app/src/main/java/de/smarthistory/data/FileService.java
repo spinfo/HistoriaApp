@@ -132,6 +132,7 @@ public class FileService {
             Log.i("---", m.getTour().getName());
             Log.i("---", tour.getName());
             Log.i("---", "" + tour.getTrack().get(3).getLatitude());
+            Log.i("---", "" + tour.getVersion());
 
             Log.i("---", "" + m.getPages().get(2).getMedia().size());
             Log.i("---", "" + m.getPages().get(2).getMedia().get(1).getGuid());

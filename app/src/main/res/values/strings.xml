@@ -5,7 +5,7 @@
     <string name="extra_key_popup_type">popup_active</string>
     <string name="extra_key_mapstop_id">mapstop_id</string>
     <string name="extra_key_popup_obj_id">popup_obj_id</string>
-    <string name="extra_key_url">url</string>
+    <string name="extra_key_simple_web_view_data">simple_web_view_data</string>
 
     <!-- General names -->
     <string name="name_mapstop">Station</string>

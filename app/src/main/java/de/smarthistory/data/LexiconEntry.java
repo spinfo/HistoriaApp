@@ -9,9 +9,12 @@ public class LexiconEntry {
 
     private final String title;
 
-    public LexiconEntry(long id, String title) {
+    private final String content;
+
+    public LexiconEntry(long id, String title, String content) {
         this.id = id;
         this.title = title;
+        this.content = content;
     }
 
     public long getId() {
@@ -20,5 +23,9 @@ public class LexiconEntry {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getContent() {
+        return content;
     }
 }

@@ -21,6 +21,10 @@ public class Tour {
     @DatabaseField(columnName = "id", id = true)
     private long id;
 
+    // The backend's publishing timestamp
+    @DatabaseField(columnName = "version")
+    private long version;
+
     @DatabaseField(columnName = "name")
     private String name;
 
@@ -91,6 +95,14 @@ public class Tour {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 
     public String getName() {
