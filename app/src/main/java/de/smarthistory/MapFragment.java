@@ -5,11 +5,11 @@ import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
@@ -41,14 +40,13 @@ import de.smarthistory.data.Tour;
  */
 public class MapFragment extends Fragment implements MainActivity.MainActivityFragment, MapPopupManager.OnTourSelectionListener {
 
-    private Logger LOGGER = Logger.getLogger(MapFragment.class.getName());
+    private static final String LOGTAG = MapFragment.class.getSimpleName();
 
     // the state of the map view that will be persisted on view destruction/after closing the app
     public static class MapState {
         MapView map;
         Tour currentTour;
         Mapstop mapstopTapped;
-        boolean zoomedToInitialTour;
     }
     private MapState state;
 
@@ -108,20 +106,19 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         };
         state.map.getOverlays().add(touchOverlay);
 
-        Tour tour;
         // initialize from saved preferences or else start with the default tour
         try {
             MapStatePersistence.load(state, getPrefs(), this.getContext());
-            tour = state.currentTour;
+            switchTourOverlays(state.currentTour);
             if (state.mapstopTapped != null) {
-                openInfoWindowFor(state.mapstopTapped);
+                reopenInfoWindowFor(state.mapstopTapped);
             }
-            LOGGER.info("Loaded state from prefs.");
+            Log.d(LOGTAG, "Loaded state from prefs.");
         } catch (MapStatePersistence.InconsistentMapStateException e) {
-            LOGGER.info("Could not load map state. Will use defaults. Message: " + e.message);
-            tour = data.getDefaultTour();
+            Log.d(LOGTAG, "Could not load map state. Will use defaults. Message: " + e.message);
+            final List<Overlay> tourOverlays = switchTourOverlays(data.getDefaultTour());
+            MapUtil.zoomToOverlays(state.map, tourOverlays);
         }
-        final List<Overlay> tourOverlays = switchTour(tour);
 
         // recreate popup from bundle if needed
         if (savedInstanceState != null) {
@@ -130,19 +127,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // add Overlay for current location
         addCurrentLocation(state.map);
-
-        // zoom to the current tour only when the layout is fully rendered, else the zoom will be
-        // wrong
-        ViewTreeObserver observer = mapFragmentView.getViewTreeObserver();
-        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if(!state.zoomedToInitialTour) {
-                    MapUtil.zoomToOverlays(state.map, tourOverlays);
-                    state.zoomedToInitialTour = true;
-                }
-            }
-        });
 
         // return the container for the map view
         return mapFragmentView;
@@ -205,7 +189,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     // switch the current tour by getting/creating markers. Return those markers.
-    private List<Overlay> switchTour(Tour tour) {
+    private List<Overlay> switchTourOverlays(Tour tour) {
         List<Overlay> markers;
 
         // remove old markers
@@ -221,20 +205,38 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         state.map.getOverlays().addAll(markers);
         state.currentTour = tour;
 
+        // close infowindows belonging to the old tour
+        if(state.mapstopTapped != null) {
+            InfoWindow.closeAllInfoWindowsOn(state.map);
+        }
+
         return markers;
     }
 
     // opens the info window belonging to a mapstop marker if the map contains a marker that
     // has the provided mapstop as a related object
-    private void openInfoWindowFor(Mapstop mapstop) {
-        // TODO: there might be a better way to do this, e.g. taking note of related objects custom service etc.
-        Marker marker;
+    private void reopenInfoWindowFor(Mapstop mapstop) {
+        // TODO: there should be a better way to do this, than looping over all overlays
+        Object relatedObject;
         for (Overlay overlay : state.map.getOverlays()) {
+            // only look at marker overlays
             if (overlay instanceof Marker) {
-                marker = (Marker) overlay;
-                if (mapstop.equals(marker.getRelatedObject())) {
-                    marker.showInfoWindow();
-                    break;
+
+                final Marker marker = (Marker) overlay;
+                relatedObject = marker.getRelatedObject();
+
+                // only look at those markers related to maptstops
+                if(relatedObject instanceof  Mapstop) {
+                    if(((Mapstop) relatedObject).getId() == mapstop.getId()) {
+
+                        // delay opening the info window after the map view has been rendered
+                        state.map.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                marker.showInfoWindow();
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -305,7 +307,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
     @Override
     public void onTourSelected(Tour tour) {
-        List<Overlay> overlays = switchTour(tour);
+        List<Overlay> overlays = switchTourOverlays(tour);
         MapUtil.zoomToOverlays(state.map, overlays);
     }
 

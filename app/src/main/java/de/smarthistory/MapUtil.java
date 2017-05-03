@@ -34,12 +34,19 @@ public abstract class MapUtil {
         map.setMultiTouchControls(true);
     }
 
-    public static void zoomToOverlays(MapView map, List<Overlay> markers) {
-        BoundingBox box = BoundingBox.fromGeoPoints(getGeoPointsFromOverlays(markers));
-        IMapController mapController = map.getController();
-        map.zoomToBoundingBox(box, true);
-        // mapController.setCenter(box.getCenter());
-        // mapController.setZoom(17);
+    public static void zoomToOverlays(final MapView map, final List<Overlay> markers) {
+        final BoundingBox box = BoundingBox.fromGeoPoints(getGeoPointsFromOverlays(markers));
+
+        // the zoom to a bounding box is a bit buggy in osmdroid. It has to happen after layout
+        // is fully rendered and it might fail if the map was not zoomed to a point before,
+        // this contraption (the runnable and the double zoom) makes it work
+        map.post(new Runnable() {
+            @Override
+            public void run() {
+                zoomTo(map, box.getCenter().getLatitude(), box.getCenter().getLongitude(), 17);
+                map.zoomToBoundingBox(box, true);
+            }
+        });
     }
 
     // A Polyline used to draw the track of a tour on the map

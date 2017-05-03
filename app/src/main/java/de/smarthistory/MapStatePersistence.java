@@ -2,6 +2,7 @@ package de.smarthistory;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.osmdroid.api.IGeoPoint;
 
@@ -28,7 +29,7 @@ public abstract class MapStatePersistence {
         writeDouble(editor, K_CENTER_LON, center.getLongitude());
         editor.putInt(K_ZOOM, state.map.getZoomLevel(false));
         editor.putLong(K_TOUR_ID, state.currentTour.getId());
-        // there might be no mapstopped tapped at the moment
+        // there might be no mapstop tapped at the moment
         if (state.mapstopTapped != null) {
             editor.putLong(K_MAPSTOP_TAPPED_ID, state.mapstopTapped.getId());
         } else {
@@ -38,6 +39,7 @@ public abstract class MapStatePersistence {
     }
 
     // restores a MapState, will complain with an InconsistentMapStateException if a value is missing
+    // sets center coordinates and zoom level on the map, but does not recreate any overlays
     public static void load(MapFragment.MapState state, SharedPreferences prefs, Context context) {
         for (String key : KEYS) {
             if (!prefs.contains(key)) {
@@ -64,6 +66,8 @@ public abstract class MapStatePersistence {
         // a mapstop doesn't have to be specified, so don't throw an exception
         if (mapstopTappedId != NO_OBJECT) {
             state.mapstopTapped = DataFacade.getInstance(context).getMapstopById(mapstopTappedId);
+        } else {
+            state.mapstopTapped = null;
         }
 
     }
