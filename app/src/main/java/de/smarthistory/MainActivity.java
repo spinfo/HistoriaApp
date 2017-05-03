@@ -42,8 +42,10 @@ public class MainActivity extends AppCompatActivity {
 
     private FileService fileService;
 
+    // A couple of strings to discern between fragments
     private static final String MAP_FRAGMENT_TAG = "map_fragment";
     private static final String EXPLORE_FRAGMENT_TAG = "explore_data_fragment";
+    private static final String TOUR_DOWNLOAD_FRAGMENT_TAG = "tour_download_fragment";
 
     // variables to interact with the main menu in the navigation drawer
     private DrawerLayout mDrawerLayout;
@@ -64,9 +66,6 @@ public class MainActivity extends AppCompatActivity {
         this.data = DataFacade.getInstance(this);
         this.fileService = new FileService(this);
 
-        // prepare the asset files if neccessary
-        data.prepareAssets(getAssets(), getExternalFilesDir(null));
-
         // This checks and requests permissions to support the map on Marshmallow and above devices
         boolean hasPermissions = checkMapPermissions();
         Log.d("main", "Permission check shows: " + hasPermissions);
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             // initialize the main fragment (the map)
             // make sure, that the fragment container is present
             if (findViewById(R.id.main_fragment_container) != null) {
-                // if we are not restored from a previous state, or t"afterPermissionsGrantedToken"his is a restart after a per-
+                // if we are not restored from a previous state, or this is a restart after a per-
                 // mission granting, create a new map fragment
                 Log.d("main", "savedInstanceState: " + savedInstanceState);
                 if (savedInstanceState == null) {
@@ -113,44 +112,43 @@ public class MainActivity extends AppCompatActivity {
 
     private MapFragment switchMainFragmentToMap(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-
-        // look, if there is a main map fragment already, create a new one if there isn't
         MapFragment mapFragment = (MapFragment) fragmentManager.findFragmentByTag(MAP_FRAGMENT_TAG);
         if (mapFragment == null) {
             mapFragment = new MapFragment();
         }
-
-        // replace the fragment and add to the transaction to the back stack to be able to switch
-        // to it later
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.main_fragment_container, mapFragment, MAP_FRAGMENT_TAG);
-        if (addToBackStack) {
-            transaction.addToBackStack(null);
-        }
-        transaction.commit();
-
+        setupFragmentAsMainFragment(mapFragment, MAP_FRAGMENT_TAG, addToBackStack);
         return mapFragment;
     }
 
     private ExploreDataFragment switchMainFragmentToExploreData(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-
-        // look, if there is a main map fragment already, create a new one if there isn't
         ExploreDataFragment exploreFragment = (ExploreDataFragment) fragmentManager.findFragmentByTag(EXPLORE_FRAGMENT_TAG);
         if (exploreFragment == null) {
             exploreFragment = new ExploreDataFragment();
         }
+        setupFragmentAsMainFragment(exploreFragment, EXPLORE_FRAGMENT_TAG, addToBackStack);
+        return exploreFragment;
+    }
 
-        // replace the fragment and add to the transaction to the back stack to be able to switch
-        // to it later
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.main_fragment_container, exploreFragment, EXPLORE_FRAGMENT_TAG);
+    private TourDownloadFragment switchMainFragmentToTourDownload(boolean addToBackStack) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        TourDownloadFragment downloadFragment = (TourDownloadFragment) fragmentManager.findFragmentByTag(TOUR_DOWNLOAD_FRAGMENT_TAG);
+        if (downloadFragment == null) {
+            downloadFragment = new TourDownloadFragment();
+        }
+        setupFragmentAsMainFragment(downloadFragment, TOUR_DOWNLOAD_FRAGMENT_TAG, addToBackStack);
+        return downloadFragment;
+    }
+
+    // replace the fragment and add (if wished) add this action to the transaction back stack
+    // to be able to switch back later
+    private void setupFragmentAsMainFragment(Fragment fragment, String fragmentTag, boolean addToBackStack) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main_fragment_container, fragment, fragmentTag);
         if (addToBackStack) {
             transaction.addToBackStack(null);
         }
         transaction.commit();
-
-        return exploreFragment;
     }
 
 
@@ -255,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Recreate activity to show the default map view
         if (allGranted) {
+            // TODO: can the next two lines be deleted?
             Intent intent = new Intent();
             intent.putExtra("afterPermissionsGrantedToken", true);
             MainActivity.this.finish();
@@ -317,6 +316,7 @@ public class MainActivity extends AppCompatActivity {
                 res.getString(R.string.menu_select_area),
                 res.getString(R.string.menu_select_tour),
                 res.getString(R.string.menu_explore_data),
+                res.getString(R.string.menu_download_tours),
                 res.getString(R.string.menu_options_general),
                 res.getString(R.string.menu_about)
         };
@@ -331,8 +331,10 @@ public class MainActivity extends AppCompatActivity {
             mapFragment.showTourSelection(data.getDefaultArea());
             mDrawerLayout.closeDrawers();
         } else if (position == 2) {
-            Fragment exploreDataFragment = new ExploreDataFragment();
             switchMainFragmentToExploreData(true);
+            mDrawerLayout.closeDrawers();
+        } else if (position == 3) {
+            switchMainFragmentToTourDownload(true);
             mDrawerLayout.closeDrawers();
         } else {
             Toast.makeText(this, "Selected: " + position, Toast.LENGTH_SHORT).show();

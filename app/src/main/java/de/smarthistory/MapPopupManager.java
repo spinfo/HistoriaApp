@@ -22,6 +22,8 @@ import de.smarthistory.data.Tour;
 
 public class MapPopupManager {
 
+    private static final String LOG_TAG = MapPopupManager.class.getSimpleName();
+
     private enum MapPopupType {
         NONE,
         TOUR_INTRO,
@@ -102,7 +104,7 @@ public class MapPopupManager {
                 final int width = (int) (surface.getWidth() * POPUP_WIDTH_RATIO);
                 final int height = (int) (surface.getHeight() * POPUP_HEIGHT_RATIO);
                 if (width == 0 || height == 0) {
-                    ErrUtil.failInDebug("Bad popup dimensions: " + width + "/" + height);
+                    ErrUtil.failInDebug(LOG_TAG, "Bad popup dimensions: " + width + "/" + height);
                     setSaveStateNil();
                 }
                 popup.setWidth(width);
@@ -295,7 +297,7 @@ public class MapPopupManager {
                 break;
             default:
                 // this should never happen per the above safeguards, but check anyway in debug
-                ErrUtil.failInDebug("Popup type not recognized.");
+                ErrUtil.failInDebug(LOG_TAG, "Popup type not recognized.");
                 activePopupType = MapPopupType.NONE;
                 break;
         }

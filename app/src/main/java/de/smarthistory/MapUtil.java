@@ -37,8 +37,9 @@ public abstract class MapUtil {
     public static void zoomToOverlays(MapView map, List<Overlay> markers) {
         BoundingBox box = BoundingBox.fromGeoPoints(getGeoPointsFromOverlays(markers));
         IMapController mapController = map.getController();
-        mapController.setCenter(box.getCenter());
-        mapController.setZoom(17);
+        map.zoomToBoundingBox(box, true);
+        // mapController.setCenter(box.getCenter());
+        // mapController.setZoom(17);
     }
 
     // A Polyline used to draw the track of a tour on the map

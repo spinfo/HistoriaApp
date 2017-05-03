@@ -61,10 +61,10 @@ public class MapstopPageView extends WebView {
                             getContext().startActivity(intent);
                             return true;
                         } else {
-                            ErrUtil.failInDebug("No lexicon article for id: " + id);
+                            ErrUtil.failInDebug(LOG_TAG, "No lexicon article for id: " + id);
                         }
                     } else {
-                        ErrUtil.failInDebug("Cannot load lexicon article from invalid url: " + url);
+                        ErrUtil.failInDebug(LOG_TAG, "Cannot load lexicon article from invalid url: " + url);
                     }
                 }
                 return false;

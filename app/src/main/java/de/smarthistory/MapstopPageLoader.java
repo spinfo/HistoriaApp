@@ -22,7 +22,7 @@ class MapstopPageLoader implements MapstopPageView.PageChangeListener {
 
     private static final String LOG_TAG = MapstopPageLoader.class.getSimpleName();
 
-    Mapstop mapstop;
+    private Mapstop mapstop;
 
     private MapstopPageView pageView;
 
@@ -58,7 +58,7 @@ class MapstopPageLoader implements MapstopPageView.PageChangeListener {
 
             // load the page content directly from string
             final Page page = this.mapstop.getPages().get(pageNo - 1);
-            pageView.loadDataWithBaseURL(null, page.getContent(), "text/html", "utf-8", null);
+            pageView.loadDataWithBaseURL(null, page.getPresentationContent(pageView.context), "text/html", "utf-8", null);
 
             // setup the current page and indicators
             currentPage = pageNo;

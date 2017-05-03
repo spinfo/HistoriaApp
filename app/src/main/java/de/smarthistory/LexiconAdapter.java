@@ -21,7 +21,7 @@ import de.smarthistory.data.LexiconEntry;
  */
 public class LexiconAdapter extends ArrayAdapter<Object> {
 
-    private Context context;
+    private static String LOG_TAG = LexiconAdapter.class.getSimpleName();
 
     private LayoutInflater inflater;
 
@@ -34,7 +34,6 @@ public class LexiconAdapter extends ArrayAdapter<Object> {
      */
     public LexiconAdapter(Context context, ArrayList<Object> data) {
         super(context, 0, data);
-        this.context = context;
         this.inflater = LayoutInflater.from(context);
     }
 
@@ -69,7 +68,9 @@ public class LexiconAdapter extends ArrayAdapter<Object> {
             displayTextView = (TextView) convertView;
             displayString = ((LexiconEntry) obj).getTitle();
         } else {
-            throw new IllegalStateException("Object in lexicon data is neither Character nor LexiconEntry.");
+            ErrUtil.failInDebug(LOG_TAG, "Object in lexicon data is neither Character nor LexiconEntry.");
+            displayTextView = (TextView) convertView;
+            displayString = "";
         }
 
         displayTextView.setText(displayString);

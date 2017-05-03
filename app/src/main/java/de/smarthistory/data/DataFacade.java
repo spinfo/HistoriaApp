@@ -14,15 +14,12 @@ public class DataFacade {
 
     private static DataFacade instance = null;
 
-    private Context context;
-
     private ExampleDataProvider exampleDataProvider;
 
     private DatabaseDataProvider dbDataProvider;
 
     // private constructor to disallow other instances
     private DataFacade(Context context) {
-        this.context = context;
         this.exampleDataProvider = new ExampleDataProvider();
         this.dbDataProvider = new DatabaseDataProvider(context);
     };
@@ -51,6 +48,7 @@ public class DataFacade {
 
     public Tour getTourById(long id) { return dbDataProvider.getTourById(id); }
 
+    public boolean saveTour(Tour tour) { return dbDataProvider.saveTour(tour); }
 
 
     public Lexicon getLexicon() {
@@ -63,9 +61,5 @@ public class DataFacade {
 
     public LexiconEntry getLexiconEntryById(long id) {
         return exampleDataProvider.getLexiconEntryById(id);
-    }
-
-    public void prepareAssets(AssetManager assetManager, File externalDir) {
-        exampleDataProvider.prepareAssets(assetManager, externalDir);
     }
 }

@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -30,6 +31,7 @@ import java.util.logging.Logger;
 
 import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.FileService;
 import de.smarthistory.data.Mapstop;
 import de.smarthistory.data.Tour;
 
@@ -46,6 +48,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         MapView map;
         Tour currentTour;
         Mapstop mapstopTapped;
+        boolean zoomedToInitialTour;
     }
     private MapState state;
 
@@ -89,8 +92,10 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // the object that will manage all popups on this map
         this.popupManager = new MapPopupManager(mapFragmentView);
 
+        FileService fs = new FileService(getContext());
+
         // set the map up to close all info windows on a click by providing a custom touch overlay
-        Overlay touchOverlay = new Overlay() {
+        final Overlay touchOverlay = new Overlay() {
             @Override
             public void draw(Canvas c, MapView osmv, boolean shadow) {
                 // do nothing
@@ -103,19 +108,20 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         };
         state.map.getOverlays().add(touchOverlay);
 
+        Tour tour;
         // initialize from saved preferences or else start with the default tour
         try {
             MapStatePersistence.load(state, getPrefs(), this.getContext());
-            switchTour(state.currentTour);
+            tour = state.currentTour;
             if (state.mapstopTapped != null) {
                 openInfoWindowFor(state.mapstopTapped);
             }
             LOGGER.info("Loaded state from prefs.");
         } catch (MapStatePersistence.InconsistentMapStateException e) {
             LOGGER.info("Could not load map state. Will use defaults. Message: " + e.message);
-            List<Overlay> overlays = switchTour(data.getDefaultTour());
-            MapUtil.zoomToOverlays(state.map, overlays);
+            tour = data.getDefaultTour();
         }
+        final List<Overlay> tourOverlays = switchTour(tour);
 
         // recreate popup from bundle if needed
         if (savedInstanceState != null) {
@@ -124,6 +130,19 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // add Overlay for current location
         addCurrentLocation(state.map);
+
+        // zoom to the current tour only when the layout is fully rendered, else the zoom will be
+        // wrong
+        ViewTreeObserver observer = mapFragmentView.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if(!state.zoomedToInitialTour) {
+                    MapUtil.zoomToOverlays(state.map, tourOverlays);
+                    state.zoomedToInitialTour = true;
+                }
+            }
+        });
 
         // return the container for the map view
         return mapFragmentView;

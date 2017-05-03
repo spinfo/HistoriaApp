@@ -21,6 +21,9 @@ import de.smarthistory.data.Mapstop;
 import de.smarthistory.data.Tour;
 
 
+/**
+ * Fragment for the "Lesemodus".
+ */
 public class ExploreDataFragment extends Fragment implements MainActivity.MainActivityFragment {
 
     private DataFacade data;
@@ -68,7 +71,7 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Object obj = parent.getItemAtPosition(position);
-                // only react to click on lexicon entries by showing the activity, else do nothing
+                // react to click on lexicon entries by showing the activity, else do nothing
                 if (LexiconEntry.class.equals(obj.getClass())) {
                     Intent intent = new Intent(getActivity(), SimpleWebViewActivity.class);
 

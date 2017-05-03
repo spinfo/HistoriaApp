@@ -31,21 +31,13 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:support-v4:25.1.0'
-    testCompile 'junit:junit:4.12'
-
-    // osmdroid map library
-    // TODO: according to doc this should have ':release@aar' after the version no. Important?
     compile 'org.osmdroid:osmdroid-android:5.6.2'
-
-    // Gson json deserialization for example data
     compile 'com.google.code.gson:gson:2.7'
-
-    // snake yaml for yaml deserialization
     compile 'com.github.bmoliveira:snake-yaml:v1.18-android'
-
-    // ormlite for persistence
     compile 'com.j256.ormlite:ormlite-android:5.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    compile group: 'net.lingala.zip4j', name: 'zip4j', version: '1.3.2'
+    testCompile 'junit:junit:4.12'
 }
