@@ -42,10 +42,9 @@ public class FileService {
             throw new RuntimeException("Could not create the main content directory.");
         }
 
-        // initialize the example tour if the main content dir is empty
-        // TODO: this seems to run too often, is the check ok?
-        initializeExampleData();
+        // initialize the example tour if the main content dir is empty (on first installation)
         if (mainContentDir.list() == null || mainContentDir.list().length == 0) {
+            Log.d(LOG_TAG, "No installed tours found. Initializing the example data.");
             status = initializeExampleData();
             if(!status) {
                 throw new RuntimeException("Could not initialize the example data.");
