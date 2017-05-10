@@ -2,6 +2,7 @@ package de.smarthistory;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -13,6 +14,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -34,13 +36,20 @@ import java.util.List;
 import java.util.Map;
 
 import de.smarthistory.data.DataFacade;
-import de.smarthistory.data.FileService;
 
+/**
+ * The main activity bascially does the following
+ *  - checks if we were restarted on error and if yes, display it
+ *  - checks if we have all necessary permissions (necessary at runtime on API level 23+)
+ *  - sets up a navigation drawer (main menu on the left of the screen)
+ *  - switches between Fragments (which implement most behavior), these are:
+ *      - a MapFragment to display tours and stops on a map
+ *      - an ExploreDataFragment to display tours and stops etc, but not on a map
+ *      - a TourDownloadFragment to download new tours
+ */
 public class MainActivity extends AppCompatActivity {
 
     private DataFacade data;
-
-    private FileService fileService;
 
     // A couple of strings to discern between fragments
     private static final String MAP_FRAGMENT_TAG = "map_fragment";
@@ -63,13 +72,43 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        this.data = DataFacade.getInstance(this);
-        this.fileService = new FileService(this);
+        // if we were re-started after a previous error, show it in a dialog and don't do anything
+        // else so as not to provoke further errors
+        String previousErrorMessage = getIntent()
+                .getStringExtra(getString(R.string.extra_key_restart_error_message));
+        if(previousErrorMessage != null) {
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setTitle(R.string.restart_error);
+            alertDialog.setMessage(previousErrorMessage);
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.resume_app),
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // start anew removing the intent
+                            Intent restartWithoutError = getIntent();
+                            restartWithoutError.removeExtra(getString(R.string.extra_key_restart_error_message));
+                            finish();
+                            startActivity(restartWithoutError);
+                        }
+                    });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getResources().getString(R.string.close_app),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            System.exit(0);
+                        }
+                    });
+            alertDialog.show();
+
+            // do not show any view, just the dialog
+            return;
+        }
 
         // This checks and requests permissions to support the map on Marshmallow and above devices
         boolean hasPermissions = checkMapPermissions();
         Log.d("main", "Permission check shows: " + hasPermissions);
         if (hasPermissions) {
+            this.data = DataFacade.getInstance(this);
+
             setContentView(R.layout.activity_main);
 
             // setup main tool bar as action bar
@@ -164,12 +203,9 @@ public class MainActivity extends AppCompatActivity {
         //if this is the first time launching this app, all settings are set defaults with one exception,
         //the tile cache. the default is the largest write storage partition, which could end up being
         //this app's private storage, depending on device config and permissions
-
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
         //also note that our preference activity has the corresponding save method on the config object, but it can be called at any time.
-
-
         File dbFile = new File(Configuration.getInstance().getOsmdroidTileCache().getAbsolutePath() + File.separator + SqlTileWriter.DATABASE_FILENAME);
         if (Build.VERSION.SDK_INT >= 9 && dbFile.exists()) {
             return dbFile.length();
