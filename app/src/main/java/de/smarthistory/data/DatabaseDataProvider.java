@@ -2,21 +2,15 @@ package de.smarthistory.data;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
-import com.j256.ormlite.stmt.QueryBuilder;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import de.smarthistory.ErrUtil;
-
-import static java.util.Collections.EMPTY_LIST;
 
 public class DatabaseDataProvider {
 
@@ -38,8 +32,9 @@ public class DatabaseDataProvider {
 
     Area getDefaultArea() {
         try {
-            // TODO: THis might not be effective. Is there a better way?
-            return dbHelper.getAreaDao().queryForAll().get(0);
+            // the default area is the first area listed
+            PreparedQuery<Area> query = dbHelper.getAreaDao().queryBuilder().prepare();
+            return dbHelper.getAreaDao().queryForFirst(query);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -63,7 +58,12 @@ public class DatabaseDataProvider {
 
     Tour getDefaultTour() {
         try {
+            // the default tour belongs to the default area, return null if there is none
             Area area = getDefaultArea();
+            if(area == null) {
+                return null;
+            }
+            // return the first tour of the default area
             Dao<Tour, Long> tourDao = dbHelper.getTourDao();
             PreparedQuery<Tour> query = tourDao.queryBuilder().where().eq("area", area).prepare();
             return tourDao.queryForFirst(query);

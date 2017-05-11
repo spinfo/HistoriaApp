@@ -30,7 +30,6 @@ import java.util.Map;
 
 import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
-import de.smarthistory.data.FileService;
 import de.smarthistory.data.Mapstop;
 import de.smarthistory.data.Tour;
 
@@ -90,8 +89,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // the object that will manage all popups on this map
         this.popupManager = new MapPopupManager(mapFragmentView);
 
-        FileService fs = new FileService(getContext());
-
         // set the map up to close all info windows on a click by providing a custom touch overlay
         final Overlay touchOverlay = new Overlay() {
             @Override
@@ -117,7 +114,12 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         } catch (MapStatePersistence.InconsistentMapStateException e) {
             Log.d(LOGTAG, "Could not load map state. Will use defaults. Message: " + e.message);
             final List<Overlay> tourOverlays = switchTourOverlays(data.getDefaultTour());
-            MapUtil.zoomToOverlays(state.map, tourOverlays);
+            if(tourOverlays.isEmpty()) {
+                Log.w(LOGTAG, "No overlays to zoom to, using default.");
+                MapUtil.zoomToDefaultLocation(state.map);
+            } else {
+                MapUtil.zoomToOverlays(state.map, tourOverlays);
+            }
         }
 
         // recreate popup from bundle if needed
@@ -163,6 +165,12 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     private List<Overlay> getOrMakeTourOverlays(MapView map, Tour tour) {
+        if(tour == null) {
+            Log.w(LOGTAG, "Not creating tour overlays for null input.");
+            return new ArrayList<>();
+        }
+
+
         // return the cached overly if one has been constructed previously
         if (tourOverlayCache.containsKey(tour)) {
             return tourOverlayCache.get(tour);

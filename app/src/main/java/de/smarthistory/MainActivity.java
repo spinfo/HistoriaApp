@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -36,11 +37,14 @@ import java.util.List;
 import java.util.Map;
 
 import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.FileService;
+import de.smarthistory.data.Tour;
 
 /**
  * The main activity bascially does the following
  *  - checks if we were restarted on error and if yes, display it
  *  - checks if we have all necessary permissions (necessary at runtime on API level 23+)
+ *  - sets up example data on a fresh installation
  *  - sets up a navigation drawer (main menu on the left of the screen)
  *  - switches between Fragments (which implement most behavior), these are:
  *      - a MapFragment to display tours and stops on a map
@@ -48,6 +52,8 @@ import de.smarthistory.data.DataFacade;
  *      - a TourDownloadFragment to download new tours
  */
 public class MainActivity extends AppCompatActivity {
+
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private DataFacade data;
 
@@ -109,6 +115,17 @@ public class MainActivity extends AppCompatActivity {
         if (hasPermissions) {
             this.data = DataFacade.getInstance(this);
 
+            // if there is no data yet, set it up
+            Tour defaultTour = this.data.getDefaultTour();
+            if(defaultTour == null) {
+                Log.d(LOG_TAG, "No default tour found. Initializing example data.");
+                FileService fs = new FileService(this);
+                boolean result = fs.initializeExampleData();
+                if(!result) {
+                    ErrUtil.failInDebug(LOG_TAG, "Failed to initialize example data.");
+                }
+            }
+
             setContentView(R.layout.activity_main);
 
             // setup main tool bar as action bar
@@ -125,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
                 // mission granting, create a new map fragment
                 Log.d("main", "savedInstanceState: " + savedInstanceState);
                 if (savedInstanceState == null) {
-                    // TODO: 'switch' is the wrong verb here, 'initOrSwitch'?
                     switchMainFragmentToMap(false);
                 }
                 // check if this is a restart after a permission grant
@@ -207,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
 
         //also note that our preference activity has the corresponding save method on the config object, but it can be called at any time.
         File dbFile = new File(Configuration.getInstance().getOsmdroidTileCache().getAbsolutePath() + File.separator + SqlTileWriter.DATABASE_FILENAME);
-        if (Build.VERSION.SDK_INT >= 9 && dbFile.exists()) {
+        if (dbFile.exists()) {
             return dbFile.length();
         }
         return -1;
@@ -232,17 +248,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         List<String> permissions = new ArrayList<>();
-        String message = "osmdroid permissions:";
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-            message += "\nLocation to show user location.";
         }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            message += "\nStorage access to store map tiles.";
         }
         if (!permissions.isEmpty()) {
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             String[] params = permissions.toArray(new String[permissions.size()]);
             // the if condition silences an android studio warning. Actual version check is done
             // when calling checkMapPermissions()
@@ -256,7 +268,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         boolean allGranted = false;
 
         switch (requestCode) {
@@ -301,13 +314,13 @@ public class MainActivity extends AppCompatActivity {
     // START drawer menu
     private void initializeNavDrawerMenu() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        final ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        final ListView drawerList = (ListView) findViewById(R.id.left_drawer);
 
         // set adapter for the list view
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, getNavDrawerTitles()));
+        drawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, getNavDrawerTitles()));
 
         // a click listener, empty for now
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         // interaction with action bar
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mainToolbar, R.string.menu_title, R.string.app_name) {
@@ -360,7 +373,7 @@ public class MainActivity extends AppCompatActivity {
         return result;
     }
 
-    // Ract to a click on a nav drawer item
+    // React to a click on a nav drawer item
     private void selectItem(int position) {
         if (position == 1) {
             MapFragment mapFragment = switchMainFragmentToMap(true);
@@ -391,6 +404,8 @@ public class MainActivity extends AppCompatActivity {
     // TODO this will need changing once we have more than one visible fragment (e.g. on bigger devices)
     public Fragment getVisibleFragment(){
         FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+
+        //noinspection RestrictedApi (this disables Android Studio linting on the next line)
         List<Fragment> fragments = fragmentManager.getFragments();
         if(fragments != null){
             for(Fragment fragment : fragments){

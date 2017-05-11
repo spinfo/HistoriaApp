@@ -28,6 +28,11 @@ public abstract class MapUtil {
         controller.setZoom(zoom);
     }
 
+    public static void zoomToDefaultLocation(MapView map) {
+        // this zooms to the center of germany atm
+        zoomTo(map, 51.163441, 10.447612, 6);
+    }
+
     public static void setMapDefaults(MapView map) {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setBuiltInZoomControls(true);

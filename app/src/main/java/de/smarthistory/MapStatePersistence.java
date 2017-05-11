@@ -10,6 +10,8 @@ import de.smarthistory.data.DataFacade;
 
 public abstract class MapStatePersistence {
 
+    private static final String LOG_TAG = MapStatePersistence.class.getSimpleName();
+
     private static final String K_CENTER_LAT = "centerLat";
     private static final String K_CENTER_LON = "centerLon";
     private static final String K_ZOOM = "zoom";
@@ -28,7 +30,12 @@ public abstract class MapStatePersistence {
         writeDouble(editor, K_CENTER_LAT, center.getLatitude());
         writeDouble(editor, K_CENTER_LON, center.getLongitude());
         editor.putInt(K_ZOOM, state.map.getZoomLevel(false));
-        editor.putLong(K_TOUR_ID, state.currentTour.getId());
+
+        // if there is no tour at the moment do not save any value. This will be dealt with on load.
+        if(state.currentTour != null) {
+            Log.w(LOG_TAG, "No tour to save in map state");
+            editor.putLong(K_TOUR_ID, state.currentTour.getId());
+        }
         // there might be no mapstop tapped at the moment
         if (state.mapstopTapped != null) {
             editor.putLong(K_MAPSTOP_TAPPED_ID, state.mapstopTapped.getId());

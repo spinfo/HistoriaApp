@@ -1,25 +1,18 @@
 package de.smarthistory.data;
 
 import android.content.Context;
-import android.provider.MediaStore;
 import android.util.Log;
-
-import com.j256.ormlite.dao.Dao;
-import com.j256.ormlite.stmt.DeleteBuilder;
-import com.j256.ormlite.stmt.PreparedQuery;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.SQLException;
+
 
 import de.smarthistory.ErrUtil;
 
@@ -40,15 +33,6 @@ public class FileService {
         boolean status = initializeMainContentDir();
         if (!status) {
             throw new RuntimeException("Could not create the main content directory.");
-        }
-
-        // initialize the example tour if the main content dir is empty (on first installation)
-        if (mainContentDir.list() == null || mainContentDir.list().length == 0) {
-            Log.d(LOG_TAG, "No installed tours found. Initializing the example data.");
-            status = initializeExampleData();
-            if(!status) {
-                throw new RuntimeException("Could not initialize the example data.");
-            }
         }
     }
 
@@ -72,7 +56,7 @@ public class FileService {
         return (mainContentDir.exists() && mainContentDir.isDirectory());
     }
 
-    private boolean initializeExampleData() {
+    public boolean initializeExampleData() {
         try {
             // Read the assets file to a temp file
             File temp = File.createTempFile(TOUR_FILE_PREFIX, "", context.getCacheDir());
@@ -89,7 +73,7 @@ public class FileService {
             // hand everything to install
             this.installTour(temp, record);
         } catch(IOException e){
-            Log.e(LOG_TAG, "Error while creating the example tour: " + e.getMessage());
+            ErrUtil.failInDebug(LOG_TAG, e);
             return false;
         }
         return true;
