@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.smarthistory.data.Area;
@@ -26,14 +27,16 @@ public class MapPopupManager {
 
     protected enum MapPopupType {
         NONE,
+        AREA_SELECTION,
         TOUR_INTRO,
         TOUR_SELECTION,
         MAPSTOP
     }
 
-    // an interface for listening on tour selections triggered by popups
-    interface OnTourSelectionListener {
+    // an interface for listening on tour or area selections triggered by a popup
+    interface OnModelSelectionListener {
         void onTourSelected(Tour tour);
+        void onAreaSelected(Area area);
     }
 
     // a data provider
@@ -153,7 +156,35 @@ public class MapPopupManager {
         showAsPopup(mapstopLayout, MapPopupType.MAPSTOP, mapstop.getId(), false);
     }
 
-    public void showTourSelection(Area area, final OnTourSelectionListener listener) {
+    public void showAreaSelection(final OnModelSelectionListener listener) {
+        // Get the list view showing the areas to select from
+        // parent has to be null as it will later be set to the popup container
+        final ListView listView = (ListView) layoutInflater.inflate(R.layout.area_list, null);
+
+        // Connect the view to the list adapter
+        final ArrayList<Area> areas = new ArrayList<>(data.getAreas());
+        final AreaArrayAdapter adapter = new AreaArrayAdapter(surface.getContext(), areas);
+        listView.setAdapter(adapter);
+
+        // open the popup
+        final PopupWindow popup = showAsPopup(listView, MapPopupType.AREA_SELECTION, NO_ACTIVE_OBJ, false);
+
+        // setup the listener to hanlde selection of an area
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object selected = parent.getItemAtPosition(position);
+                if(selected == null || !(selected instanceof Area)) {
+                    ErrUtil.failInDebug(LOG_TAG, "Ignoring bad area selection.");
+                } else {
+                    listener.onAreaSelected((Area) selected);
+                    popup.dismiss();
+                }
+            }
+        });
+    }
+
+    public void showTourSelection(Area area, final OnModelSelectionListener listener) {
         // Get the list view showing the tours to select from
         // parent has to be null as it will later be set to the popup container
         final ListView listView = (ListView) layoutInflater.inflate(R.layout.tour_or_mapstop_list, null);
@@ -165,19 +196,20 @@ public class MapPopupManager {
         listView.setAdapter(toursAdapter);
 
         // open the popup
-        final PopupWindow popup = showAsPopup(listView, MapPopupType.TOUR_SELECTION, area.getId(), false);
+        showAsPopup(listView, MapPopupType.TOUR_SELECTION, area.getId(), false);
 
         // tapping a tour should close tour selection and show the tour intro
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Tour tour = (Tour) parent.getItemAtPosition(position);
+                // hand the listener to the new popup where the tour selection can be made
                 showTourIntro(tour, listener);
             }
         });
     }
 
-    public void showTourIntro(final Tour tour, final OnTourSelectionListener listener) {
+    public void showTourIntro(final Tour tour, final OnModelSelectionListener listener) {
         // get the tour intro view
         // parent has to be null as it will later be set to the popup container
         final View tourIntroView = layoutInflater.inflate(R.layout.tour_intro, null, false);
@@ -257,21 +289,27 @@ public class MapPopupManager {
     }
 
     // restore a popup from a saved state
-    public void restorePopupStateFrom(Bundle bundle, OnTourSelectionListener listener) {
+    public void restorePopupStateFrom(Bundle bundle, OnModelSelectionListener listener) {
         // get the type that was saved to the bundle
         final String savedName = bundle.getString(getString(R.string.extra_key_popup_type), MapPopupType.NONE.name());
         final MapPopupType type = MapPopupType.valueOf(savedName);
 
         // return immediately if no popup is specified
         if (type == MapPopupType.NONE) {
-            activePopupType = type;
+            activePopupType = MapPopupType.NONE;
             return;
+        }
+
+        // if the popup type is the area selection, just show it and be done
+        if (type == MapPopupType.AREA_SELECTION) {
+            activePopupType = MapPopupType.AREA_SELECTION;
+            showAreaSelection(listener);
         }
 
         // get the objects id belonging to the popup to recreate
         final long objId = bundle.getLong(getString(R.string.extra_key_popup_obj_id), -1);
         if (objId == -1) {
-            Log.e("map", "Invalid: Found saved type: " + type + " without saved object id.");
+            Log.e(LOG_TAG, "Invalid: Found saved type: " + type + " without saved object id.");
             activePopupType = MapPopupType.NONE;
             return;
         }
@@ -279,7 +317,7 @@ public class MapPopupManager {
         // if we get this far, try to retrieve the object in question
         final Object popupObject = retrievePopupObject(type, objId);
         if (popupObject == null) {
-            Log.e("map", "Invalid: No object retrievable for popup type: " + type + " and objId: " + objId);
+            Log.e(LOG_TAG, "Invalid: No object retrievable for popup type: " + type + " and objId: " + objId);
             activePopupType = MapPopupType.NONE;
             return;
         }
@@ -296,7 +334,7 @@ public class MapPopupManager {
                 showTourSelection((Area) popupObject, listener);
                 break;
             default:
-                // this should never happen per the above safeguards, but check anyway in debug
+                // this should never happen per the above safeguards, but check anyway
                 ErrUtil.failInDebug(LOG_TAG, "Popup type not recognized.");
                 activePopupType = MapPopupType.NONE;
                 break;

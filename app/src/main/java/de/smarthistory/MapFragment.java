@@ -39,12 +39,13 @@ import de.smarthistory.data.TourOnMap;
 /**
  * The fragment handling the map view
  */
-public class MapFragment extends Fragment implements MainActivity.MainActivityFragment, MapPopupManager.OnTourSelectionListener {
+public class MapFragment extends Fragment implements MainActivity.MainActivityFragment, MapPopupManager.OnModelSelectionListener {
 
     private static final String LOGTAG = MapFragment.class.getSimpleName();
 
     // the state of the map view that will be persisted on view destruction/after closing the app
     public static class MapState {
+        Area area;
         MapView map;
         List<TourOnMap> toursOnMap;
         Mapstop mapstopTapped;
@@ -115,9 +116,11 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             Log.d(LOGTAG, "Loaded state from prefs.");
         } catch (MapStatePersistence.InconsistentMapStateException e) {
             Log.d(LOGTAG, "Could not load map state. Will use defaults. Message: " + e.message);
-            ArrayList<TourOnMap> toursOnMap = new ArrayList<>();
-            toursOnMap.add(new TourOnMap(data.getDefaultTour()));
-            final List<Overlay> tourOverlays = switchTourOverlays(toursOnMap);
+            List<Overlay> tourOverlays = Collections.emptyList();
+            final Tour defaultTour = data.getDefaultTour();
+            if(defaultTour != null) {
+                tourOverlays = switchTourOverlays(new TourOnMap(defaultTour));
+            }
             if(tourOverlays.isEmpty()) {
                 Log.w(LOGTAG, "No overlays to zoom to, using default.");
                 MapUtil.zoomToDefaultLocation(state.map);
@@ -335,6 +338,10 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         popupManager.showTourSelection(area, this);
     }
 
+    public void showAreaSelection() {
+        popupManager.showAreaSelection(this);
+    }
+
     @Override
     public void onTourSelected(Tour tour) {
         if(tour == null) {
@@ -342,6 +349,22 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             return;
         }
         List<Overlay> overlays = switchTourOverlays(new TourOnMap(tour));
+        MapUtil.zoomToOverlays(state.map, overlays);
+    }
+
+    @Override
+    public void onAreaSelected(Area area) {
+        if(area == null || area.getTours() == null || area.getTours().isEmpty()) {
+            if(area != null) Log.d("---->", "" + area.getTours());
+            Log.w(LOGTAG, "Not selecting null or empty area.");
+            return;
+        }
+
+        List<TourOnMap> toursOnMap = new ArrayList<>();
+        for(Tour tour : area.getTours()) {
+            toursOnMap.add(new TourOnMap(tour));
+        }
+        List<Overlay> overlays = switchTourOverlays(toursOnMap);
         MapUtil.zoomToOverlays(state.map, overlays);
     }
 

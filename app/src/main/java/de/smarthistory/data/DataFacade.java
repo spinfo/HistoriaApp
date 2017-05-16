@@ -44,6 +44,10 @@ public class DataFacade {
 
     public Area getDefaultArea() { return dbDataProvider.getDefaultArea(); }
 
+    public long getToursAmount(Area area) {
+        return dbDataProvider.getTourAmount(area);
+    }
+
     public Tour getDefaultTour() { return dbDataProvider.getDefaultTour(); }
 
     public Tour getTourById(long id) { return dbDataProvider.getTourById(id); }

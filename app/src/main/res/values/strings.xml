@@ -36,4 +36,7 @@
     <!-- Strings to indicate whether the application should be resumed or closed -->
     <string name="resume_app">Weiter</string>
     <string name="close_app">Beenden</string>
+
+    <!-- String to indicate a number of tours -->
+    <string name="tour_amount_template">Touren: %d</string>
 </resources>

@@ -2,6 +2,7 @@ package de.smarthistory.data;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
@@ -80,6 +81,25 @@ public class DatabaseDataProvider {
             return dbHelper.getTourDao().queryForId(id);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Get the amount of tours in the area without fetching them.
+     *
+     * @param area The area to find out about.
+     * @return The amount of tours in the area.
+     */
+    long getTourAmount(Area area) {
+        if(area == null) {
+            Log.w(LOG_TAG, "Not counting tours on null area");
+            return 0;
+        }
+        try{
+            return dbHelper.getTourDao().queryBuilder().where().eq("area", area).countOf();
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
+            return 0;
         }
     }
 

@@ -375,7 +375,11 @@ public class MainActivity extends AppCompatActivity {
 
     // React to a click on a nav drawer item
     private void selectItem(int position) {
-        if (position == 1) {
+        if (position == 0) {
+            MapFragment mapFragment = switchMainFragmentToMap(true);
+            mapFragment.showAreaSelection();
+            mDrawerLayout.closeDrawers();
+        } else if (position == 1) {
             MapFragment mapFragment = switchMainFragmentToMap(true);
             mapFragment.showTourSelection(data.getDefaultArea());
             mDrawerLayout.closeDrawers();
