@@ -50,6 +50,13 @@ public class DataFacade {
 
     public boolean saveTour(Tour tour) { return dbDataProvider.saveTour(tour); }
 
+    public List<TourOnMap> getToursOnMap() {
+        return dbDataProvider.getToursOnMap();
+    }
+
+    public boolean saveToursOnMap(List<TourOnMap> toursOnMap) {
+        return dbDataProvider.saveToursOnMap(toursOnMap);
+    }
 
     public Lexicon getLexicon() {
         return exampleDataProvider.getLexicon();

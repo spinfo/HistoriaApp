@@ -5,9 +5,12 @@ import android.content.Context;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.DeleteBuilder;
+import com.j256.ormlite.stmt.PreparedDelete;
 import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 
 import de.smarthistory.ErrUtil;
@@ -139,6 +142,33 @@ public class DatabaseDataProvider {
             return false;
         }
         return true;
+    }
+
+    List<TourOnMap> getToursOnMap() {
+        try {
+            return dbHelper.getTourOnMapDao().queryForAll();
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
+            return Collections.emptyList();
+        }
+    }
+
+    boolean saveToursOnMap(List<TourOnMap> tours) {
+        try {
+            // clear the whole table
+            TableUtils.clearTable(dbHelper.getConnectionSource(), TourOnMap.class);
+
+            // insert the given tours
+            if(tours != null) {
+                int rowsInserted = dbHelper.getTourOnMapDao().create(tours);
+                return (rowsInserted == tours.size());
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
+            return false;
+        }
     }
 
 }

@@ -24,6 +24,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<Tour, Long> tourDao = null;
     private Dao<PersistentGeoPoint, Long> geopointDao = null;
     private Dao<Area, Long> areaDao = null;
+    private Dao<TourOnMap, Long> tourOnMapDao = null;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -39,6 +40,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, Tour.class);
             TableUtils.createTable(connectionSource, PersistentGeoPoint.class);
             TableUtils.createTable(connectionSource, Area.class);
+            TableUtils.createTable(connectionSource, TourOnMap.class);
         } catch (SQLException e){
             throw new RuntimeException(e);
         }
@@ -97,6 +99,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return areaDao;
     }
 
+    public Dao<TourOnMap, Long> getTourOnMapDao() {
+        if(tourOnMapDao == null) {
+            tourOnMapDao = getMyDaoRuntimeExcept(TourOnMap.class);
+        }
+        return tourOnMapDao;
+    }
+
     // convenience method that wraps the SQL Exception on Dao Creation
     private <D extends Dao<T, ?>, T> D getMyDaoRuntimeExcept(Class<T> clazz) {
         D result = null;
@@ -117,6 +126,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         tourDao = null;
         geopointDao = null;
         areaDao = null;
+        tourOnMapDao = null;
 
         super.close();
     }

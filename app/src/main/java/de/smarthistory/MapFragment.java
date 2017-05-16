@@ -24,6 +24,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.Mapstop;
 import de.smarthistory.data.Tour;
+import de.smarthistory.data.TourOnMap;
 
 
 /**
@@ -44,7 +46,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     // the state of the map view that will be persisted on view destruction/after closing the app
     public static class MapState {
         MapView map;
-        Tour currentTour;
+        List<TourOnMap> toursOnMap;
         Mapstop mapstopTapped;
     }
     private MapState state;
@@ -105,15 +107,17 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // initialize from saved preferences or else start with the default tour
         try {
-            MapStatePersistence.load(state, getPrefs(), this.getContext());
-            switchTourOverlays(state.currentTour);
+            MapStatePersistence.load(state, getPrefs(), data, this.getContext());
+            switchTourOverlays(state.toursOnMap);
             if (state.mapstopTapped != null) {
                 reopenInfoWindowFor(state.mapstopTapped);
             }
             Log.d(LOGTAG, "Loaded state from prefs.");
         } catch (MapStatePersistence.InconsistentMapStateException e) {
             Log.d(LOGTAG, "Could not load map state. Will use defaults. Message: " + e.message);
-            final List<Overlay> tourOverlays = switchTourOverlays(data.getDefaultTour());
+            ArrayList<TourOnMap> toursOnMap = new ArrayList<>();
+            toursOnMap.add(new TourOnMap(data.getDefaultTour()));
+            final List<Overlay> tourOverlays = switchTourOverlays(toursOnMap);
             if(tourOverlays.isEmpty()) {
                 Log.w(LOGTAG, "No overlays to zoom to, using default.");
                 MapUtil.zoomToDefaultLocation(state.map);
@@ -138,7 +142,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     @Override
     public void onPause() {
         super.onPause();
-        MapStatePersistence.save(state, getPrefs());
+        MapStatePersistence.save(state, getPrefs(), data);
     }
 
     // temporarily save an open popup view in the preferences
@@ -170,7 +174,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             return new ArrayList<>();
         }
 
-
         // return the cached overly if one has been constructed previously
         if (tourOverlayCache.containsKey(tour)) {
             return tourOverlayCache.get(tour);
@@ -196,24 +199,43 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         return overlays;
     }
 
-    // switch the current tour by getting/creating markers. Return those markers.
-    private List<Overlay> switchTourOverlays(Tour tour) {
-        List<Overlay> markers;
+    // switches the current tour to the single tour supplied by getting/creating markers.
+    // Returns those markers.
+    private List<Overlay> switchTourOverlays(TourOnMap tourOnMap) {
+        if (tourOnMap == null || tourOnMap.getTour() == null) {
+            Log.w(LOGTAG, "Empty tour as input.");
+            return Collections.emptyList();
+        }
+
+        final List<TourOnMap> substituteList = new ArrayList<TourOnMap>(1);
+        substituteList.add(tourOnMap);
+        return switchTourOverlays(substituteList);
+    }
+
+    // switches the current tour to the tours supplied by getting/creating markers.
+    // Returns those markers.
+    private List<Overlay> switchTourOverlays(List<TourOnMap> toursOnMap) {
+        final List<Overlay> markers = new ArrayList<>();
 
         // remove old markers
         // we cannot clear() the whole list because of the touch overlay registering general clicks
         // to the map.
-        if (state.currentTour != null) {
-            markers = getOrMakeTourOverlays(state.map, state.currentTour);
+        if (state.toursOnMap != null) {
+            for (TourOnMap tourOnMap : toursOnMap) {
+                markers.addAll(getOrMakeTourOverlays(state.map, tourOnMap.getTour()));
+            }
             state.map.getOverlays().removeAll(markers);
+            markers.clear();
         }
 
         // add new markers
-        markers = getOrMakeTourOverlays(state.map, tour);
-        state.map.getOverlays().addAll(markers);
-        state.currentTour = tour;
+        for(TourOnMap tourOnMap : toursOnMap) {
+            markers.addAll(getOrMakeTourOverlays(state.map, tourOnMap.getTour()));
+            state.map.getOverlays().addAll(markers);
+        }
+        state.toursOnMap = toursOnMap;
 
-        // close infowindows belonging to the old tour
+        // close a possible infowindow belonging to the old tour
         if(state.mapstopTapped != null) {
             InfoWindow.closeAllInfoWindowsOn(state.map);
         }
@@ -315,7 +337,11 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
     @Override
     public void onTourSelected(Tour tour) {
-        List<Overlay> overlays = switchTourOverlays(tour);
+        if(tour == null) {
+            Log.w(LOGTAG, "Not selecting null tour.");
+            return;
+        }
+        List<Overlay> overlays = switchTourOverlays(new TourOnMap(tour));
         MapUtil.zoomToOverlays(state.map, overlays);
     }
 

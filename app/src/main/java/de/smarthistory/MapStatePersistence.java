@@ -6,7 +6,10 @@ import android.util.Log;
 
 import org.osmdroid.api.IGeoPoint;
 
+import java.util.List;
+
 import de.smarthistory.data.DataFacade;
+import de.smarthistory.data.TourOnMap;
 
 public abstract class MapStatePersistence {
 
@@ -15,15 +18,13 @@ public abstract class MapStatePersistence {
     private static final String K_CENTER_LAT = "centerLat";
     private static final String K_CENTER_LON = "centerLon";
     private static final String K_ZOOM = "zoom";
-    private static final String K_TOUR_ID = "tourId";
     private static final String K_MAPSTOP_TAPPED_ID = "mapstopTappedId";
 
     private static final long NO_OBJECT = -1;
 
-    private static final String[] KEYS = { K_CENTER_LAT, K_CENTER_LON, K_ZOOM,
-            K_TOUR_ID, K_MAPSTOP_TAPPED_ID };
+    private static final String[] KEYS = { K_CENTER_LAT, K_CENTER_LON, K_ZOOM, K_MAPSTOP_TAPPED_ID };
 
-    public static void save(MapFragment.MapState state, SharedPreferences prefs) {
+    public static void save(MapFragment.MapState state, SharedPreferences prefs, DataFacade data) {
         IGeoPoint center = state.map.getMapCenter();
 
         SharedPreferences.Editor editor = prefs.edit();
@@ -31,11 +32,14 @@ public abstract class MapStatePersistence {
         writeDouble(editor, K_CENTER_LON, center.getLongitude());
         editor.putInt(K_ZOOM, state.map.getZoomLevel(false));
 
-        // if there is no tour at the moment do not save any value. This will be dealt with on load.
-        if(state.currentTour != null) {
-            Log.w(LOG_TAG, "No tour to save in map state");
-            editor.putLong(K_TOUR_ID, state.currentTour.getId());
+        // if there is no tour at the moment do not save any value.
+        if(state.toursOnMap != null) {
+            final boolean result = data.saveToursOnMap(state.toursOnMap);
+            if(!result) {
+                Log.w(LOG_TAG, "Failed to save state of tours on map.");
+            }
         }
+
         // there might be no mapstop tapped at the moment
         if (state.mapstopTapped != null) {
             editor.putLong(K_MAPSTOP_TAPPED_ID, state.mapstopTapped.getId());
@@ -47,7 +51,7 @@ public abstract class MapStatePersistence {
 
     // restores a MapState, will complain with an InconsistentMapStateException if a value is missing
     // sets center coordinates and zoom level on the map, but does not recreate any overlays
-    public static void load(MapFragment.MapState state, SharedPreferences prefs, Context context) {
+    public static void load(MapFragment.MapState state, SharedPreferences prefs, DataFacade data, Context context) {
         for (String key : KEYS) {
             if (!prefs.contains(key)) {
                 throw new InconsistentMapStateException("Map state without key '" + key + "'");
@@ -57,18 +61,18 @@ public abstract class MapStatePersistence {
             throw new InconsistentMapStateException("Can't load map state onto null view.");
         }
         // TODO: Bounds check or better default values
-        double lat = readDouble(prefs, K_CENTER_LAT, 0.0);
-        double lon = readDouble(prefs, K_CENTER_LON, 0.0);
-        int zoom = prefs.getInt(K_ZOOM, 16);
-        long tourId = prefs.getLong(K_TOUR_ID, NO_OBJECT);
-        long mapstopTappedId = prefs.getLong(K_MAPSTOP_TAPPED_ID, NO_OBJECT);
-
+        final double lat = readDouble(prefs, K_CENTER_LAT, 0.0);
+        final double lon = readDouble(prefs, K_CENTER_LON, 0.0);
+        final int zoom = prefs.getInt(K_ZOOM, 16);
+        final long mapstopTappedId = prefs.getLong(K_MAPSTOP_TAPPED_ID, NO_OBJECT);
         MapUtil.zoomTo(state.map, lat, lon, zoom);
-        if (tourId != NO_OBJECT) {
-            state.currentTour = DataFacade.getInstance(context).getTourById(tourId);
-        } else {
+
+        final List<TourOnMap> toursOnMap = data.getToursOnMap();
+        if (toursOnMap == null || toursOnMap.isEmpty()) {
             // a tour is always specified
-            throw new InconsistentMapStateException("Tour id not specified.");
+            throw new InconsistentMapStateException("No tour on map given.");
+        } else {
+            state.toursOnMap = toursOnMap;
         }
         // a mapstop doesn't have to be specified, so don't throw an exception
         if (mapstopTappedId != NO_OBJECT) {
@@ -92,11 +96,13 @@ public abstract class MapStatePersistence {
         return Double.longBitsToDouble(prefs.getLong(key, 0));
     }
 
-    public static class InconsistentMapStateException extends RuntimeException {
+    static class InconsistentMapStateException extends RuntimeException {
+
+        static final long serialVersionUID = 1L;
 
         String message;
 
-        public InconsistentMapStateException(String message) {
+        InconsistentMapStateException(String message) {
             super(message);
             this.message = message;
         }
