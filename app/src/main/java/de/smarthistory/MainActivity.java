@@ -381,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
             mDrawerLayout.closeDrawers();
         } else if (position == 1) {
             MapFragment mapFragment = switchMainFragmentToMap(true);
-            mapFragment.showTourSelection(data.getDefaultArea());
+            mapFragment.showTourSelection();
             mDrawerLayout.closeDrawers();
         } else if (position == 2) {
             switchMainFragmentToExploreData(true);

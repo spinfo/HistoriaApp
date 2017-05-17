@@ -334,8 +334,11 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         }
     }
 
-    public void showTourSelection(Area area) {
-        popupManager.showTourSelection(area, this);
+    public void showTourSelection() {
+        if(state.area == null) {
+            ErrUtil.failInDebug(LOGTAG, "No area given to select tours for.");
+        }
+        popupManager.showTourSelection(state.area, this);
     }
 
     public void showAreaSelection() {

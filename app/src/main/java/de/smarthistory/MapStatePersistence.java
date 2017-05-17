@@ -88,6 +88,8 @@ public abstract class MapStatePersistence {
         } else {
             state.mapstopTapped = null;
         }
+        // an area should always be given. Read it from the preferences or set default from db
+        state.area = getArea(prefs, data);
     }
 
     /**
