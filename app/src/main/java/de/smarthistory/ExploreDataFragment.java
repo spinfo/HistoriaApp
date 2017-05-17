@@ -1,8 +1,11 @@
 package de.smarthistory;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,7 @@ import android.widget.TabHost.TabSpec;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.LexiconEntry;
 import de.smarthistory.data.Mapstop;
@@ -25,6 +29,8 @@ import de.smarthistory.data.Tour;
  * Fragment for the "Lesemodus".
  */
 public class ExploreDataFragment extends Fragment implements MainActivity.MainActivityFragment {
+
+    private static final String LOGTAG = ExploreDataFragment.class.getSimpleName();
 
     private DataFacade data;
 
@@ -84,15 +90,15 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
         });
 
         // Tab2: Lesezeichen
-        TabSpec tabSpec2 = tabHost.newTabSpec("Lesezeichen");
+        TabSpec tabSpec2 = tabHost.newTabSpec(getString(R.string.favorites));
         tabSpec2.setContent(R.id.tab2);
-        tabSpec2.setIndicator("Lesezeichen");
+        tabSpec2.setIndicator(getString(R.string.favorites));
         tabHost.addTab(tabSpec2);
 
         // Tab3: Touren
-        TabSpec tabSpec3 = tabHost.newTabSpec("Touren");
+        TabSpec tabSpec3 = tabHost.newTabSpec(getString(R.string.tours));
         tabSpec3.setContent(R.id.tab3);
-        tabSpec3.setIndicator("Touren");
+        tabSpec3.setIndicator(getString(R.string.tours));
         tabHost.addTab(tabSpec3);
 
         // the list view that will contain tours as well as mapstops
@@ -115,9 +121,16 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
             }
         };
 
-        // setup the list view with tours initially
-        List<Tour> tourData = data.getDefaultArea().getTours();
-        Tour[] tours = tourData.toArray(new Tour[tourData.size()]);
+        // setup the list view with tours initially, use the area defined in preferences or db
+        final Area area = MapStatePersistence.getArea(getPrefs(), data);
+        final Tour[] tours;
+        if(area != null) {
+            List<Tour> tourData = area.getTours();
+            tours = tourData.toArray(new Tour[tourData.size()]);
+        } else {
+            ErrUtil.failInDebug(LOGTAG, "Cannot determine area to use.");
+            tours = new Tour[0];
+        }
         tourAdapter = new TourArrayAdapter(getContext(), tours);
         tourOrMapstopList.setAdapter(tourAdapter);
         tourOrMapstopList.setOnItemClickListener(onTourOrMapstopClickListener);
@@ -128,8 +141,7 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
     private ListAdapter getMapstopListAdapterForTour(Tour tour) {
         List<Mapstop> mapstopData = tour.getMapstops();
         Mapstop[] mapstops = mapstopData.toArray(new Mapstop[mapstopData.size()]);
-        MapstopArrayAdapter mapstopAdapter = new MapstopArrayAdapter(getContext(), mapstops);
-        return mapstopAdapter;
+        return new MapstopArrayAdapter(getContext(), mapstops);
     }
 
     @Override
@@ -144,5 +156,10 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
             }
         }
         return result;
+    }
+
+    // Convenience method to get SharedPreferences in a standard way
+    private SharedPreferences getPrefs() {
+        return getActivity().getPreferences(Context.MODE_PRIVATE);
     }
 }

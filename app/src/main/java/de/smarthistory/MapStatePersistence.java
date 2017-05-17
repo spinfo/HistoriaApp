@@ -8,6 +8,7 @@ import org.osmdroid.api.IGeoPoint;
 
 import java.util.List;
 
+import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.TourOnMap;
 
@@ -19,10 +20,12 @@ public abstract class MapStatePersistence {
     private static final String K_CENTER_LON = "centerLon";
     private static final String K_ZOOM = "zoom";
     private static final String K_MAPSTOP_TAPPED_ID = "mapstopTappedId";
+    private static final String K_AREA_ID = "areaId";
 
     private static final long NO_OBJECT = -1;
 
-    private static final String[] KEYS = { K_CENTER_LAT, K_CENTER_LON, K_ZOOM, K_MAPSTOP_TAPPED_ID };
+    private static final String[] KEYS = { K_CENTER_LAT, K_CENTER_LON, K_ZOOM,
+            K_AREA_ID, K_MAPSTOP_TAPPED_ID };
 
     public static void save(MapFragment.MapState state, SharedPreferences prefs, DataFacade data) {
         IGeoPoint center = state.map.getMapCenter();
@@ -40,11 +43,16 @@ public abstract class MapStatePersistence {
             }
         }
 
+        // there should always be an area value to set
+        if(state.area != null) {
+            safeWriteIdValue(editor, K_AREA_ID, state.area.getId());
+        }
+
         // there might be no mapstop tapped at the moment
         if (state.mapstopTapped != null) {
-            editor.putLong(K_MAPSTOP_TAPPED_ID, state.mapstopTapped.getId());
+            safeWriteIdValue(editor, K_MAPSTOP_TAPPED_ID, state.mapstopTapped.getId());
         } else {
-            editor.putLong(K_MAPSTOP_TAPPED_ID, NO_OBJECT);
+            safeWriteIdValue(editor, K_MAPSTOP_TAPPED_ID, NO_OBJECT);
         }
         editor.apply();
     }
@@ -76,11 +84,37 @@ public abstract class MapStatePersistence {
         }
         // a mapstop doesn't have to be specified, so don't throw an exception
         if (mapstopTappedId != NO_OBJECT) {
-            state.mapstopTapped = DataFacade.getInstance(context).getMapstopById(mapstopTappedId);
+            state.mapstopTapped = data.getMapstopById(mapstopTappedId);
         } else {
             state.mapstopTapped = null;
         }
+    }
 
+    /**
+     * Read the area from shared Preferences
+     * @param prefs The SharedPreferences used to get the area id from.
+     * @return Area object or null on db failure
+     */
+    public static Area getArea(SharedPreferences prefs, DataFacade data) {
+        final Area result;
+        if(prefs.contains(K_AREA_ID)) {
+            final long id = prefs.getLong(K_AREA_ID, NO_OBJECT);
+            if(id == NO_OBJECT) {
+                result = data.getDefaultArea();
+            } else {
+                result = data.getAreaById(id);
+            }
+        } else {
+            result = data.getDefaultArea();
+        }
+        return result;
+    }
+
+    private static void safeWriteIdValue(SharedPreferences.Editor editor, String key, Long id) {
+        if(id == null || id < 0) {
+            id = NO_OBJECT;
+        }
+        editor.putLong(key, id);
     }
 
     // since shared prefs can't store doubles we need to store as long to not loose precision

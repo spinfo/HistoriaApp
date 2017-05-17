@@ -12,6 +12,8 @@
     <string name="name_mapstop">Station</string>
     <string name="name_mapstops">Stationen</string>
     <string name="action_test">Testen</string>
+    <string name="tours">Touren</string>
+    <string name="favorites">Lesezeichen</string>
 
     <!-- Strings for the menu -->
     <string name="menu_title">Menü</string>

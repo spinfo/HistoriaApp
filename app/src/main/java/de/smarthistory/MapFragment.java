@@ -354,12 +354,15 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
     @Override
     public void onAreaSelected(Area area) {
+        // abort if the area is null or has no tours connected
         if(area == null || area.getTours() == null || area.getTours().isEmpty()) {
             if(area != null) Log.d("---->", "" + area.getTours());
             Log.w(LOGTAG, "Not selecting null or empty area.");
             return;
         }
-
+        // set the area in the state
+        state.area = area;
+        // show the tours of the area
         List<TourOnMap> toursOnMap = new ArrayList<>();
         for(Tour tour : area.getTours()) {
             toursOnMap.add(new TourOnMap(tour));
