@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmartHistory</string>
+    <string name="app_name">HistoriaApp</string>
 
     <!-- Strings for bundle extra keys -->
     <string name="extra_key_popup_type">popup_active</string>
