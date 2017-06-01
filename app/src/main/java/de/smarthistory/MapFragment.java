@@ -119,10 +119,12 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             List<Overlay> tourOverlays = Collections.emptyList();
             final Tour defaultTour = data.getDefaultTour();
             if(defaultTour != null) {
+                state.area = defaultTour.getArea();
                 tourOverlays = switchTourOverlays(new TourOnMap(defaultTour));
             }
             if(tourOverlays.isEmpty()) {
                 Log.w(LOGTAG, "No overlays to zoom to, using default.");
+                state.area = data.getDefaultArea();
                 MapUtil.zoomToDefaultLocation(state.map);
             } else {
                 MapUtil.zoomToOverlays(state.map, tourOverlays);
