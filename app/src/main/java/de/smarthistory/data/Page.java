@@ -1,12 +1,10 @@
 package de.smarthistory.data;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -86,31 +84,7 @@ public class Page {
     }
 
     public String getPresentationContent(Context context) {
-        List<Mediaitem> media = getMedia();
-        if(media == null || media.isEmpty()) {
-            return this.content;
-        }
-
-        FileService fileService = new FileService(context);
-        String content = getContent();
-        for(Mediaitem mediaitem : media) {
-            // Treat the mediaitem guid as a file to get the basename
-            File guidFile = new File(mediaitem.getGuid());
-            String base = guidFile.getName();
-
-            if(base.isEmpty()) {
-                Log.w(LOG_TAG, "Could not determine base for guid: " + mediaitem.getGuid());
-            } else {
-                File file = fileService.getFile(base);
-                if(file.exists()) {
-                    String replacement = UrlSchemes.FILE + file.getAbsolutePath();
-                    Log.d(LOG_TAG, "Replacing: '" + mediaitem.getGuid() + "' with '" + replacement + "'");
-                    content = content.replaceAll(mediaitem.getGuid(), replacement);
-                } else {
-                    Log.w(LOG_TAG, "No file for basename: " + base);
-                }
-            }
-        }
-        return content;
+        String content = HtmlContentCompletion.replaceMediaitems(getContent(), getMedia(), context);
+        return HtmlContentCompletion.wrapInPage(content);
     }
 }
