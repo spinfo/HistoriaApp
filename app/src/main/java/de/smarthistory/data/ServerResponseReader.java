@@ -14,13 +14,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class BackendDeserialiser {
+public class ServerResponseReader {
 
-    private static final String LOG_TAG = BackendDeserialiser.class.getName();
+    private static final String LOG_TAG = ServerResponseReader.class.getName();
 
-    private static Yaml yaml = new Yaml();
+    private static final Yaml yaml = new Yaml();
 
-    private static Yaml TOUR_RECORD_YAML = new Yaml(new Constructor(TourRecord.class));
+    private static final Yaml TOUR_RECORD_YAML = new Yaml(new Constructor(TourRecord.class));
+
+    private static final Yaml LEXICON_ENTRY_YAML = new Yaml(new Constructor(LexiconEntry.class));
 
     private static final Yaml MAPSTOP_YAML;
     static {
@@ -83,6 +85,7 @@ public class BackendDeserialiser {
         List<Mapstop> mapstops = new ArrayList<>();
         List<Map<String, Object>> mapstopsInput = (List) map.get("mapstops");
         for(Map<String, Object> mapstopInput : mapstopsInput) {
+            // TODO: There should be a better way to do this (not dumping, then loading)
             String mapstopTest = yaml.dump(mapstopInput);
             Mapstop mapstop = (Mapstop) MAPSTOP_YAML.load(mapstopTest);
             mapstops.add(mapstop);
@@ -122,6 +125,18 @@ public class BackendDeserialiser {
         } else {
             long version = Long.valueOf((int) map.get("version"));
             result.setVersion(version);
+        }
+
+        // if there are lexicon entries, add them to the tour
+        if(map.get("lexiconEntries") != null) {
+            List<Map<String, Object>> entriesInput = (List) map.get("lexiconEntries");
+            List<LexiconEntry> entries = new ArrayList<>(entriesInput.size());
+            for(Map<String, Object> entryInput : entriesInput) {
+                // TODO: There should be a better way to do this (not dumping, then loading)
+                LexiconEntry entry = (LexiconEntry) LEXICON_ENTRY_YAML.load(yaml.dump(entryInput));
+                entries.add(entry);
+            }
+            result.setLexiconEntries(entries);
         }
 
         return result;

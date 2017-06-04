@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -47,6 +49,15 @@ public class MapstopPageView extends WebView {
     private void init(final Context context) {
         this.context = context;
         this.gestureDetector = new GestureDetector(context, simpleOnGestureListener);
+
+        // disable hardware acceleration for this view.
+        this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+
+        // disable caching as our pages are all local
+        this.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+
+        // here we overwrite what happens when a link is clicked, and especially modify the
+        // behaviour for links that go to lexicon articles
         this.setWebViewClient(new WebViewClient() {
 
             @Override

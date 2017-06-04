@@ -62,5 +62,14 @@ public class HtmlContentCompletion {
         return content;
     }
 
+    public static String setTitle(String content, String title) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<h1>");
+        sb.append(title);
+        sb.append("</h1>");
+        sb.append(content);
+        return sb.toString();
+    }
+
 
 }

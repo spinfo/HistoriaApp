@@ -14,13 +14,10 @@ public class DataFacade {
 
     private static DataFacade instance = null;
 
-    private ExampleDataProvider exampleDataProvider;
-
     private DatabaseDataProvider dbDataProvider;
 
     // private constructor to disallow other instances
     private DataFacade(Context context) {
-        this.exampleDataProvider = new ExampleDataProvider();
         this.dbDataProvider = new DatabaseDataProvider(context);
     };
 
@@ -63,14 +60,14 @@ public class DataFacade {
     }
 
     public Lexicon getLexicon() {
-        return exampleDataProvider.getLexicon();
-    }
-
-    public List<LexiconEntry> getLexiconEntries() {
-        return exampleDataProvider.getLexiconEntries();
+        return dbDataProvider.getLexicon();
     }
 
     public LexiconEntry getLexiconEntryById(long id) {
-        return exampleDataProvider.getLexiconEntryById(id);
+        return dbDataProvider.getLexiconEntryById(id);
+    }
+
+    public boolean saveLexiconEntries(List<LexiconEntry> entries) {
+        return dbDataProvider.saveLexiconEntries(entries);
     }
 }

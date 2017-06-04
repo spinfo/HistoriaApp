@@ -112,6 +112,7 @@ public class DatabaseDataProvider {
         Dao<PersistentGeoPoint, Long> pointDao = dbHelper.getGeopointDao();
         Dao<Area, Long> areaDao = dbHelper.getAreaDao();
 
+        // TODO: Implement proper deletion of a tour cascading to mapstops, pages, track etc.
         try {
             for (Mapstop m : tour.getMapstops()) {
                 m.setTour(tour);
@@ -188,6 +189,49 @@ public class DatabaseDataProvider {
         } catch (SQLException e) {
             ErrUtil.failInDebug(LOG_TAG, e);
             return false;
+        }
+    }
+
+    boolean saveLexiconEntries(List<LexiconEntry> entries) {
+        if(entries == null || entries.isEmpty()) {
+            Log.w(LOG_TAG, "Attempt to save empty or null list of lexicon entries");
+            return true;
+        }
+
+        try {
+            for(LexiconEntry entry : entries) {
+                dbHelper.getLexiconEntryDao().createOrUpdate(entry);
+            }
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
+            return false;
+        }
+        return true;
+    }
+
+    protected Lexicon getLexicon() {
+        Lexicon lexicon = new Lexicon();
+
+        List<LexiconEntry> entries = Collections.emptyList();
+        try {
+            entries = dbHelper.getLexiconEntryDao().queryForAll();
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
+        }
+
+        for (LexiconEntry entry : entries) {
+            lexicon.addEntry(entry);
+        }
+
+        return lexicon;
+    }
+
+    protected LexiconEntry getLexiconEntryById(long id) {
+        try {
+            return dbHelper.getLexiconEntryDao().queryForId(id);
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
+            return null;
         }
     }
 

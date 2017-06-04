@@ -17,7 +17,7 @@ import android.widget.Toast;
 import java.io.File;
 
 import de.smarthistory.data.AvailableTours;
-import de.smarthistory.data.BackendDeserialiser;
+import de.smarthistory.data.ServerResponseReader;
 import de.smarthistory.data.DownloadCallback;
 import de.smarthistory.data.DownloadFileTask;
 import de.smarthistory.data.DownloadStringTask;
@@ -57,7 +57,7 @@ public class TourDownloadFragment extends Fragment implements MainActivity.MainA
                 Toast.makeText(getActivity(), "Unable to connect to server.", Toast.LENGTH_LONG).show();
                 TourDownloadFragment.this.availableTours = new AvailableTours();
             } else {
-                TourDownloadFragment.this.availableTours = BackendDeserialiser.parseAvailableTours(result);
+                TourDownloadFragment.this.availableTours = ServerResponseReader.parseAvailableTours(result);
             }
         }
 

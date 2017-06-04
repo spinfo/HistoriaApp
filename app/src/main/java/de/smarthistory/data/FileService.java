@@ -101,15 +101,18 @@ public class FileService {
         if(tourFile.exists()) {
             try {
                 FileInputStream stream = new FileInputStream(tourFile);
-                Tour tour = BackendDeserialiser.parseTour(stream);
+                Tour tour = ServerResponseReader.parseTour(stream);
                 tour.setVersion(record.getVersion());
                 if(DataFacade.getInstance(this.context).saveTour(tour)) {
                     result = tour;
+                    if(!DataFacade.getInstance(this.context).saveLexiconEntries(tour.getLexiconEntries())) {
+                        ErrUtil.failInDebug(LOG_TAG, "Failed to save lexicon entries.");
+                    }
                 } else {
-                    ErrUtil.failInDebug(LOG_TAG, "Failed to save the new tour");
+                    ErrUtil.failInDebug(LOG_TAG, "Failed to save tour.");
                 }
             } catch (IOException e) {
-                ErrUtil.failInDebug(LOG_TAG, "Failed to read the tour file.");
+                ErrUtil.failInDebug(LOG_TAG, "Failed to read tour file.");
             }
         } else {
             ErrUtil.failInDebug(LOG_TAG, "No tour file after unpacking the archive: " );

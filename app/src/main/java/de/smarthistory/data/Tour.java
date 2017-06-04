@@ -69,6 +69,10 @@ public class Tour {
     @DatabaseField(columnName = "created_at")
     private Date createdAt;
 
+    // a tour may have a number of lexicon entries associated to it, especially during installation.
+    // The connection to these however is not persisted to the database.
+    private List<LexiconEntry> lexiconEntries;
+
     protected Tour() {}
 
     // TODO: Remove
@@ -235,5 +239,13 @@ public class Tour {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<LexiconEntry> getLexiconEntries() {
+        return lexiconEntries;
+    }
+
+    public void setLexiconEntries(List<LexiconEntry> lexiconEntries) {
+        this.lexiconEntries = lexiconEntries;
     }
 }

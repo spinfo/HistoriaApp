@@ -14,7 +14,7 @@ import java.sql.SQLException;
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     // TODO: Set the final name (this will change during development to avoid dealing with version changes, but must be fixed on release)
-    private static final String DATABASE_NAME = "historia-app-dev.db";
+    private static final String DATABASE_NAME = "historia-app-dev-2.db";
     private static final int DATABASE_VERSION = 1;
 
     private Dao<Place, Long> placeDao = null;
@@ -25,6 +25,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<PersistentGeoPoint, Long> geopointDao = null;
     private Dao<Area, Long> areaDao = null;
     private Dao<TourOnMap, Long> tourOnMapDao = null;
+    private Dao<LexiconEntry, Long> lexiconEntryDao = null;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -41,6 +42,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, PersistentGeoPoint.class);
             TableUtils.createTable(connectionSource, Area.class);
             TableUtils.createTable(connectionSource, TourOnMap.class);
+            TableUtils.createTable(connectionSource, LexiconEntry.class);
         } catch (SQLException e){
             throw new RuntimeException(e);
         }
@@ -106,6 +108,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return tourOnMapDao;
     }
 
+    public Dao<LexiconEntry, Long> getLexiconEntryDao() {
+        if(lexiconEntryDao == null) {
+            lexiconEntryDao = getMyDaoRuntimeExcept(LexiconEntry.class);
+        }
+        return lexiconEntryDao;
+    }
+
     // convenience method that wraps the SQL Exception on Dao Creation
     private <D extends Dao<T, ?>, T> D getMyDaoRuntimeExcept(Class<T> clazz) {
         D result = null;
@@ -127,6 +136,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         geopointDao = null;
         areaDao = null;
         tourOnMapDao = null;
+        lexiconEntryDao = null;
 
         super.close();
     }

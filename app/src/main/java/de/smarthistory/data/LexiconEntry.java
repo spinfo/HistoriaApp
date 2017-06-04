@@ -1,15 +1,26 @@
 package de.smarthistory.data;
 
+import com.j256.ormlite.field.DatabaseField;
+
 /**
- * Data object for a lexicon entry (the actual entry is one page of html).
+ * Data object for a lexicon entry (the actual entry is a page of html without mediaitems).
  */
 public class LexiconEntry {
 
-    private final long id;
+    // the server's id value for this page
+    @DatabaseField(columnName = "id", id = true)
+    private long id;
 
-    private final String title;
+    // the title of this lexicon page
+    @DatabaseField(columnName = "title")
+    private String title;
 
-    private final String content;
+    // the html content of this lexicon page
+    @DatabaseField(columnName = "content")
+    private String content;
+
+    // Default constructor for YAML parsing, db
+    public LexiconEntry() {}
 
     public LexiconEntry(long id, String title, String content) {
         this.id = id;
@@ -26,6 +37,7 @@ public class LexiconEntry {
     }
 
     public String getContent() {
-        return content;
+        final String content = HtmlContentCompletion.setTitle(this.content, this.title);
+        return HtmlContentCompletion.wrapInPage(content);
     }
 }
