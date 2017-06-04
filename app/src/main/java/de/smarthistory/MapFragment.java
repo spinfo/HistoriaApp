@@ -39,7 +39,7 @@ import de.smarthistory.data.TourOnMap;
 /**
  * The fragment handling the map view
  */
-public class MapFragment extends Fragment implements MainActivity.MainActivityFragment, MapPopupManager.OnModelSelectionListener {
+public class MapFragment extends Fragment implements MainActivity.MainActivityFragment, OnModelSelectionListener {
 
     private static final String LOGTAG = MapFragment.class.getSimpleName();
 
@@ -60,6 +60,9 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     // the view that this will instantiate, has to be a FrameLayout for us to be able to dim
     // the map on creating a popup
     private FrameLayout mapFragmentView;
+
+    // if model selection are registered by this fragment they will be passed to this listener
+    private OnModelSelectionListener onModelSelectionListener;
 
     // a simple cache for tour overlays used by this map
     private Map<Tour, List<Overlay>> tourOverlayCache = new HashMap<>();
@@ -91,6 +94,12 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // the object that will manage all popups on this map
         this.popupManager = new MapPopupManager(mapFragmentView);
+
+        // setup the activity this fragment was created by as the selection listener
+        // NOTE: this is the MainActivity
+        if(this.onModelSelectionListener == null) {
+            this.onModelSelectionListener = (OnModelSelectionListener) getActivity();
+        }
 
         // set the map up to close all info windows on a click by providing a custom touch overlay
         final Overlay touchOverlay = new Overlay() {
@@ -129,6 +138,11 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             } else {
                 MapUtil.zoomToOverlays(state.map, tourOverlays);
             }
+        }
+
+        // pass the now selected area up to the model selection listener
+        if (state.area != null) {
+            onModelSelectionListener.onAreaSelected(state.area);
         }
 
         // recreate popup from bundle if needed
@@ -355,13 +369,17 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         }
         List<Overlay> overlays = switchTourOverlays(new TourOnMap(tour));
         MapUtil.zoomToOverlays(state.map, overlays);
+
+        // pass the change on
+        if(onModelSelectionListener != null) {
+            onModelSelectionListener.onTourSelected(tour);
+        }
     }
 
     @Override
     public void onAreaSelected(Area area) {
         // abort if the area is null or has no tours connected
         if(area == null || area.getTours() == null || area.getTours().isEmpty()) {
-            if(area != null) Log.d("---->", "" + area.getTours());
             Log.w(LOGTAG, "Not selecting null or empty area.");
             return;
         }
@@ -374,6 +392,15 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         }
         List<Overlay> overlays = switchTourOverlays(toursOnMap);
         MapUtil.zoomToOverlays(state.map, overlays);
+
+        // pass the change on
+        if(onModelSelectionListener != null) {
+            onModelSelectionListener.onAreaSelected(area);
+        }
+    }
+
+    public void setOnModelSelectionListener(OnModelSelectionListener listener) {
+        this.onModelSelectionListener = listener;
     }
 
     @Override

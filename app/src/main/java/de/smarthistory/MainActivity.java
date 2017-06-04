@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.smarthistory.data.Area;
 import de.smarthistory.data.DataFacade;
 import de.smarthistory.data.FileService;
 import de.smarthistory.data.Tour;
@@ -51,7 +53,7 @@ import de.smarthistory.data.Tour;
  *      - an ExploreDataFragment to display tours and stops etc, but not on a map
  *      - a TourDownloadFragment to download new tours
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnModelSelectionListener {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -68,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
 
     // the main toolbar that is set up as the action bar
     private Toolbar mainToolbar;
+
+    // the normal toolbar title (i.e. when the drawer is not toggled)
+    private String defaultToolbarTitle;
 
     // an interface for the Fragments created by this class
     interface MainActivityFragment {
@@ -128,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
 
             setContentView(R.layout.activity_main);
 
-            // setup main tool bar as action bar
+            // setup main tool bar as action bar, it's title is just the app name at first
+            this.defaultToolbarTitle = getString(R.string.app_name);
             this.mainToolbar = (Toolbar) findViewById(R.id.main_toolbar);
             this.setSupportActionBar(mainToolbar);
 
@@ -171,6 +177,8 @@ public class MainActivity extends AppCompatActivity {
         if (mapFragment == null) {
             mapFragment = new MapFragment();
         }
+        // setup this activity to listen to selections made from the map fragment
+        mapFragment.setOnModelSelectionListener(this);
         setupFragmentAsMainFragment(mapFragment, MAP_FRAGMENT_TAG, addToBackStack);
         return mapFragment;
     }
@@ -327,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
 
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
+                getSupportActionBar().setTitle(defaultToolbarTitle);
             }
 
             public void onDrawerOpened(View view) {
@@ -403,6 +411,30 @@ public class MainActivity extends AppCompatActivity {
         if (!fragmentReacted) {
             super.onBackPressed();
         }
+    }
+
+    private void setDefaultActionBarTitleWithSuffix(String titleSuffix) {
+        defaultToolbarTitle = getString(R.string.app_name);
+        if(titleSuffix != null && !titleSuffix.isEmpty()) {
+            defaultToolbarTitle += ": " + titleSuffix;
+        }
+
+        ActionBar bar = getSupportActionBar();
+        if(bar != null) {
+            bar.setTitle(defaultToolbarTitle);
+        }
+    }
+
+    @Override
+    public void onAreaSelected(Area area) {
+        if(area != null) {
+            this.setDefaultActionBarTitleWithSuffix(area.getName());
+        }
+    }
+
+    @Override
+    public void onTourSelected(Tour tour) {
+        // do nothing
     }
 
     // TODO this will need changing once we have more than one visible fragment (e.g. on bigger devices)
