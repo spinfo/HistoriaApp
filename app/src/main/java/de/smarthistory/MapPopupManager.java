@@ -33,12 +33,6 @@ public class MapPopupManager {
         MAPSTOP
     }
 
-    // an interface for listening on tour or area selections triggered by a popup
-    interface OnModelSelectionListener {
-        void onTourSelected(Tour tour);
-        void onAreaSelected(Area area);
-    }
-
     // a data provider
     private final DataFacade data;
 
@@ -362,14 +356,11 @@ public class MapPopupManager {
     // a basic listener to handle dismissing of a popup on the surface
     private class MapPopupOnDismissListener implements PopupWindow.OnDismissListener {
         public void onDismiss() {
-            Log.d("--->", "dismissing...");
             // if a mapstop is shown close the page view to stop all processing involved in showing
             // it (e.g. an open audio/video etc.)
             if(activePopupType == MapPopupType.MAPSTOP) {
-                Log.d("--->", "Finding someting to stop....");
                 MapstopPageView pageView = (MapstopPageView) activePopup.getContentView().findViewById(R.id.mapstop_page);
                 if (pageView != null) {
-                    Log.d("--->", "Actually stopping....");
                     pageView.onPause();
                 }
             }

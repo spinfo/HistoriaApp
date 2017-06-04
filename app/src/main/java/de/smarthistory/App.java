@@ -14,6 +14,8 @@ import android.util.Log;
  */
 public class App extends Application {
 
+    private static final String LOG_TAG = App.class.getName();
+
     // a reference to the default exception handler that we will replace
     private Thread.UncaughtExceptionHandler defaultExceptionHandler;
 
@@ -23,12 +25,8 @@ public class App extends Application {
             new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(final Thread thread, final Throwable ex) {
-                    Log.d(".--.", "caught something");
-
-
                     // if we are not in debug mode let the normal handler handle the exception
                     if (!BuildConfig.DEBUG) {
-                        Log.d(".--.", "not in debug...");
                         defaultExceptionHandler.uncaughtException(thread, ex);
                         return;
                     }
@@ -48,6 +46,9 @@ public class App extends Application {
                     intentToRestartWithError.putExtra(
                             getResources().getString(R.string.extra_key_restart_error_message),
                             errMessage.toString());
+
+                    // Output the message to the debug log in any case
+                    Log.d(LOG_TAG, errMessage.toString());
 
                     // wrap into a pending intent and schedule it to start after a second
                     PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),
