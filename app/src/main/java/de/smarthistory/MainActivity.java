@@ -177,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         if (mapFragment == null) {
             mapFragment = new MapFragment();
         }
+
         // setup this activity to listen to selections made from the map fragment
         mapFragment.setOnModelSelectionListener(this);
         setupFragmentAsMainFragment(mapFragment, MAP_FRAGMENT_TAG, addToBackStack);
