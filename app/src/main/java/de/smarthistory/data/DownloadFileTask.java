@@ -8,9 +8,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -153,12 +151,12 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
             return null;
         }
 
-        HttpURLConnection connection = null;
+        HttpsURLConnection connection = null;
         InputStream stream = null;
         File result = null;
         try {
             URL url = new URL(urlStr);
-            connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpsURLConnection) url.openConnection();
 
             // set timeouts
             connection.setConnectTimeout(3000);

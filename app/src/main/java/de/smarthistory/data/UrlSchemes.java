@@ -7,7 +7,7 @@ public abstract class UrlSchemes {
     private static final String LOG_TAG = UrlSchemes.class.getSimpleName();
 
     public static final String SERVER_BASE_URI =
-            "http://smarthistory.spinfo.uni-koeln.de/wp-content/uploads/smart-history-tours";
+            "https://historia-app.de/wp-content/uploads/smart-history-tours";
 
     public static final String AVAILABLE_TOURS_URL = SERVER_BASE_URI + "/tours.yaml";
 

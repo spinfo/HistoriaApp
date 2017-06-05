@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -145,12 +144,12 @@ public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTa
             return "";
         }
 
-        HttpURLConnection connection = null;
+        HttpsURLConnection connection = null;
         InputStream stream = null;
         String result = "";
         try {
             URL url = new URL(urlStr);
-            connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpsURLConnection) url.openConnection();
 
             // set timeouts
             connection.setConnectTimeout(3000);
