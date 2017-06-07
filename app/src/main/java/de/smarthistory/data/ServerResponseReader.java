@@ -67,9 +67,13 @@ public class ServerResponseReader {
         String type = (String) map.get("type");
         Tour.Type tourType = null;
         if("tour".matches(type)) {
-            tourType = Tour.Type.Spaziergang;
+            tourType = Tour.Type.Tour;
         } else if("round-tour".matches(type)) {
-            tourType = Tour.Type.Rundgang;
+            tourType = Tour.Type.RoundTour;
+        } else if("public-transport-tour".matches(type)) {
+            tourType = Tour.Type.PublicTransportTour;
+        } else if("bike-tour".matches(type)) {
+            tourType = Tour.Type.BikeTour;
         }
 
         // handle the tour track

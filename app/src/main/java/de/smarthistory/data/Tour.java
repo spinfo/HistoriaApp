@@ -16,7 +16,25 @@ import java.util.List;
  */
 public class Tour {
 
-    public enum Type {Rundgang, Spaziergang};
+    public enum Type {
+        RoundTour,
+        Tour,
+        PublicTransportTour,
+        BikeTour;
+
+        private String representation;
+
+        static {
+            RoundTour.representation = "Rundgang";
+            Tour.representation = "Spaziergang";
+            PublicTransportTour.representation = "ÖPNV-Tour";
+            BikeTour.representation = "Fahrrad-Tour";
+        }
+
+        public String getRepresentation() {
+            return representation;
+        }
+    };
 
     @DatabaseField(columnName = "id", id = true)
     private long id;

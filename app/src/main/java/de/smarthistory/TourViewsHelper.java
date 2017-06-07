@@ -25,7 +25,7 @@ public abstract class TourViewsHelper {
         // set line with essentials
         String essentials = String.format(Locale.getDefault(),
                 "%s, %d min., %.2f km (%s)",
-                tour.getType().toString(), tour.getDuration(),
+                tour.getType().getRepresentation(), tour.getDuration(),
                 tour.getWalkLength() / 1000.0, tour.getAccessibility());
         essentialsView.setText(essentials);
 
