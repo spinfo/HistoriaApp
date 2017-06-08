@@ -375,7 +375,6 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
                 res.getString(R.string.menu_select_tour),
                 res.getString(R.string.menu_explore_data),
                 res.getString(R.string.menu_download_tours),
-                res.getString(R.string.menu_options_general),
                 res.getString(R.string.menu_about)
         };
 
@@ -398,6 +397,9 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         } else if (position == 3) {
             switchMainFragmentToTourDownload(true);
             mDrawerLayout.closeDrawers();
+        } else if (position == 4) {
+            final Intent intent = new Intent(MainActivity.this, AboutPageAcitvity.class);
+            MainActivity.this.startActivity(intent);
         } else {
             Toast.makeText(this, "Selected: " + position, Toast.LENGTH_SHORT).show();
         }

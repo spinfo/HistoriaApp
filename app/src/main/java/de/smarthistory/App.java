@@ -5,6 +5,7 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 /**
@@ -40,6 +41,15 @@ public class App extends Application {
                         errMessage.append("\n - ");
                         errMessage.append(trace[i].toString());
                     }
+                    // append the version name
+                    String version;
+                    try {
+                        version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+                    } catch (PackageManager.NameNotFoundException e) {
+                        version = "No version found";
+                    }
+                    errMessage.append("\n\n -- Version: ");
+                    errMessage.append(version);
 
                     // put the message into an intent to restart the app
                     Intent intentToRestartWithError = new Intent(getApplicationContext(), MainActivity.class);

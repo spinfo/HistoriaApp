@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/about_page"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="de.smarthistory.AboutPageAcitvity">
+
+    <TextView
+        android:id="@+id/about_page_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:padding="10dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="@string/app_full_name"/>
+
+    <TextView
+        android:id="@+id/about_page_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/about_page_title"
+        android:padding="10dp"
+        android:text="Hier folgen Infos über die App"/>
+
+    <TextView
+        android:id="@+id/about_page_version_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="5dp"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="12sp"
+        android:gravity="center" />
+
+</RelativeLayout>

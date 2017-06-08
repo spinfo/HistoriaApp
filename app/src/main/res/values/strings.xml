@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">HistoriaApp</string>
+    <string name="app_full_name">HistoriaApp by HHU</string>
+    <string name="app_version_template">App-Version: %s</string>
 
     <!-- Strings for bundle extra keys -->
     <string name="extra_key_popup_type">popup_active</string>
