@@ -234,31 +234,24 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     // switches the current tour to the tours supplied by getting/creating markers.
     // Returns those markers.
     private List<Overlay> switchTourOverlays(List<TourOnMap> toursOnMap) {
-        final List<Overlay> markers = new ArrayList<>();
 
-        // remove old markers
-        // we cannot clear() the whole list because of the touch overlay registering general clicks
-        // to the map.
-        if (state.toursOnMap != null) {
-            for (TourOnMap tourOnMap : toursOnMap) {
-                markers.addAll(getOrMakeTourOverlays(state.map, tourOnMap.getTour()));
+        // close all infowindows that might still be open.
+        InfoWindow.closeAllInfoWindowsOn(state.map);
+
+        // clear the map of all markers and polylines
+        for (Overlay overlay : state.map.getOverlays()) {
+            if (overlay instanceof Marker || overlay instanceof Polyline) {
+                state.map.getOverlays().remove(overlay);
             }
-            state.map.getOverlays().removeAll(markers);
-            markers.clear();
         }
 
-        // add new markers
+        // add new markers and return them
+        final List<Overlay> markers = new ArrayList<>();
         for(TourOnMap tourOnMap : toursOnMap) {
             markers.addAll(getOrMakeTourOverlays(state.map, tourOnMap.getTour()));
             state.map.getOverlays().addAll(markers);
         }
         state.toursOnMap = toursOnMap;
-
-        // close a possible infowindow belonging to the old tour
-        if(state.mapstopTapped != null) {
-            InfoWindow.closeAllInfoWindowsOn(state.map);
-        }
-
         return markers;
     }
 
