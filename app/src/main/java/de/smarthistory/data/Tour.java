@@ -243,7 +243,7 @@ public class Tour {
         return result;
     }
 
-    protected Collection<PersistentGeoPoint> getPersistableTrack() {
+    Collection<PersistentGeoPoint> getPersistableTrack() {
         return this.track;
     }
 
@@ -259,11 +259,11 @@ public class Tour {
         this.createdAt = createdAt;
     }
 
-    public List<LexiconEntry> getLexiconEntries() {
+    List<LexiconEntry> getLexiconEntries() {
         return lexiconEntries;
     }
 
-    public void setLexiconEntries(List<LexiconEntry> lexiconEntries) {
+    void setLexiconEntries(List<LexiconEntry> lexiconEntries) {
         this.lexiconEntries = lexiconEntries;
     }
 }

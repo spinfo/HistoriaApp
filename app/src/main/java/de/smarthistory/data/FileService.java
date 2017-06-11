@@ -103,7 +103,7 @@ public class FileService {
                 FileInputStream stream = new FileInputStream(tourFile);
                 Tour tour = ServerResponseReader.parseTour(stream);
                 tour.setVersion(record.getVersion());
-                if(DataFacade.getInstance(this.context).saveTour(tour)) {
+                if(DataFacade.getInstance(this.context).saveTour(tour, this.context)) {
                     result = tour;
                     if(!DataFacade.getInstance(this.context).saveLexiconEntries(tour.getLexiconEntries())) {
                         ErrUtil.failInDebug(LOG_TAG, "Failed to save lexicon entries.");
@@ -117,6 +117,8 @@ public class FileService {
         } else {
             ErrUtil.failInDebug(LOG_TAG, "No tour file after unpacking the archive: " );
         }
+        // TODO: The deletion of orphanded files should be handled here
+
         return result;
     }
 

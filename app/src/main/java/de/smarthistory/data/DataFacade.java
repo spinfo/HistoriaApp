@@ -49,7 +49,9 @@ public class DataFacade {
 
     public Tour getTourById(long id) { return dbDataProvider.getTourById(id); }
 
-    public boolean saveTour(Tour tour) { return dbDataProvider.saveTour(tour); }
+    public boolean saveTour(Tour tour, Context context) {
+        return dbDataProvider.saveTour(tour, context);
+    }
 
     public List<TourOnMap> getToursOnMap() {
         return dbDataProvider.getToursOnMap();

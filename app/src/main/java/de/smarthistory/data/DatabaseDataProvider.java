@@ -103,66 +103,9 @@ public class DatabaseDataProvider {
         }
     }
 
-    boolean saveTour(Tour tour) {
-        Dao<Place, Long> placeDao = dbHelper.getPlaceDao();
-        Dao<Mapstop, Long> mapstopDao = dbHelper.getMapstopDao();
-        Dao<Page, Long> pageDao = dbHelper.getPageDao();
-        Dao<Mediaitem, Long> mediaitemDao = dbHelper.getMediaitemDao();
-        Dao<Tour, Long> tourDao = dbHelper.getTourDao();
-        Dao<PersistentGeoPoint, Long> pointDao = dbHelper.getGeopointDao();
-        Dao<Area, Long> areaDao = dbHelper.getAreaDao();
-
-        // TODO: Implement proper deletion of a tour cascading to mapstops, pages, track etc.
-        try {
-            for (Mapstop m : tour.getMapstops()) {
-                m.setTour(tour);
-                placeDao.createOrUpdate(m.getPlace());
-                mapstopDao.createOrUpdate(m);
-                for (Page p : m.getPages()) {
-                    p.setMapstop(m);
-                    pageDao.createOrUpdate(p);
-                    for (Mediaitem item : p.getMedia()) {
-                        item.setPage(p);
-                        // only persist the mediaitem if there is not one already for this mapstop
-                        // with the same name
-                        PreparedQuery<Mediaitem> existingMediaitemsQuery = mediaitemDao.queryBuilder()
-                                .setCountOf(true)
-                                .where().eq("guid", item.getGuid())
-                                .and().eq("page", p).prepare();
-                        Long count = mediaitemDao.countOf(existingMediaitemsQuery);
-                        if (count == 0) {
-                            mediaitemDao.create(item);
-                        }
-                    }
-                }
-            }
-            tourDao.createOrUpdate(tour);
-
-            // delete a previous track if there is any, then persist the new one
-            DeleteBuilder trackDeleteBuilder = pointDao.deleteBuilder();
-            trackDeleteBuilder.where().eq("tour", tour);
-            trackDeleteBuilder.delete();
-            for (PersistentGeoPoint point : tour.getPersistableTrack()) {
-                point.setTour(tour);
-                pointDao.createOrUpdate(point);
-            }
-
-            // create or update the area
-            Area newArea = tour.getArea();
-            Area fromDb = areaDao.queryForId(newArea.getId());
-            if (fromDb != null) {
-                // transfer id values of the points and update them
-                newArea.getPoint1().setId(fromDb.getPoint1().getId());
-                newArea.getPoint2().setId(fromDb.getPoint2().getId());
-            }
-            pointDao.createOrUpdate(newArea.getPoint1());
-            pointDao.createOrUpdate(newArea.getPoint2());
-            areaDao.createOrUpdate(newArea);
-        } catch (SQLException e) {
-            ErrUtil.failInDebug(LOG_TAG, e);
-            return false;
-        }
-        return true;
+    boolean saveTour(Tour tour, Context context) {
+        DatabaseTourInstaller installer = new DatabaseTourInstaller(context);
+        return installer.saveTour(tour);
     }
 
     List<TourOnMap> getToursOnMap() {
