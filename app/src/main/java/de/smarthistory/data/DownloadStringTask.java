@@ -3,6 +3,7 @@ package de.smarthistory.data;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +37,7 @@ public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTa
         setCallback(callback);
     }
 
-    void setCallback(DownloadCallback<String> callback) {
+    private void setCallback(DownloadCallback<String> callback) {
         mCallback = callback;
     }
 
@@ -46,12 +47,12 @@ public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTa
      * This allows you to pass exceptions to the UI thread that were thrown during doInBackground().
      */
     static class Result {
-        public String mResultValue;
-        public Exception mException;
-        public Result(String resultValue) {
+        String mResultValue;
+        Exception mException;
+        Result(String resultValue) {
             mResultValue = resultValue;
         }
-        public Result(Exception exception) {
+        Result(Exception exception) {
             mException = exception;
         }
     }
@@ -83,7 +84,7 @@ public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTa
             String urlString = urls[0];
             try {
                 String resultString = downloadUrl(urlString, this.readTimeoutMilliseconds, this.maxBytes);
-                if (resultString != null) {
+                if (resultString != null && !resultString.isEmpty()) {
                     result = new Result(resultString);
                 } else {
                     throw new IOException("No response received.");
@@ -102,8 +103,8 @@ public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTa
     protected void onPostExecute(Result result) {
         if (result != null && mCallback != null) {
             if (result.mException != null) {
-                // if an Exception was raised re-raise in debug and update the caller with null
-                ErrUtil.failInDebug(LOG_TAG, result.mException);
+                // if an Exception was raised, log it and simply update the caller with null
+                Log.e(LOG_TAG, "Download failed", result.mException);
                 mCallback.updateFromDownload(null);
             } else if (result.mResultValue != null) {
                 mCallback.updateFromDownload(result.mResultValue);
@@ -172,10 +173,6 @@ public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTa
             result = saveToString(stream, maxBytes);
         } catch (MalformedURLException e) {
             ErrUtil.failInDebug(LOG_TAG, "Bad url given: " + e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-            ErrUtil.failInDebug(LOG_TAG, e);
-            e.printStackTrace();
         } finally {
             // Close Stream and disconnect HTTPS connection.
             if (connection != null) {
@@ -187,38 +184,35 @@ public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTa
     }
 
     // save the input stream to a string updating the callback with a progress, return empty string on error
-    // TODO: Needs error handling for callback, see DownloadCallback statuses
-    public String saveToString(InputStream stream, int maxBytes) {
-        if (stream == null) {
-            ErrUtil.failInDebug(LOG_TAG, "Received empty input strem");
-            return "";
-        }
-        String result = "";
-        try {
+    public String saveToString(InputStream stream, int maxBytes) throws IOException {
+        String result = null;
 
-            // Read InputStream using the UTF-8 charset.
-            InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
-            // Create temporary buffer to hold Stream data with specified max length.
-            char[] buffer = new char[maxBytes];
-            // Populate temporary buffer with Stream data.
-            int numChars = 0;
-            int readSize = 0;
-            while (numChars < maxBytes && readSize != -1) {
-                numChars += readSize;
-                int percent = (100 * numChars) / maxBytes;
-                publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS, percent);
-                readSize = reader.read(buffer, numChars, buffer.length - numChars);
-            }
-            if (numChars != -1) {
-                // The stream was not empty.
-                // Create String that is actual length of response body if actual length was less than
-                // max length.
-                numChars = Math.min(numChars, maxBytes);
-                result = new String(buffer, 0, numChars);
-            }
-        } catch(IOException e) {
-            ErrUtil.failInDebug(LOG_TAG, e);
+        if (stream == null) {
+            Log.e(LOG_TAG, "Received empty input strem");
+            return null;
         }
+
+        // Read InputStream using the UTF-8 charset.
+        InputStreamReader reader = new InputStreamReader(stream, "UTF-8");
+        // Create temporary buffer to hold Stream data with specified max length.
+        char[] buffer = new char[maxBytes];
+        // Populate temporary buffer with Stream data.
+        int numChars = 0;
+        int readSize = 0;
+        while (numChars < maxBytes && readSize != -1) {
+            numChars += readSize;
+            int percent = (100 * numChars) / maxBytes;
+            publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS, percent);
+            readSize = reader.read(buffer, numChars, buffer.length - numChars);
+        }
+        if (numChars != -1) {
+            // The stream was not empty.
+            // Create String that is actual length of response body if actual length was less than
+            // max length.
+            numChars = Math.min(numChars, maxBytes);
+            result = new String(buffer, 0, numChars);
+        }
+
         return result;
     }
 

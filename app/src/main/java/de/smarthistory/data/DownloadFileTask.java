@@ -3,6 +3,7 @@ package de.smarthistory.data;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,7 +44,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
         setCallback(callback);
     }
 
-    void setCallback(DownloadCallback<File> callback) {
+    private void setCallback(DownloadCallback<File> callback) {
         mCallback = callback;
     }
 
@@ -53,12 +54,12 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
      * This allows you to pass exceptions to the UI thread that were thrown during doInBackground().
      */
     static class Result {
-        public File mResultValue;
-        public Exception mException;
-        public Result(File resultValue) {
+        File mResultValue;
+        Exception mException;
+        Result(File resultValue) {
             mResultValue = resultValue;
         }
-        public Result(Exception exception) {
+        Result(Exception exception) {
             mException = exception;
         }
     }
@@ -109,8 +110,8 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
     protected void onPostExecute(Result result) {
         if (result != null && mCallback != null) {
             if (result.mException != null) {
-                // if an Exception was raised re-raise in debug and update the caller with null
-                ErrUtil.failInDebug(LOG_TAG, result.mException);
+                // if an Exception was raised, log it and simply update the caller with null
+                Log.e(LOG_TAG, "Download failed", result.mException);
                 mCallback.updateFromDownload(null);
             } else if (result.mResultValue != null) {
                 mCallback.updateFromDownload(result.mResultValue);
@@ -124,6 +125,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
      */
     @Override
     protected void onCancelled(Result result) {
+        super.onCancelled();
     }
 
     // hand the values for progress etc directly to the callback
@@ -179,23 +181,17 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
             result = saveToFile(stream);
         } catch (MalformedURLException e) {
             ErrUtil.failInDebug(LOG_TAG, "Bad url given: " + e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-            ErrUtil.failInDebug(LOG_TAG, e);
-            e.printStackTrace();
         } finally {
             // Close Stream and disconnect HTTPS connection.
             if (connection != null) {
                 connection.disconnect();
             }
-
         }
         return result;
     }
 
     // save the input stream to a file updating the callback with a progress, return null on error
-    // TODO: Needs error handling for callback, see DownloadCallback statuses
-    public File saveToFile(InputStream stream) {
+    private File saveToFile(InputStream stream) throws IOException {
 
         File result = null;
         OutputStream output = null;
@@ -219,15 +215,9 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
                     publishProgress(DownloadCallback.Progress.PROCESS_INPUT_STREAM_IN_PROGRESS, (int) (total * 100 / this.maxBytes));
                 output.write(data, 0, count);
             }
-        } catch (IOException e) {
-            ErrUtil.failInDebug(LOG_TAG, e);
         } finally {
-            try {
-                if (output != null) {
-                    output.close();
-                }
-            } catch (IOException ignoreInsideFinally) {
-                ErrUtil.failInDebug(LOG_TAG, ignoreInsideFinally);
+            if (output != null) {
+                output.close();
             }
         }
         return result;

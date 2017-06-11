@@ -22,6 +22,7 @@ import de.smarthistory.data.DownloadCallback;
 import de.smarthistory.data.DownloadFileTask;
 import de.smarthistory.data.DownloadStringTask;
 import de.smarthistory.data.FileService;
+import de.smarthistory.data.Tour;
 import de.smarthistory.data.TourRecord;
 import de.smarthistory.data.UrlSchemes;
 
@@ -54,7 +55,7 @@ public class TourDownloadFragment extends Fragment implements MainActivity.MainA
         @Override
         public void updateFromDownload(String result) {
             if(result == null) {
-                Toast.makeText(getActivity(), "Unable to connect to server.", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), getString(R.string.tour_records_unavailable), Toast.LENGTH_LONG).show();
                 TourDownloadFragment.this.availableTours = new AvailableTours();
             } else {
                 TourDownloadFragment.this.availableTours = ServerResponseReader.parseAvailableTours(result);
@@ -103,8 +104,13 @@ public class TourDownloadFragment extends Fragment implements MainActivity.MainA
         // hand the received File to the File Service for installation
         @Override
         public void updateFromDownload(File result) {
-            FileService fileService = new FileService(getContext());
-            fileService.installTour(result, record);
+            if(result == null) {
+                Toast.makeText(getActivity(), getString(R.string.tour_download_failed), Toast.LENGTH_LONG).show();
+                TourDownloadFragment.this.availableTours = new AvailableTours();
+            } else {
+                FileService fileService = new FileService(getContext());
+                fileService.installTour(result, record);
+            }
         }
 
         @Override
@@ -186,7 +192,7 @@ public class TourDownloadFragment extends Fragment implements MainActivity.MainA
     }
 
     private void retrieveAvailableTours() {
-        int maxSize = 1000000;
+        int maxSize = 10000000;
         AvailableToursDownloadCallback callback = new AvailableToursDownloadCallback(maxSize);
         DownloadStringTask task = new DownloadStringTask(callback, 2000, maxSize);
         task.execute(UrlSchemes.AVAILABLE_TOURS_URL);

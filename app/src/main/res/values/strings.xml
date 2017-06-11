@@ -43,4 +43,8 @@
 
     <!-- String to indicate a number of tours -->
     <string name="tour_amount_template">Touren: %d</string>
+
+    <!-- Strings to indicate a download failure -->
+    <string name="tour_records_unavailable">Server nicht erreichbar.</string>
+    <string name="tour_download_failed">Tour konnte nicht geladen werden.</string>
 </resources>
