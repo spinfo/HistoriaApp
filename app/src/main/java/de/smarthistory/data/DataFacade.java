@@ -7,27 +7,20 @@ import java.io.File;
 import java.util.List;
 
 /**
- * A Singleton Facade to hide all data access behind
- * TODO: Is a singleton a good choice, espacially now that it needs a Context? Investigate!
+ * A Facade class to hide all data access behind. (Not a Singleton because it depends on a Context
+ * that might get lost.)
  */
 public class DataFacade {
 
-    private static DataFacade instance = null;
-
     private DatabaseDataProvider dbDataProvider;
 
+    private final Context context;
+
     // private constructor to disallow other instances
-    private DataFacade(Context context) {
+    public DataFacade(Context context) {
+        this.context = context;
         this.dbDataProvider = new DatabaseDataProvider(context);
     };
-
-    // return the singleton instance that manages access to all data
-    public static DataFacade getInstance(Context context) {
-        if (instance == null) {
-            instance = new DataFacade(context);
-        }
-        return instance;
-    }
 
     public Area getAreaById(long id) {
         return dbDataProvider.getAreaById(id);
@@ -49,8 +42,8 @@ public class DataFacade {
 
     public Tour getTourById(long id) { return dbDataProvider.getTourById(id); }
 
-    public boolean saveTour(Tour tour, Context context) {
-        return dbDataProvider.saveTour(tour, context);
+    public boolean saveTour(Tour tour) {
+        return dbDataProvider.saveTour(tour, this.context);
     }
 
     public List<TourOnMap> getToursOnMap() {

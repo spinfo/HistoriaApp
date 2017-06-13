@@ -55,7 +55,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     private MapPopupManager popupManager;
 
     // the interface to retrieve all actual data from
-    private DataFacade data = DataFacade.getInstance(getContext());
+    private DataFacade data;
 
     // the view that this will instantiate, has to be a FrameLayout for us to be able to dim
     // the map on creating a popup
@@ -67,13 +67,12 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     // a simple cache for tour overlays used by this map
     private Map<Tour, List<Overlay>> tourOverlayCache = new HashMap<>();
 
-    public MapFragment() {
-        // Required empty public constructor
-    }
+    public MapFragment() { }
 
      @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+         super.onCreate(savedInstanceState);
+         this.data = new DataFacade(getContext());
     }
 
     @Override

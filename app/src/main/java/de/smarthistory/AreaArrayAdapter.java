@@ -24,9 +24,12 @@ public class AreaArrayAdapter extends ArrayAdapter<Area> {
 
     private final Context context;
 
+    private final DataFacade data;
+
     public AreaArrayAdapter(Context context, ArrayList<Area> areas) {
         super(context, 0, areas);
         this.context = context;
+        this.data = new DataFacade(context);
     }
 
 
@@ -49,7 +52,7 @@ public class AreaArrayAdapter extends ArrayAdapter<Area> {
             numTours = 0;
         } else {
             title = area.getName();
-            numTours = DataFacade.getInstance(context).getToursAmount(area);
+            numTours = this.data.getToursAmount(area);
         }
 
         final TextView tvTitle = (TextView) convertView.findViewById(R.id.area_meta_title_line);

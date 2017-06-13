@@ -96,6 +96,7 @@ public class FileService {
         }
 
         // There should now be a file with the tour's content, given by the tour id and version
+        final DataFacade data = new DataFacade(this.context);
         Tour result = null;
         File tourFile = new File(getTourFilePath(record));
         if(tourFile.exists()) {
@@ -103,9 +104,9 @@ public class FileService {
                 FileInputStream stream = new FileInputStream(tourFile);
                 Tour tour = ServerResponseReader.parseTour(stream);
                 tour.setVersion(record.getVersion());
-                if(DataFacade.getInstance(this.context).saveTour(tour, this.context)) {
+                if(data.saveTour(tour)) {
                     result = tour;
-                    if(!DataFacade.getInstance(this.context).saveLexiconEntries(tour.getLexiconEntries())) {
+                    if(!data.saveLexiconEntries(tour.getLexiconEntries())) {
                         ErrUtil.failInDebug(LOG_TAG, "Failed to save lexicon entries.");
                     }
                 } else {

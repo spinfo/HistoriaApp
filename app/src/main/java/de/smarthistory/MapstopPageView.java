@@ -58,6 +58,7 @@ public class MapstopPageView extends WebView {
 
         // here we overwrite what happens when a link is clicked, and especially modify the
         // behaviour for links that go to lexicon articles
+        final DataFacade data = new DataFacade(context);
         this.setWebViewClient(new WebViewClient() {
 
             @Override
@@ -65,7 +66,7 @@ public class MapstopPageView extends WebView {
                 if (url != null && url.startsWith(UrlSchemes.LEXICON)) {
                     Long id = UrlSchemes.parseLexiconEntryIdFromUrl(url);
                     if(id != 0L) {
-                        LexiconEntry entry = DataFacade.getInstance(context).getLexiconEntryById(id);
+                        LexiconEntry entry = data.getLexiconEntryById(id);
                         if(entry != null) {
                             Intent intent = new Intent(getContext(), SimpleWebViewActivity.class);
                             intent.putExtra(getResources().getString(R.string.extra_key_simple_web_view_data), entry.getContent());

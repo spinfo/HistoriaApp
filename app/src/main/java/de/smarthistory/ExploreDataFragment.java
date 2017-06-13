@@ -41,7 +41,6 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
     private static final int TAB_POS_TOURS = 2;
 
     public ExploreDataFragment() {
-        this.data = DataFacade.getInstance(this.getContext());
     }
 
     // these allow to navigate back to tour list from mapstop list
@@ -51,6 +50,7 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.data = new DataFacade(this.getContext());
     }
 
     @Override

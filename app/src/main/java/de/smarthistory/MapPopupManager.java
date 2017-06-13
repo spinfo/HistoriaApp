@@ -59,7 +59,7 @@ public class MapPopupManager {
     private static long NO_ACTIVE_OBJ = -1;
 
     public MapPopupManager(FrameLayout surface) {
-        this.data = DataFacade.getInstance(surface.getContext());
+        this.data = new DataFacade(surface.getContext());
         this.surface = surface;
         this.layoutInflater = LayoutInflater.from(surface.getContext());
 

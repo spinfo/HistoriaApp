@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         boolean hasPermissions = checkMapPermissions();
         Log.d("main", "Permission check shows: " + hasPermissions);
         if (hasPermissions) {
-            this.data = DataFacade.getInstance(this);
+            this.data = new DataFacade(this);
 
             // if there is no data yet, set it up
             Tour defaultTour = this.data.getDefaultTour();
