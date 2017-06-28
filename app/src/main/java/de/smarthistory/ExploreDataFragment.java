@@ -89,12 +89,6 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
             }
         });
 
-        // Tab2: Lesezeichen
-        TabSpec tabSpec2 = tabHost.newTabSpec(getString(R.string.favorites));
-        tabSpec2.setContent(R.id.tab2);
-        tabSpec2.setIndicator(getString(R.string.favorites));
-        tabHost.addTab(tabSpec2);
-
         // Tab3: Touren
         TabSpec tabSpec3 = tabHost.newTabSpec(getString(R.string.tours));
         tabSpec3.setContent(R.id.tab3);
