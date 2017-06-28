@@ -72,6 +72,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     private OnModelSelectionListener onModelSelectionListener;
 
     // a simple cache for tour overlays used by this map
+    // TODO: Check if this is really improving performance (on orientation change?)
     private Map<Tour, List<Overlay>> tourOverlayCache = new HashMap<>();
 
     // the user's location (if recorded)
@@ -234,8 +235,8 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     private List<Overlay> getOrMakeTourOverlays(MapView map, Tour tour) {
-        if(tour == null) {
-            Log.w(LOGTAG, "Not creating tour overlays for null input.");
+        if(tour == null || tour.getMapstops() == null || tour.getMapstops().isEmpty()) {
+            Log.w(LOGTAG, "Not creating tour overlays for empty input.");
             return new ArrayList<>();
         }
 
@@ -254,11 +255,16 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // markers for mapstops share a custom info window
         final MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
         Marker marker;
-        for (final Mapstop mapstop : tour.getMapstops()) {
-            marker = MapUtil.makeMapstopMarker(getContext(), state.map, mapstop);
+        Mapstop mapstop;
+        // as the osmdroid Marker overlay does not support a z-index draw the normal mapstop markers
+        // first, then add the first marker
+        for(int i = 1; i < tour.getMapstops().size(); i++) {
+            marker = MapUtil.makeMapstopMarker(getContext(), state.map, tour.getMapstops().get(i));
             marker.setInfoWindow(window);
             overlays.add(marker);
         }
+        marker = MapUtil.makeFirstMapstopMarkerInTour(getContext(), state.map, tour.getMapstops().get(0));
+        overlays.add(marker);
 
         tourOverlayCache.put(tour, overlays);
         return overlays;

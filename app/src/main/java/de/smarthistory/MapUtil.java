@@ -76,13 +76,25 @@ public abstract class MapUtil {
     // A marker representing a mapstop on the map
     public static Marker makeMapstopMarker(Context context, MapView map, Mapstop mapstop) {
         Marker marker = new Marker(map);
+        setMarkerDefaults(marker, mapstop);
+        marker.setIcon(ContextCompat.getDrawable(context, R.drawable.map_marker_icon_blue_small));
+        return marker;
+    }
+
+    // A marker representing the first mapstop of a tour
+    public static Marker makeFirstMapstopMarkerInTour(Context context, MapView map, Mapstop mapstop) {
+        Marker marker = new Marker(map);
+        setMarkerDefaults(marker, mapstop);
+        marker.setIcon(ContextCompat.getDrawable(context, R.drawable.map_marker_icon_red_small));
+        return marker;
+    }
+
+    private static void setMarkerDefaults(Marker marker, Mapstop mapstop) {
         marker.setPosition(mapstop.getPlace().getLocation());
         marker.setTitle(mapstop.getName());
         marker.setSubDescription(mapstop.getDescription());
         marker.setRelatedObject(mapstop);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        marker.setIcon(ContextCompat.getDrawable(context, R.drawable.map_marker_icon_blue_small));
-        return marker;
     }
 
     // TODO: This is messy especially for Polyline that does not actually save points as GeoPoints. The results of this should probably be cached somewhere
