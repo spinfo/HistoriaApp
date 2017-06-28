@@ -43,6 +43,9 @@
     <!-- String to indicate a number of tours -->
     <string name="tour_amount_template">Touren: %d</string>
 
+    <!-- String to indicate a failure to get location data -->
+    <string name="no_location_available_message">Standort nicht bestimmbar.</string>
+
     <!-- Strings to indicate a download failure -->
     <string name="tour_records_unavailable">Server nicht erreichbar.</string>
     <string name="tour_download_failed">Tour konnte nicht geladen werden.</string>
@@ -54,4 +57,7 @@
 
     <!-- Letting the User choose programs -->
     <string name="choose_mail_program_title">Wählen Sie ein Mailprogramm</string>
+
+    <!-- Strings for button descriptions on the map -->
+    <string name="bt_center_map_description">Zu meiner Position</string>
 </resources>
