@@ -235,9 +235,9 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     private List<Overlay> getOrMakeTourOverlays(MapView map, Tour tour) {
-        if(tour == null || tour.getMapstops() == null || tour.getMapstops().isEmpty()) {
+        if(tour == null) {
             Log.w(LOGTAG, "Not creating tour overlays for empty input.");
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         // return the cached overly if one has been constructed previously
@@ -252,19 +252,25 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         line.setPoints(tour.getTrackAsGeoPoints());
         overlays.add(line);
 
-        // markers for mapstops share a custom info window
-        final MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
-        Marker marker;
-        Mapstop mapstop;
-        // as the osmdroid Marker overlay does not support a z-index draw the normal mapstop markers
-        // first, then add the first marker
-        for(int i = 1; i < tour.getMapstops().size(); i++) {
-            marker = MapUtil.makeMapstopMarker(getContext(), state.map, tour.getMapstops().get(i));
-            marker.setInfoWindow(window);
+        // get the tour mapstops only once. This prooved relevant for performance with ormlite.
+        final List<Mapstop> mapstops = tour.getMapstops();
+        if(mapstops != null && !mapstops.isEmpty()) {
+            // markers for mapstops share a custom info window
+            final MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
+            Marker marker;
+            Mapstop mapstop;
+            // as the osmdroid Marker overlay does not support a z-index draw the normal mapstop markers
+            // first, then add the first marker to let them appear on top
+            for(int i = 1; i < mapstops.size(); i++) {
+                marker = MapUtil.makeMapstopMarker(getContext(), state.map, mapstops.get(i));
+                marker.setInfoWindow(window);
+                overlays.add(marker);
+            }
+            marker = MapUtil.makeFirstMapstopMarkerInTour(getContext(), state.map, mapstops.get(0));
             overlays.add(marker);
+        } else {
+            Log.w(LOGTAG, "No mapstops for tour. Overlay creation skipped.");
         }
-        marker = MapUtil.makeFirstMapstopMarkerInTour(getContext(), state.map, tour.getMapstops().get(0));
-        overlays.add(marker);
 
         tourOverlayCache.put(tour, overlays);
         return overlays;
