@@ -214,7 +214,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         // setup an overlay for the user's location
         final MyLocationNewOverlay userLocationOverlay = new MyLocationNewOverlay(locationProvider, map);
         userLocationOverlay.enableMyLocation();
-        userLocationOverlay.enableFollowLocation();
         userLocationOverlay.setOptionsMenuEnabled(true);
 
         // setup the button to center the map on the user's location
