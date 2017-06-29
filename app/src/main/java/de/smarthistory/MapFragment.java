@@ -266,6 +266,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
                 overlays.add(marker);
             }
             marker = MapUtil.makeFirstMapstopMarkerInTour(getContext(), state.map, mapstops.get(0));
+            marker.setInfoWindow(window);
             overlays.add(marker);
         } else {
             Log.w(LOGTAG, "No mapstops for tour. Overlay creation skipped.");
