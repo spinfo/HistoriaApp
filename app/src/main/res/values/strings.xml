@@ -60,4 +60,8 @@
 
     <!-- Strings for button descriptions on the map -->
     <string name="bt_center_map_description">Zu meiner Position</string>
+
+    <!-- Strings related to the open street map legal notice -->
+    <string name="copyright_osm_contributors">© OpenStreetMap contributors</string>
+    <string name="osm_copyright_url">https://www.openstreetmap.org/copyright/</string>
 </resources>

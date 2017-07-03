@@ -1,11 +1,13 @@
 package de.historia_app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -180,6 +182,9 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // add the overlay showing the user's location and enable location options
         addUserLocationOptions(state.map);
+
+        // make the link to the osm license clickable
+        createOSMLicenseLink(mapFragmentView.findViewById(R.id.osm_legal_reference));
     }
 
     // Permanently save the basic map view on pause
@@ -207,6 +212,24 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         return getActivity().getPreferences(Context.MODE_PRIVATE);
     }
 
+    // sets up the view as a link to the open street map license page
+    private void createOSMLicenseLink(final View view) {
+        Log.i("--->", "Called for view: " + view);
+        if(view == null) {
+            Log.e(LOGTAG, "Cannot setup osm legal notice");
+            return;
+        }
+
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("--->", "Clicked...");
+                final String url = getString(R.string.osm_copyright_url);
+                final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
+            }
+        });
+    }
 
     private void addUserLocationOptions(final MapView map) {
         GpsMyLocationProvider locationProvider = new GpsMyLocationProvider(getContext());
@@ -481,4 +504,5 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     public void onProviderDisabled(String provider) {
         // do nothing
     }
+
 }

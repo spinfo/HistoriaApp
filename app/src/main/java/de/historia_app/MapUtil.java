@@ -35,7 +35,7 @@ public abstract class MapUtil {
 
     public static void setMapDefaults(MapView map) {
         map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setBuiltInZoomControls(true);
+        map.setBuiltInZoomControls(false);
         map.setMultiTouchControls(true);
     }
 
