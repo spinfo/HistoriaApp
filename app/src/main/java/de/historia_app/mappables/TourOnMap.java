@@ -1,6 +1,7 @@
-package de.historia_app.data;
+package de.historia_app.mappables;
 
 import com.j256.ormlite.field.DatabaseField;
+import de.historia_app.data.Tour;
 
 /**
  * A wrapper for a tour's state one the map, that may be persisted to the database

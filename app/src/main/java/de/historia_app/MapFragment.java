@@ -33,6 +33,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,8 +42,11 @@ import java.util.Map;
 import de.historia_app.data.Area;
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.Mapstop;
+import de.historia_app.data.Place;
 import de.historia_app.data.Tour;
-import de.historia_app.data.TourOnMap;
+import de.historia_app.mappables.PlaceOnMap;
+import de.historia_app.mappables.TourCollectionOnMap;
+import de.historia_app.mappables.TourOnMap;
 
 
 /**
@@ -214,7 +218,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
     // sets up the view as a link to the open street map license page
     private void createOSMLicenseLink(final View view) {
-        Log.i("--->", "Called for view: " + view);
         if(view == null) {
             Log.e(LOGTAG, "Cannot setup osm legal notice");
             return;
@@ -223,7 +226,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("--->", "Clicked...");
                 final String url = getString(R.string.osm_copyright_url);
                 final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(intent);
@@ -256,46 +258,34 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         map.getOverlays().add(userLocationOverlay);
     }
 
-    private List<Overlay> getOrMakeTourOverlays(MapView map, Tour tour) {
-        if(tour == null) {
-            Log.w(LOGTAG, "Not creating tour overlays for empty input.");
-            return Collections.emptyList();
-        }
-
-        // return the cached overly if one has been constructed previously
-        if (tourOverlayCache.containsKey(tour)) {
-            return tourOverlayCache.get(tour);
-        }
+    // TODO: Refactor this to use ObjectOnMap.draw()
+    private List<Overlay> getOrMakeTourOverlays(MapView map, TourCollectionOnMap tourCollectionOnMap) {
         List<Overlay> overlays = new ArrayList<>();
 
         // the tour's track is drawn with a polyline
         // add this first for it to be drawn before the markers
-        final Polyline line = MapUtil.makeEmptyTourTrackPolyline(getContext());
-        line.setPoints(tour.getTrackAsGeoPoints());
-        overlays.add(line);
-
-        // get the tour mapstops only once. This prooved relevant for performance with ormlite.
-        final List<Mapstop> mapstops = tour.getMapstops();
-        if(mapstops != null && !mapstops.isEmpty()) {
-            // markers for mapstops share a custom info window
-            final MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
-            Marker marker;
-            Mapstop mapstop;
-            // as the osmdroid Marker overlay does not support a z-index draw the normal mapstop markers
-            // first, then add the first marker to let them appear on top
-            for(int i = 1; i < mapstops.size(); i++) {
-                marker = MapUtil.makeMapstopMarker(getContext(), state.map, mapstops.get(i));
-                marker.setInfoWindow(window);
-                overlays.add(marker);
-            }
-            marker = MapUtil.makeFirstMapstopMarkerInTour(getContext(), state.map, mapstops.get(0));
-            marker.setInfoWindow(window);
-            overlays.add(marker);
-        } else {
-            Log.w(LOGTAG, "No mapstops for tour. Overlay creation skipped.");
+        for (TourOnMap tourOnMap : tourCollectionOnMap.getToursOnMap()) {
+            Tour tour = tourOnMap.getTour();
+            final Polyline line = MapUtil.makeEmptyTourTrackPolyline(getContext());
+            line.setPoints(tour.getTrackAsGeoPoints());
+            overlays.add(line);
         }
 
-        tourOverlayCache.put(tour, overlays);
+        // get the tour mapstops only once. This prooved relevant for performance with ormlite.
+        final MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
+        Marker marker;
+        Mapstop mapstop;
+        for (PlaceOnMap placeOnMap : tourCollectionOnMap.getPlacesOnMap()) {
+            mapstop = placeOnMap.getMapstopsOnMap().get(0).getMapstop();
+            if(placeOnMap.hasTourBeginMapstop()) {
+                marker = MapUtil.makeFirstMapstopMarkerInTour(getContext(), state.map, mapstop);
+            } else {
+                marker = MapUtil.makeMapstopMarker(getContext(), state.map, mapstop);
+            }
+            marker.setInfoWindow(window);
+            overlays.add(marker);
+        }
+
         return overlays;
     }
 
@@ -326,14 +316,18 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             }
         }
 
-        // add new markers and return them
-        final List<Overlay> markers = new ArrayList<>();
+        // create a collection of the tours
+        final List<Tour> tours = new ArrayList<>(toursOnMap.size());
         for(TourOnMap tourOnMap : toursOnMap) {
-            markers.addAll(getOrMakeTourOverlays(state.map, tourOnMap.getTour()));
-            state.map.getOverlays().addAll(markers);
+            tours.add(tourOnMap.getTour());
         }
+        TourCollectionOnMap tourCollectionOnMap = new TourCollectionOnMap(tours);
+
+        final List<Overlay> overlays = getOrMakeTourOverlays(state.map, tourCollectionOnMap);
+        state.map.getOverlays().addAll(overlays);
+
         state.toursOnMap = toursOnMap;
-        return markers;
+        return overlays;
     }
 
     // opens the info window belonging to a mapstop marker if the map contains a marker that

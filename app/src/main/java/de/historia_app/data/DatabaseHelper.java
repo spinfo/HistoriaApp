@@ -10,6 +10,8 @@ import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 
+import de.historia_app.mappables.TourOnMap;
+
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     // TODO: Set the final name (this will change during development to avoid dealing with version changes, but must be fixed on release)

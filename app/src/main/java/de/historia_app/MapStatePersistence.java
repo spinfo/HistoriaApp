@@ -10,7 +10,7 @@ import java.util.List;
 
 import de.historia_app.data.Area;
 import de.historia_app.data.DataFacade;
-import de.historia_app.data.TourOnMap;
+import de.historia_app.mappables.TourOnMap;
 
 public abstract class MapStatePersistence {
 

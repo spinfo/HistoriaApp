@@ -4,6 +4,8 @@ import android.content.Context;
 
 import java.util.List;
 
+import de.historia_app.mappables.TourOnMap;
+
 /**
  * A Facade class to hide all data access behind. (Not a Singleton because it depends on a Context
  * that might get lost.)

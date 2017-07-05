@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.historia_app.ErrUtil;
+import de.historia_app.mappables.TourOnMap;
 
 public class DatabaseDataProvider {
 
