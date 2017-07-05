@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewManager;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import de.historia_app.data.Area;
 import de.historia_app.data.DataFacade;
+import de.historia_app.data.Lexicon;
 import de.historia_app.data.LexiconEntry;
 import de.historia_app.data.Mapstop;
 import de.historia_app.data.Tour;
@@ -56,46 +58,20 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // inflate the layout for this fragment
-        final View result = inflater.inflate(R.layout.fragment_explore_data, container, false);
+        final View view = inflater.inflate(R.layout.fragment_explore_data, container, false);
 
         // setup the tab host
-        tabHost = (TabHost) result.findViewById(R.id.tabHost);
+        tabHost = (TabHost) view.findViewById(R.id.tabHost);
         tabHost.setup();
 
-        // Tab1: Lexikon
-        TabSpec tabSpec1 = tabHost.newTabSpec("Lexikon");
-        tabSpec1.setContent(R.id.tab1);
-        tabSpec1.setIndicator("Lexikon");
+        // Tab1: Touren
+        TabSpec tabSpec1 = tabHost.newTabSpec(getString(R.string.tours));
+        tabSpec1.setContent(R.id.tourOrMapstopTab);
+        tabSpec1.setIndicator(getString(R.string.tours));
         tabHost.addTab(tabSpec1);
 
-        ArrayList<Object> lexData = LexiconAdapter.makeData(data.getLexicon());
-        LexiconAdapter lexiconAdapter = new LexiconAdapter(getContext(), lexData);
-        ListView lexiconList = (ListView) result.findViewById(R.id.lexicon_list);
-        lexiconList.setAdapter(lexiconAdapter);
-        lexiconList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Object obj = parent.getItemAtPosition(position);
-                // react to click on lexicon entries by showing the activity, else do nothing
-                if (LexiconEntry.class.equals(obj.getClass())) {
-                    Intent intent = new Intent(getActivity(), SimpleWebViewActivity.class);
-
-                    // put lexicon entry content into the intent and render by the web view activity
-                    final String content = ((LexiconEntry) obj).getContent();
-                    intent.putExtra(getResources().getString(R.string.extra_key_simple_web_view_data), content);
-                    getActivity().startActivity(intent);
-                }
-            }
-        });
-
-        // Tab3: Touren
-        TabSpec tabSpec3 = tabHost.newTabSpec(getString(R.string.tours));
-        tabSpec3.setContent(R.id.tab3);
-        tabSpec3.setIndicator(getString(R.string.tours));
-        tabHost.addTab(tabSpec3);
-
         // the list view that will contain tours as well as mapstops
-        tourOrMapstopList = (ListView) result.findViewById(R.id.tour_or_mapstop_list);
+        tourOrMapstopList = (ListView) view.findViewById(R.id.tour_or_mapstop_list);
 
         // setup listener that either:
         //      * changes the list to mapstop on click on a tour
@@ -128,7 +104,42 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
         tourOrMapstopList.setAdapter(tourAdapter);
         tourOrMapstopList.setOnItemClickListener(onTourOrMapstopClickListener);
 
-        return result;
+        // Tab2: Lexikon
+        TabSpec tabSpec2 = tabHost.newTabSpec("Lexikon");
+        tabSpec2.setContent(R.id.lexiconTab);
+        tabSpec2.setIndicator("Lexikon");
+        tabHost.addTab(tabSpec2);
+
+        Lexicon lexicon = data.getLexicon();
+
+        if(lexicon.hasEntries()) {
+            // remove the anouncement that no entries are present
+            View noEntriesView = view.findViewById(R.id.no_lexicon_entries);
+            ((ViewManager)noEntriesView.getParent()).removeView(noEntriesView);
+
+            // fill the list of entries
+            ArrayList<Object> lexData = LexiconAdapter.makeData(lexicon);
+            LexiconAdapter lexiconAdapter = new LexiconAdapter(getContext(), lexData);
+            ListView lexiconList = (ListView) view.findViewById(R.id.lexicon_list);
+            lexiconList.setAdapter(lexiconAdapter);
+            lexiconList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Object obj = parent.getItemAtPosition(position);
+                    // react to click on lexicon entries by showing the activity, else do nothing
+                    if (LexiconEntry.class.equals(obj.getClass())) {
+                        Intent intent = new Intent(getActivity(), SimpleWebViewActivity.class);
+
+                        // put lexicon entry content into the intent and render by the web view activity
+                        final String content = ((LexiconEntry) obj).getContent();
+                        intent.putExtra(getResources().getString(R.string.extra_key_simple_web_view_data), content);
+                        getActivity().startActivity(intent);
+                    }
+                }
+            });
+        }
+
+        return view;
     }
 
     private ListAdapter getMapstopListAdapterForTour(Tour tour) {

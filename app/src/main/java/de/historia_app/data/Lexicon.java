@@ -51,4 +51,8 @@ public class Lexicon {
         }
     }
 
+    public boolean hasEntries() {
+        return (lettersToEntries.size() > 0);
+    }
+
 }

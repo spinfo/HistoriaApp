@@ -64,4 +64,9 @@
     <!-- Strings related to the open street map legal notice -->
     <string name="copyright_osm_contributors">© OpenStreetMap contributors</string>
     <string name="osm_copyright_url">https://www.openstreetmap.org/copyright/</string>
+
+    <!-- Lexicon related strings -->
+    <string name="lexicon">Lexikon</string>
+    <string name="no_lexicon_entries">Keine Lexikon-Einträge vorhanden</string>
+
 </resources>

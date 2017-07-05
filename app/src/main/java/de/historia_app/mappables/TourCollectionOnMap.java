@@ -24,10 +24,7 @@ public class TourCollectionOnMap {
     private Collection<PlaceOnMap> placesOnMap;
 
     public TourCollectionOnMap(List<Tour> tours) {
-        long start = System.currentTimeMillis();
         this.initializeFromTours(tours);
-        // TODO: Remove
-        Log.i("--->", "Used: " + (System.currentTimeMillis() - start) + " ms");
     }
 
     public Collection<TourOnMap> getToursOnMap() {

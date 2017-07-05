@@ -15,40 +15,11 @@
         android:layout_height="fill_parent"
         android:id="@android:id/tabcontent"
         >
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/tab1"
-            android:orientation="vertical"
-            android:paddingTop="60dp"
-            >
-            <include
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                layout="@layout/lexicon_list"
-                />
-
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/tab2"
-            android:orientation="vertical"
-            android:paddingTop="60dp"
-            >
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="100dp"
-                android:id="@+id/txt2"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/tab3"
+            android:id="@+id/tourOrMapstopTab"
             android:orientation="vertical"
             android:paddingTop="60dp"
             >
@@ -59,6 +30,32 @@
                 />
 
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/lexiconTab"
+            android:orientation="vertical"
+            android:paddingTop="60dp"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/no_lexicon_entries"
+                android:paddingTop="16dp"
+                android:textColor="@android:color/darker_gray"
+                android:textAlignment="center"
+                android:textSize="24sp"
+                android:text="@string/no_lexicon_entries"/>
+            <include
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                layout="@layout/lexicon_list"
+                />
+
+        </LinearLayout>
+
+
     </FrameLayout>
 
 </TabHost>
