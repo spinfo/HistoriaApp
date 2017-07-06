@@ -19,13 +19,14 @@ public abstract class MapStatePersistence {
     private static final String K_CENTER_LAT = "centerLat";
     private static final String K_CENTER_LON = "centerLon";
     private static final String K_ZOOM = "zoom";
-    private static final String K_MAPSTOP_TAPPED_ID = "mapstopTappedId";
+    private static final String K_PLACE_TAPPED_ID = "placeTappedId";
     private static final String K_AREA_ID = "areaId";
+    private static final String K_MAPSTOP_SWITCHED_POS = "mapstopSwitchedPos";
 
     private static final long NO_OBJECT = -1;
 
     private static final String[] KEYS = { K_CENTER_LAT, K_CENTER_LON, K_ZOOM,
-            K_AREA_ID, K_MAPSTOP_TAPPED_ID };
+            K_AREA_ID, K_PLACE_TAPPED_ID, K_MAPSTOP_SWITCHED_POS};
 
     public static void save(MapFragment.MapState state, SharedPreferences prefs, DataFacade data) {
         IGeoPoint center = state.map.getMapCenter();
@@ -48,11 +49,14 @@ public abstract class MapStatePersistence {
             safeWriteIdValue(editor, K_AREA_ID, state.area.getId());
         }
 
-        // there might be no mapstop tapped at the moment
-        if (state.mapstopTapped != null) {
-            safeWriteIdValue(editor, K_MAPSTOP_TAPPED_ID, state.mapstopTapped.getId());
+        // there might be no placeOnMap tapped at the moment
+        // the mapstop switched to is only saved if a place was tapped, else it set to 0
+        if (state.placeTapped != null) {
+            safeWriteIdValue(editor, K_PLACE_TAPPED_ID, state.placeTapped.getId());
+            editor.putInt(K_MAPSTOP_SWITCHED_POS, state.mapstopSwitchedPos);
         } else {
-            safeWriteIdValue(editor, K_MAPSTOP_TAPPED_ID, NO_OBJECT);
+            safeWriteIdValue(editor, K_PLACE_TAPPED_ID, NO_OBJECT);
+            editor.putInt(K_MAPSTOP_SWITCHED_POS, 0);
         }
         editor.apply();
     }
@@ -68,13 +72,17 @@ public abstract class MapStatePersistence {
         if (state.map == null) {
             throw new InconsistentMapStateException("Can't load map state onto null view.");
         }
-        // TODO: Bounds check or better default values
+        // get all values from the prefs
         final double lat = readDouble(prefs, K_CENTER_LAT, 0.0);
         final double lon = readDouble(prefs, K_CENTER_LON, 0.0);
         final int zoom = prefs.getInt(K_ZOOM, 16);
-        final long mapstopTappedId = prefs.getLong(K_MAPSTOP_TAPPED_ID, NO_OBJECT);
+        final long placeTappedId = prefs.getLong(K_PLACE_TAPPED_ID, NO_OBJECT);
+        final int mapstopSwitchedPos = prefs.getInt(K_MAPSTOP_SWITCHED_POS, 0);
+
+        // zoom the map to the restored positionq
         MapUtil.zoomTo(state.map, lat, lon, zoom);
 
+        // get the tours that were previously on the map from the database
         final List<TourOnMap> toursOnMap = data.getToursOnMap();
         if (toursOnMap == null || toursOnMap.isEmpty()) {
             // a tour is always specified
@@ -82,11 +90,14 @@ public abstract class MapStatePersistence {
         } else {
             state.toursOnMap = toursOnMap;
         }
-        // a mapstop doesn't have to be specified, so don't throw an exception
-        if (mapstopTappedId != NO_OBJECT) {
-            state.mapstopTapped = data.getMapstopById(mapstopTappedId);
+        // A place doesn't have to be specified, so don't throw an exception if it isn't there.
+        // Only set mapstopSwitchedPosition if a place marker was tapped else set the default.
+        if (placeTappedId != NO_OBJECT) {
+            state.placeTapped = data.getPlaceById(placeTappedId);
+            state.mapstopSwitchedPos = mapstopSwitchedPos;
         } else {
-            state.mapstopTapped = null;
+            state.placeTapped = null;
+            state.mapstopSwitchedPos = 0;
         }
         // an area should always be given. Read it from the preferences or set default from db
         state.area = getArea(prefs, data);

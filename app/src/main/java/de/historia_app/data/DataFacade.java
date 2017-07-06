@@ -54,6 +54,10 @@ public class DataFacade {
         return dbDataProvider.saveToursOnMap(toursOnMap);
     }
 
+    public Place getPlaceById(long id) {
+        return dbDataProvider.getPlaceById(id);
+    }
+
     public Lexicon getLexicon() {
         return dbDataProvider.getLexicon();
     }

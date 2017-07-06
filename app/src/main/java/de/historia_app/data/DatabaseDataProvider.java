@@ -134,6 +134,14 @@ public class DatabaseDataProvider {
         }
     }
 
+    Place getPlaceById(long id) {
+        try {
+            return dbHelper.getPlaceDao().queryForId(id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     boolean saveLexiconEntries(List<LexiconEntry> entries) {
         if(entries == null || entries.isEmpty()) {
             Log.w(LOG_TAG, "Attempt to save empty or null list of lexicon entries");

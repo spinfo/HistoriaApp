@@ -70,4 +70,7 @@
     <string name="lexicon">Lexikon</string>
     <string name="no_lexicon_entries">Keine Lexikon-Einträge vorhanden</string>
 
+    <!-- Symbolic strings -->
+    <string name="right_arrow">➡</string>
+    <string name="letter_X">X</string>
 </resources>

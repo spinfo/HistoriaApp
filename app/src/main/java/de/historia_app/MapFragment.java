@@ -18,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
@@ -33,7 +32,6 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +59,8 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         Area area;
         MapView map;
         List<TourOnMap> toursOnMap;
-        Mapstop mapstopTapped;
+        Place placeTapped;
+        int mapstopSwitchedPos;
     }
     private MapState state;
 
@@ -136,8 +135,8 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         try {
             MapStatePersistence.load(state, getPrefs(), data, this.getContext());
             switchTourOverlays(state.toursOnMap);
-            if (state.mapstopTapped != null) {
-                reopenInfoWindowFor(state.mapstopTapped);
+            if (state.placeTapped != null) {
+                reopenInfoWindowFor(state.placeTapped, state.mapstopSwitchedPos);
             }
             Log.d(LOGTAG, "Loaded state from prefs.");
         } catch (MapStatePersistence.InconsistentMapStateException e) {
@@ -276,17 +275,12 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             overlays.add(line);
         }
 
-        // get the tour mapstops only once. This prooved relevant for performance with ormlite.
-        final MarkerInfoWindow window = new MapFragment.MapstopMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map);
+        // get the tour mapstops only once. This proofed relevant for performance with ormlite.
+        MarkerInfoWindow window;
         Marker marker;
-        Mapstop mapstop;
         for (PlaceOnMap placeOnMap : tourCollectionOnMap.getPlacesOnMap()) {
-            mapstop = placeOnMap.getMapstopsOnMap().get(0).getMapstop();
-            if(placeOnMap.hasTourBeginMapstop()) {
-                marker = MapUtil.makeFirstMapstopMarkerInTour(getContext(), state.map, mapstop);
-            } else {
-                marker = MapUtil.makeMapstopMarker(getContext(), state.map, mapstop);
-            }
+            window = new PlaceMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map, this);
+            marker = MapUtil.makeMapstopMarker(getContext(), state.map, placeOnMap);
             marker.setInfoWindow(window);
             overlays.add(marker);
         }
@@ -335,10 +329,12 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         return overlays;
     }
 
-    // opens the info window belonging to a mapstop marker if the map contains a marker that
-    // has the provided mapstop as a related object
-    private void reopenInfoWindowFor(Mapstop mapstop) {
+    // opens the info window belonging to a place marker if the map contains a marker that
+    // has the provided place as a related object, switches the infowindow bubble to the mapstop
+    // given by pos.
+    private void reopenInfoWindowFor(final Place place, final int pos) {
         // TODO: there should be a better way to do this, than looping over all overlays
+        final long needle = place.getId();
         Object relatedObject;
         for (Overlay overlay : state.map.getOverlays()) {
             // only look at marker overlays
@@ -347,79 +343,21 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
                 final Marker marker = (Marker) overlay;
                 relatedObject = marker.getRelatedObject();
 
-                // only look at those markers related to maptstops
-                if(relatedObject instanceof  Mapstop) {
-                    if(((Mapstop) relatedObject).getId() == mapstop.getId()) {
-
+                // only look at those markers related to a PlaeceOnMap
+                if(relatedObject instanceof  PlaceOnMap) {
+                    if(((PlaceOnMap) relatedObject).getPlace().getId() == needle) {
                         // delay opening the info window after the map view has been rendered
                         state.map.post(new Runnable() {
                             @Override
                             public void run() {
                                 marker.showInfoWindow();
+                                PlaceMarkerInfoWindow window = (PlaceMarkerInfoWindow) marker.getInfoWindow();
+                                window.switchToPosition(pos);
                             }
                         });
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * A class controlling the behaviour of the bubble appearing above mapstop markers on the map
-     */
-    private class MapstopMarkerInfoWindow extends MarkerInfoWindow {
-
-        private class MapstopMarkerInfoWindowOnclickListner implements View.OnClickListener {
-
-            Mapstop mapstop;
-
-            @Override
-            public void onClick(View view) {
-                popupManager.showMapstop(this.mapstop);
-            }
-
-            public void setMapstop(Mapstop mapstop) {
-                this.mapstop = mapstop;
-            }
-        };
-
-        MapFragment.MapstopMarkerInfoWindow.MapstopMarkerInfoWindowOnclickListner onClickListener;
-
-        MapView map;
-
-        public MapstopMarkerInfoWindow(int layoutResId, final MapView mapView) {
-            super(layoutResId, mapView);
-            this.map = mapView;
-            this.onClickListener = new MapFragment.MapstopMarkerInfoWindow.MapstopMarkerInfoWindowOnclickListner();
-        }
-
-        @Override
-        public void onOpen(Object item) {
-            super.onOpen(item);
-            //opening one window closes all others on the map
-            InfoWindow.closeAllInfoWindowsOn(this.map);
-
-            // the mapstap this window refers to is saved as a related object of the marker
-            final Mapstop mapstop = (Mapstop) getMarkerReference().getRelatedObject();
-
-            // set the right mapstop to use for the onclick listener
-            this.onClickListener.setMapstop(mapstop);
-
-            // mark the mapstop infowindow as opened in map state for persistence
-            MapFragment.this.state.mapstopTapped = mapstop;
-
-            // set on click listener for the bubble/infowindow
-            LinearLayout layout = (LinearLayout) getView().findViewById(R.id.map_my_bonuspack_bubble);
-            layout.setClickable(true);
-            layout.setOnClickListener(this.onClickListener);
-        }
-
-        @Override
-        public void onClose() {
-            super.onClose();
-
-            // tell the map state that no mapstop is opened atm
-            MapFragment.this.state.mapstopTapped = null;
         }
     }
 
@@ -470,6 +408,26 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         if(onModelSelectionListener != null) {
             onModelSelectionListener.onAreaSelected(area);
         }
+    }
+
+    @Override
+    public void onPlaceTapped(PlaceOnMap placeOnMap) {
+        // treat null as the signal that no place is tapped.
+        if(placeOnMap == null) {
+            this.state.placeTapped = null;
+        } else {
+            this.state.placeTapped = placeOnMap.getPlace();
+        }
+    }
+
+    @Override
+    public void onMapstopSwitched(int position) {
+        this.state.mapstopSwitchedPos = position;
+    }
+
+    @Override
+    public void onMapstopSelected(PlaceOnMap placeOnMap, int position) {
+        popupManager.showMapstop(placeOnMap.getMapstopsOnMap().get(position).getMapstop());
     }
 
     public void setOnModelSelectionListener(OnModelSelectionListener listener) {

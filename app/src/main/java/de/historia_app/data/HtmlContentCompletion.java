@@ -18,7 +18,7 @@ public class HtmlContentCompletion {
                 "<head>" +
                     "<meta charset=\"UTF-8\">" +
                     "<style>" +
-                        "img { max-width: 100%; height: auto !important; }" +
+                        "img { max-width: 95%; height: auto !important; }" +
                         "figure { max-width: 100%; margin: 1em 0 1em; }" +
                     "</style>" +
                 "</head>" +

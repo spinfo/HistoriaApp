@@ -41,6 +41,7 @@ import de.historia_app.data.Area;
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.FileService;
 import de.historia_app.data.Tour;
+import de.historia_app.mappables.PlaceOnMap;
 
 /**
  * The main activity bascially does the following
@@ -483,6 +484,21 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
     public void onTourSelected(Tour tour) {
         // setup the nav drawer item to explore the current map
         toggleNavDrawerItemToExploreMap(true, tour.getArea());
+    }
+
+    @Override
+    public void onPlaceTapped(PlaceOnMap placeOnMap) {
+        // do nothing
+    }
+
+    @Override
+    public void onMapstopSelected(PlaceOnMap placeOnMap, int position) {
+        // do nothing
+    }
+
+    @Override
+    public void onMapstopSwitched(int position) {
+        // do nothing
     }
 
     // TODO this will need changing once we have more than one visible fragment (e.g. on bigger devices)

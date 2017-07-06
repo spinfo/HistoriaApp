@@ -14,7 +14,7 @@
         android:layout_alignParentEnd="true"
         android:minHeight="0dp"
         android:minWidth="0dp"
-        android:text="X"/>
+        android:text="@string/letter_X"/>
 
     <RelativeLayout
         android:id="@+id/map_popup_content"
