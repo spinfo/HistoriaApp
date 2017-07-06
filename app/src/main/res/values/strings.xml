@@ -19,6 +19,7 @@
     <!-- Strings for the menu -->
     <string name="menu_title">Menü</string>
     <string name="menu_select_area">Karte wechseln</string>
+    <string name="menu_explore_area">Karte erkunden</string>
     <string name="menu_select_tour">Touren wählen</string>
     <string name="menu_explore_data">Lesemodus</string>
     <string name="menu_download_tours">Touren laden</string>

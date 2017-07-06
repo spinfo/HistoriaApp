@@ -162,6 +162,11 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             onModelSelectionListener.onAreaSelected(state.area);
         }
 
+        // if there is only a single tour selected, tell the listener as well
+        if (state.toursOnMap != null && state.toursOnMap.size() == 1) {
+            onModelSelectionListener.onTourSelected(state.toursOnMap.get(0).getTour());
+        }
+
         // recreate popup from bundle if needed
         if (savedInstanceState != null) {
             popupManager.restorePopupStateFrom(savedInstanceState, this);

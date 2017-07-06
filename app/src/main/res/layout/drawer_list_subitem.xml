@@ -2,4 +2,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    style="@style/navDrawerItem" />
+    style="@style/navDrawerItem"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
+    android:paddingLeft="32dp" />

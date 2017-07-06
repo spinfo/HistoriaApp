@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -33,6 +32,7 @@ import org.osmdroid.tileprovider.modules.SqlTileWriter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
     interface MainActivityFragment {
         boolean reactToBackButtonPressed();
     }
+
+    // the drawer items shown in the left menu and an adapter to hold them
+    private ArrayList<NavDrawerItem> navDrawerItems;
+    private ArrayAdapter<NavDrawerItem> navDrawerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -323,15 +327,19 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
     // START drawer menu
     private void initializeNavDrawerMenu() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        final ListView drawerList = (ListView) findViewById(R.id.left_drawer);
 
-        // set adapter for the list view
-        drawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, getNavDrawerTitles()));
+        final ListView drawerList = (ListView) mDrawerLayout.findViewById(R.id.left_drawer);
+        navDrawerItems = createDefaultNavDrawerItems();
+        navDrawerAdapter = new NavDrawerAdapter(MainActivity.this, navDrawerItems);
+        drawerList.setAdapter(navDrawerAdapter);
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectNavDrawerItem((NavDrawerItem) parent.getItemAtPosition(position));
+            }
+        });
 
-        // a click listener, empty for now
-        drawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        // interaction with action bar
+        // interaction of the drawer with action bar
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mainToolbar, R.string.menu_title, R.string.app_name) {
 
             public void onDrawerClosed(View view) {
@@ -360,54 +368,88 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         }
     }
 
-    // The click listner for ListView in the navigation drawer
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
-        }
-    }
-
-    private String[] getNavDrawerTitles() {
-        final Resources res = getResources();
-        String[] result = {
-                res.getString(R.string.menu_select_area),
-                res.getString(R.string.menu_select_tour),
-                res.getString(R.string.menu_explore_data),
-                res.getString(R.string.menu_download_tours),
-                res.getString(R.string.menu_about)
+    private ArrayList<NavDrawerItem> createDefaultNavDrawerItems() {
+        final NavDrawerItem[] navItems = {
+                new NavDrawerItem(NavDrawerItem.ID.SELECT_AREA, getString(R.string.menu_select_area), false),
+                new NavDrawerItem(NavDrawerItem.ID.SELECT_TOUR, getString(R.string.menu_select_tour), false),
+                new NavDrawerItem(NavDrawerItem.ID.EXPLORE_DATA, getString(R.string.menu_explore_data), false),
+                new NavDrawerItem(NavDrawerItem.ID.LOAD_TOUR, getString(R.string.menu_download_tours), false),
+                new NavDrawerItem(NavDrawerItem.ID.ABOUT, getString(R.string.menu_about), false)
         };
 
-        return result;
+        return new ArrayList<>(Arrays.asList(navItems));
+    }
+
+    private void toggleNavDrawerItemToExploreMap(boolean enable, Area area) {
+        if(navDrawerAdapter == null || navDrawerAdapter.getItem(1) == null) {
+            Log.e(LOG_TAG, "Drawer items not or wrongly initialized");
+            return;
+        }
+
+        boolean itemIsPresent = (navDrawerAdapter.getItem(1).getId() == NavDrawerItem.ID.EXPLORE_AREA);
+
+        if(enable && !itemIsPresent) {
+            final String title = getString(R.string.menu_explore_area);
+            final NavDrawerItem item  = new NavDrawerItem(NavDrawerItem.ID.EXPLORE_AREA, title, true);
+            item.setRelatedObject(area);
+            navDrawerItems.add(1, item);
+            navDrawerAdapter.notifyDataSetChanged();
+        } else if(!enable && itemIsPresent) {
+            navDrawerItems.remove(1);
+            navDrawerAdapter.notifyDataSetChanged();
+        }
     }
 
     // React to a click on a nav drawer item
-    private void selectItem(int position) {
-        if (position == 0) {
-            MapFragment mapFragment = switchMainFragmentToMap(true);
-            mapFragment.showAreaSelection();
-            mDrawerLayout.closeDrawers();
-        } else if (position == 1) {
-            MapFragment mapFragment = switchMainFragmentToMap(true);
-            mapFragment.showTourSelection();
-            mDrawerLayout.closeDrawers();
-        } else if (position == 2) {
-            switchMainFragmentToExploreData(true);
-            mDrawerLayout.closeDrawers();
-        } else if (position == 3) {
-            switchMainFragmentToTourDownload(true);
-            mDrawerLayout.closeDrawers();
-        } else if (position == 4) {
-            final Intent intent = new Intent(MainActivity.this, AboutPageAcitvity.class);
-            MainActivity.this.startActivity(intent);
-        } else {
-            Toast.makeText(this, "Selected: " + position, Toast.LENGTH_SHORT).show();
+    private void selectNavDrawerItem(NavDrawerItem item) {
+        if(item == null) {
+            Log.e(LOG_TAG, "No drawer item to select");
+            return;
         }
+        final MapFragment mapFragment;
+
+        switch (item.getId()) {
+            case SELECT_AREA:
+                mapFragment = switchMainFragmentToMap(true);
+                mapFragment.showAreaSelection();
+                break;
+            case EXPLORE_AREA:
+                mapFragment = switchMainFragmentToMap(true);
+                mapFragment.onAreaSelected((Area) item.getRelatedObject());
+                break;
+            case SELECT_TOUR:
+                mapFragment = switchMainFragmentToMap(true);
+                mapFragment.showTourSelection();
+                break;
+            case EXPLORE_DATA:
+                switchMainFragmentToExploreData(true);
+                toggleNavDrawerItemToExploreMap(false, null);
+                break;
+            case LOAD_TOUR:
+                switchMainFragmentToTourDownload(true);
+                toggleNavDrawerItemToExploreMap(false, null);
+                break;
+            case ABOUT:
+                toggleNavDrawerItemToExploreMap(false, null);
+                final Intent intent = new Intent(MainActivity.this, AboutPageAcitvity.class);
+                MainActivity.this.startActivity(intent);
+                break;
+            default:
+                Toast.makeText(this, "Selected: " + item.getTitle(), Toast.LENGTH_SHORT).show();
+                break;
+        }
+
+        mDrawerLayout.closeDrawers();
     }
     // END drawer menu
 
     @Override
     public void onBackPressed() {
+        // if the drawer is open, just close it and return
+        if(mDrawerLayout.isDrawerOpen(findViewById(R.id.left_drawer))) {
+            mDrawerLayout.closeDrawers();
+            return;
+        }
         // inform the current fragment of the back press and only get active if it wasn't handled
         MainActivityFragment fragment = (MainActivityFragment) getVisibleFragment();
         boolean fragmentReacted = fragment.reactToBackButtonPressed();
@@ -433,11 +475,14 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         if(area != null) {
             this.setDefaultActionBarTitleWithSuffix(area.getName());
         }
+        // disable the nav drawer item to explore the current map
+        toggleNavDrawerItemToExploreMap(false, null);
     }
 
     @Override
     public void onTourSelected(Tour tour) {
-        // do nothing
+        // setup the nav drawer item to explore the current map
+        toggleNavDrawerItemToExploreMap(true, tour.getArea());
     }
 
     // TODO this will need changing once we have more than one visible fragment (e.g. on bigger devices)
