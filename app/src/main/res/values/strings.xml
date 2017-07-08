@@ -52,6 +52,7 @@
     <string name="tour_download_failed">Tour konnte nicht geladen werden.</string>
 
     <!-- Strings related to the about page -->
+    <string name="about_page_title">HistoriaApp, Über uns</string>
     <string name="app_version_template">Version %s</string>
     <string name="about_page_asset_name">about_page.html</string>
     <string name="about_page_unreachable">Lesefehler. Besuchen Sie zu Informationen über die App: historia-app.de</string>

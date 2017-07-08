@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.MailTo;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,7 +33,7 @@ public class AboutPageAcitvity extends AppCompatActivity {
 
         // set the content of the about page by pointing the web view to the asset file
         WebView contentView = (WebView) this.findViewById(R.id.about_page_content);
-        contentView.setWebViewClient(new MailIntentWebViewClient(this));
+        contentView.setWebViewClient(new MailAndHttpRedirectingWebViewClient(this));
         contentView.loadDataWithBaseURL(null, getAboutPageContent(), "text/html", "utf-8", null);
     }
 
@@ -65,11 +66,11 @@ public class AboutPageAcitvity extends AppCompatActivity {
         }
     }
 
-    private class MailIntentWebViewClient extends WebViewClient {
+    private class MailAndHttpRedirectingWebViewClient extends WebViewClient {
 
         private final Context context;
 
-        MailIntentWebViewClient(Context context) {
+        MailAndHttpRedirectingWebViewClient(Context context) {
             this.context = context;
         }
 
@@ -80,6 +81,10 @@ public class AboutPageAcitvity extends AppCompatActivity {
                 Intent email = newEmailIntent(mt.getTo(), mt.getSubject(), mt.getBody(), mt.getCc());
                 Intent chooseMail = Intent.createChooser(email, getString(R.string.choose_mail_program_title));
                 AboutPageAcitvity.this.startActivityForResult(chooseMail, 0);
+                return true;
+            } else if (url.startsWith("http")) {
+                final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(intent);
                 return true;
             }
             return false;
