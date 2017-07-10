@@ -21,8 +21,9 @@ public class Area {
     private String name;
 
     // The tours within this area, not to be fetched eagerly as they do some eager fetching
-    // themselves
-    @ForeignCollectionField(columnName = "tours")
+    // themselves.
+    // Tours for an area are fetched in the reversed order of their creation date on the server.
+    @ForeignCollectionField(columnName = "tours", orderColumnName = "created_at", orderAscending = false)
     private Collection<Tour> tours;
 
     // One corner of the area's rectangle
