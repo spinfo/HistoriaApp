@@ -15,6 +15,7 @@ public class TourOnMap {
     @DatabaseField(columnName = "tour", foreign = true, foreignAutoRefresh = true)
     private Tour tour;
 
+    // TODO: This is not actually used, remove
     // whether all mapstops of the tour are displayed as markers (or only the first)
     @DatabaseField(columnName = "all_mapstops_displayed")
     private boolean displayingAllMapstops;

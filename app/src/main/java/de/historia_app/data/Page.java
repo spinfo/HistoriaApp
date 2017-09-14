@@ -32,7 +32,7 @@ public class Page {
     @DatabaseField(columnName = "content")
     private String content;
 
-    // a list of guids (server urls) of the page's media items
+    // the mediaitems linked from this page
     @ForeignCollectionField(columnName = "media", eager = true)
     private Collection<Mediaitem> media = new ArrayList<>();
 

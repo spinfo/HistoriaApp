@@ -76,10 +76,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     // if model selection are registered by this fragment they will be passed to this listener
     private OnModelSelectionListener onModelSelectionListener;
 
-    // a simple cache for tour overlays used by this map
-    // TODO: Check if this is really improving performance (on orientation change?)
-    private Map<Tour, List<Overlay>> tourOverlayCache = new HashMap<>();
-
     // the user's location (if recorded)
     private Location userLocation;
 
@@ -105,7 +101,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         state = new MapState();
         state.map = (MapView) mapFragmentView.findViewById(R.id.map);
 
-        tourOverlayCache = new HashMap<>();
         MapUtil.setMapDefaults(state.map);
 
         // the object that will manage all popups on this map
@@ -262,7 +257,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         map.getOverlays().add(userLocationOverlay);
     }
 
-    // TODO: Refactor this to use ObjectOnMap.draw()
+    // TODO: Rename? This seems to no longer get, only make
     private List<Overlay> getOrMakeTourOverlays(MapView map, TourCollectionOnMap tourCollectionOnMap) {
         List<Overlay> overlays = new ArrayList<>();
 

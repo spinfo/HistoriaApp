@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Data object for an Area containing Tours
+ * Data object for an Area containing Tours (otherwise: a name connected to a geographic rectangle)
  */
 public class Area {
 
