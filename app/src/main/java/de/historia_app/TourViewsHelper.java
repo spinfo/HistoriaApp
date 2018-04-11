@@ -65,7 +65,7 @@ public abstract class TourViewsHelper {
         String text;
         int position = 1;
         for (final Mapstop mapstop : tour.getMapstops()) {
-            textView = new TextView(tourIntro.getContext(), null, R.attr.listViewTextItemStyle);
+            textView = new TextView(tourIntro.getContext());
 
             text = String.format(Locale.getDefault(), "%2d. %s", position, mapstop.getName());
             textView.setText(text);
