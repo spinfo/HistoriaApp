@@ -82,7 +82,9 @@ public abstract class MapUtil {
         marker.setPosition(placeOnMap.getPlace().getLocation());
         marker.setRelatedObject(placeOnMap);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        if(placeOnMap.hasTourBeginMapstop()) {
+        if(placeOnMap.hasIndoorTourMapstop()) {
+            marker.setIcon(ContextCompat.getDrawable(context, R.drawable.map_marker_icon_black_small));
+        } else if(placeOnMap.hasTourBeginMapstop()) {
             marker.setIcon(ContextCompat.getDrawable(context, R.drawable.map_marker_icon_red_small));
         } else {
             marker.setIcon(ContextCompat.getDrawable(context, R.drawable.map_marker_icon_blue_small));

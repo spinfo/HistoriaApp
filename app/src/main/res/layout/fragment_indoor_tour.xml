@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_indoor_tour"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+
+    <HorizontalScrollView
+        android:id="@+id/scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+
+            <ImageView
+                android:id="@+id/scene"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/indoor_tour_scene_view"
+                android:adjustViewBounds="true"
+                >
+            </ImageView>
+
+            <RelativeLayout
+                android:id="@+id/coordinate_container"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:layout_alignTop="@id/scene"
+                >
+
+                <!-- Mapstops will be added programmatically -->
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </HorizontalScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        >
+
+        <ImageButton
+            android:id="@+id/previous_button"
+            android:src="@drawable/previous_button"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/previous_scene_button"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:scaleType="fitCenter"
+            >
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/next_button"
+            android:src="@drawable/next_button"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/next_scene_button"
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:scaleType="centerInside"
+            >
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/close_button"
+            android:src="@drawable/close_button"
+            android:background="#00ffffff"
+            android:contentDescription="@string/close_tour_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:scaleType="fitCenter"
+            >
+        </ImageButton>
+
+    </RelativeLayout>
+
+</FrameLayout>

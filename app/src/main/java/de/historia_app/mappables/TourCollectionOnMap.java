@@ -66,6 +66,10 @@ public class TourCollectionOnMap {
                     firstStop = false;
                 }
 
+                if(tour.isIndoor()) {
+                    stopOnMap.setIsPartOfIndoorTour(true);
+                }
+
                 // link stop and place together
                 placeOnMap.addMapstopOnMap(stopOnMap);
             }

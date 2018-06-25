@@ -1,11 +1,15 @@
 package de.historia_app.data;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,6 +34,22 @@ public class ServerResponseReader {
         TypeDescription mapstopDescription = new TypeDescription(Mapstop.class);
         mapstopDescription.putListPropertyType("pages", Page.class);
         MAPSTOP_YAML = new Yaml(constructor);
+    }
+
+    private static final Yaml SCENE_YAML;
+    static {
+        Constructor constructor = new Constructor(Scene.class);
+        TypeDescription sceneDescription = new TypeDescription(Scene.class);
+        sceneDescription.putListPropertyType("mapstops", Mapstop.class);
+        sceneDescription.putListPropertyType("coordinates", Coordinate.class);
+        SCENE_YAML = new Yaml(constructor);
+    }
+
+    private static final Yaml COORDINATE_YAML;
+    static {
+        Constructor constructor = new Constructor(Coordinate.class);
+        TypeDescription coordinateDescription = new TypeDescription(Coordinate.class);
+        COORDINATE_YAML = new Yaml(constructor);
     }
 
     public static AvailableTours parseAvailableTours(String input) {
@@ -74,6 +94,8 @@ public class ServerResponseReader {
             tourType = Tour.Type.PublicTransportTour;
         } else if("bike-tour".matches(type)) {
             tourType = Tour.Type.BikeTour;
+        } else if("indoor-tour".matches(type)) {
+            tourType = Tour.Type.IndoorTour;
         }
 
         // handle the tour track
@@ -92,7 +114,45 @@ public class ServerResponseReader {
             // TODO: There should be a better way to do this (not dumping, then loading)
             String mapstopTest = yaml.dump(mapstopInput);
             Mapstop mapstop = (Mapstop) MAPSTOP_YAML.load(mapstopTest);
+            if (!mapstop.hasPages()) {
+                mapstop.setPages(new ArrayList<Page>());
+            }
             mapstops.add(mapstop);
+        }
+
+        // handle scenes
+        List<Scene> scenes = new ArrayList<>();
+        List<Map<String, Object>> scenesInput = (List) map.get("scenes");
+        if (scenesInput != null) {
+            for (Map<String, Object> sceneInput : scenesInput) {
+                String sceneTest = yaml.dump(sceneInput);
+                Scene scene = (Scene) SCENE_YAML.load(sceneTest);
+                if (!scene.hasCoordinates()) {
+                    scene.setCoordinates(new ArrayList<Coordinate>());
+                }
+                List<Mapstop> sceneMapstops = scene.getMapstops();
+                for (int i = 0; i < sceneMapstops.size(); i++) {
+                    Mapstop oldMapstop = sceneMapstops.get(i);
+                    for (Mapstop newMapstop : mapstops) {
+                        if (newMapstop.getId() == oldMapstop.getId()) {
+                            newMapstop.setScene(scene);
+                            sceneMapstops.set(i, newMapstop);
+                            break;
+                        }
+                    }
+                }
+                scene.setMapstops(sceneMapstops);
+                for (int i = 0; i < scene.getCoordinates().size(); i++) {
+                    scene.getCoordinates().get(i).setScene(scene);
+                    for (Mapstop newMapstop : scene.getMapstops()) {
+                        if (newMapstop.getId() == scene.getCoordinates().get(i).getMapstop().getId()) {
+                            newMapstop.setCoordinate(scene.getCoordinates().get(i));
+                            scene.getCoordinates().get(i).setMapstop(newMapstop);
+                        }
+                    }
+                }
+                scenes.add(scene);
+            }
         }
 
         // handle the Area
@@ -115,7 +175,7 @@ public class ServerResponseReader {
             Log.e(LOG_TAG, "Could not parse creation date: " + e.getMessage());
         }
 
-        Tour result = new Tour(name, mapstops, tourType, id, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author, intro, track);
+        Tour result = new Tour(name, mapstops, tourType, id, walkLength, duration, tagWhat, tagWhen, tagWhere, createdAt, accessibility, author, intro, track, scenes);
 
         // set area for the tour and the tour's places
         result.setArea(area);

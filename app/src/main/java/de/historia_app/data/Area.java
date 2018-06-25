@@ -3,6 +3,7 @@ package de.historia_app.data;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.field.ForeignCollectionField;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * Data object for an Area containing Tours (otherwise: a name connected to a geographic rectangle)
  */
-public class Area {
+public class Area implements Serializable {
 
     // the server's id for this area
     @DatabaseField(columnName = "id", id = true)

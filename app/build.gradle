@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "de.historia_app"
         minSdkVersion 14
@@ -38,6 +38,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.github.bmoliveira:snake-yaml:v1.18-android'
     compile 'com.j256.ormlite:ormlite-android:5.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
     testCompile 'junit:junit:4.12'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }

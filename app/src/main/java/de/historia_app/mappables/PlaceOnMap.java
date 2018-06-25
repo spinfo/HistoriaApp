@@ -17,6 +17,9 @@ public class PlaceOnMap {
     // whether the place has a mapstop that is the begin of a tour
     private boolean hasTourBeginMapstop;
 
+    // whether the place has a mapstop that is part of an indoor tour
+    private boolean hasIndoorTourMapstop;
+
     // the place of which this is the representation on the map
     private Place place;
 
@@ -25,6 +28,7 @@ public class PlaceOnMap {
         // initialize to a capacity of 1 as that is the most common scenario
         this.mapstopsOnMap = new ArrayList<>(1);
         this.hasTourBeginMapstop = false;
+        this.hasIndoorTourMapstop = false;
     }
 
     public List<MapstopOnMap> getMapstopsOnMap() {
@@ -35,11 +39,18 @@ public class PlaceOnMap {
         if(mapstopOnMap.isFirstInTour()) {
             this.hasTourBeginMapstop = true;
         }
+        if(mapstopOnMap.isPartOfIndoorTour()) {
+            this.hasIndoorTourMapstop = true;
+        }
         this.mapstopsOnMap.add(mapstopOnMap);
     }
 
     public boolean hasTourBeginMapstop() {
         return hasTourBeginMapstop;
+    }
+
+    public boolean hasIndoorTourMapstop() {
+        return hasIndoorTourMapstop;
     }
 
     public Place getPlace() {

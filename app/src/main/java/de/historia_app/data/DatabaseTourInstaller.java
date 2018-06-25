@@ -27,6 +27,8 @@ public class DatabaseTourInstaller {
     private Dao<Tour, Long> tourDao;
     private Dao<PersistentGeoPoint, Long> pointDao;
     private Dao<Area, Long> areaDao;
+    private Dao<Scene, Long> sceneDao;
+    private Dao<Coordinate, Long> coordinateDao;
 
     DatabaseTourInstaller(final Context context) {
         this.dbHelper = new DatabaseHelper(context);
@@ -38,6 +40,8 @@ public class DatabaseTourInstaller {
         this.tourDao = dbHelper.getTourDao();
         this.pointDao = dbHelper.getGeopointDao();
         this.areaDao = dbHelper.getAreaDao();
+        this.sceneDao = dbHelper.getSceneDao();
+        this.coordinateDao = dbHelper.getCoordinateDao();
 
         // TODO: this could need some kind of a mutex structure, to make sure, that only one  installer is
         // running at any time
@@ -112,6 +116,20 @@ public class DatabaseTourInstaller {
                     }
                 }
             }
+            for (Scene scene : tour.getScenes()) {
+                scene.setTour(tour);
+                for (Mapstop mapstop : scene.getMapstops()) {
+                    mapstop.setScene(scene);
+                    // todo : mapstop.setPage() etc. ?
+                    mapstopDao.createOrUpdate(mapstop);
+                }
+                for (Coordinate coordinate : scene.getCoordinates()) {
+                    coordinate.setScene(scene);
+                    // todo : coordinate.setMapstop(...); ?
+                    coordinateDao.createOrUpdate(coordinate);
+                }
+                sceneDao.createOrUpdate(scene);
+            }
             tourDao.createOrUpdate(tour);
 
             // save the tour track
@@ -158,6 +176,18 @@ public class DatabaseTourInstaller {
 
             // delete all the mapstops
             deleteEq(mapstopDao, "tour", tour);
+
+            // Iterate over scenes, delete all related items
+            for (Scene scene : tour.getScenes()) {
+                for (Mapstop mapstop : scene.getMapstops()) {
+                    deleteEq(mapstopDao, "scene", scene);
+                }
+                for (Coordinate coordinate : scene.getCoordinates()) {
+                    deleteEq(coordinateDao, "scene", scene);
+                }
+            }
+            // delete all the scenes
+            deleteEq(sceneDao, "tour", tour);
 
             // delete the area if this is the only tour for it
             long count = tourDao.queryBuilder().setCountOf(true)

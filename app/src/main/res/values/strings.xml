@@ -27,7 +27,7 @@
     <string name="menu_about">Über uns</string>
 
     <!-- Strings for the dialog popup -->
-    <string name="dialog_popup_ok">OK</string>
+    <string name="dialog_popup_ok">Starten</string>
     <string name="dialog_popup_cancel">Abbrechen</string>
     <string name="dialog_popup_back">Zurück</string>
 
@@ -74,4 +74,10 @@
     <!-- Symbolic strings -->
     <string name="right_arrow">➡</string>
     <string name="letter_X">X</string>
+
+    <!-- Indoor Tour -->
+    <string name="indoor_tour_scene_view">Indoor Tour Scene View</string>
+    <string name="previous_scene_button">Vorherige Szene</string>
+    <string name="next_scene_button">Nächste Szene</string>
+    <string name="close_tour_button">Tour verlassen</string>
 </resources>

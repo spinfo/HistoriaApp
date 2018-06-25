@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
     private static final String MAP_FRAGMENT_TAG = "map_fragment";
     private static final String EXPLORE_FRAGMENT_TAG = "explore_data_fragment";
     private static final String TOUR_DOWNLOAD_FRAGMENT_TAG = "tour_download_fragment";
+    private static final String INDOOR_TOUR_FRAGMENT_TAG = "indoor_tour_fragment";
 
     // variables to interact with the main menu in the navigation drawer
     private DrawerLayout mDrawerLayout;
@@ -130,8 +131,9 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
             if(defaultTour == null) {
                 Log.d(LOG_TAG, "No default tour found. Initializing example data.");
                 FileService fs = new FileService(this);
-                boolean result = fs.initializeExampleData();
-                if(!result) {
+                boolean result = fs.initializeExampleData("example-tour.zip");
+                boolean result2 = fs.initializeExampleData("example-indoor-tour.zip");
+                if(!result || !result2) {
                     ErrUtil.failInDebug(LOG_TAG, "Failed to initialize example data.");
                 }
             }
@@ -176,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         }
     }
 
-    private MapFragment switchMainFragmentToMap(boolean addToBackStack) {
+    protected MapFragment switchMainFragmentToMap(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         MapFragment mapFragment = (MapFragment) fragmentManager.findFragmentByTag(MAP_FRAGMENT_TAG);
         if (mapFragment == null) {
@@ -189,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         return mapFragment;
     }
 
-    private ExploreDataFragment switchMainFragmentToExploreData(boolean addToBackStack) {
+    protected ExploreDataFragment switchMainFragmentToExploreData(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         ExploreDataFragment exploreFragment = (ExploreDataFragment) fragmentManager.findFragmentByTag(EXPLORE_FRAGMENT_TAG);
         if (exploreFragment == null) {
@@ -199,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         return exploreFragment;
     }
 
-    private TourDownloadFragment switchMainFragmentToTourDownload(boolean addToBackStack) {
+    protected TourDownloadFragment switchMainFragmentToTourDownload(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         TourDownloadFragment downloadFragment = (TourDownloadFragment) fragmentManager.findFragmentByTag(TOUR_DOWNLOAD_FRAGMENT_TAG);
         if (downloadFragment == null) {
@@ -207,6 +209,16 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         }
         setupFragmentAsMainFragment(downloadFragment, TOUR_DOWNLOAD_FRAGMENT_TAG, addToBackStack);
         return downloadFragment;
+    }
+
+    protected IndoorTourFragment switchMainFragmentToIndoorTour(boolean addToBackStack) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        IndoorTourFragment indoorTourFragment = (IndoorTourFragment) fragmentManager.findFragmentByTag(INDOOR_TOUR_FRAGMENT_TAG);
+        if (indoorTourFragment == null) {
+            indoorTourFragment = new IndoorTourFragment();
+        }
+        setupFragmentAsMainFragment(indoorTourFragment, INDOOR_TOUR_FRAGMENT_TAG, addToBackStack);
+        return indoorTourFragment;
     }
 
     // replace the fragment and add (if wished) add this action to the transaction back stack
@@ -381,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         return new ArrayList<>(Arrays.asList(navItems));
     }
 
-    private void toggleNavDrawerItemToExploreMap(boolean enable, Area area) {
+    protected void toggleNavDrawerItemToExploreMap(boolean enable, Area area) {
         if(navDrawerAdapter == null || navDrawerAdapter.getItem(1) == null) {
             Log.e(LOG_TAG, "Drawer items not or wrongly initialized");
             return;
