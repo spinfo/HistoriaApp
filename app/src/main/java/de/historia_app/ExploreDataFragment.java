@@ -17,6 +17,7 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -147,18 +148,16 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
     private ListAdapter getMapstopListAdapterForTour(Tour tour) {
         List<Mapstop> mapstopData = tour.getMapstops();
         if (tour.isIndoor()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mapstopData.sort(new Comparator<Mapstop>() {
-                    @Override
-                    public int compare(Mapstop o1, Mapstop o2) {
-                        if (o1.getScene().getPos() == o2.getScene().getPos()) {
-                            return o1.getPos() - o2.getPos();
-                        }
-
-                        return o1.getScene().getPos() - o2.getScene().getPos();
+            Collections.sort(mapstopData, new Comparator<Mapstop>() {
+                @Override
+                public int compare(Mapstop o1, Mapstop o2) {
+                    if (o1.getScene().getPos() == o2.getScene().getPos()) {
+                        return o1.getPos() - o2.getPos();
                     }
-                });
-            }
+
+                    return o1.getScene().getPos() - o2.getScene().getPos();
+                }
+            });
         }
         Mapstop[] mapstops = mapstopData.toArray(new Mapstop[mapstopData.size()]);
         return new MapstopArrayAdapter(getContext(), mapstops);
