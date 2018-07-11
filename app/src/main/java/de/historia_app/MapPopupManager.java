@@ -43,8 +43,8 @@ public class MapPopupManager {
     private final LayoutInflater layoutInflater;
 
     // values to compute the dimensions of the popup
-    private static final float POPUP_WIDTH_RATIO = 0.85f;
-    private static final float POPUP_HEIGHT_RATIO = 0.90f;
+    private static final float POPUP_WIDTH_RATIO = 1.00f;
+    private static final float POPUP_HEIGHT_RATIO = 0.95f;
 
     // the state needed to save/recreate a popup: The popup's type and the id of the
     // object in question (either Mapstop, Area or Tour)
@@ -103,11 +103,13 @@ public class MapPopupManager {
                 if (width == 0 || height == 0) {
                     ErrUtil.failInDebug(LOG_TAG, "Bad popup dimensions: " + width + "/" + height);
                     setSaveStateNil();
+                } else {
+                    popup.setWidth(width);
+                    popup.setHeight(height);
                 }
-                popup.setWidth(width);
-                popup.setHeight(height);
                 popup.setFocusable(true);
-                popup.showAtLocation(surface, Gravity.CENTER, 0, 0);
+                popup.setAnimationStyle(R.style.mapPopupAnimation);
+                popup.showAtLocation(surface, Gravity.BOTTOM, 0, 0);
 
                 // this should only be done after the popup is actually shown
                 setBackgroundDimmed(true);
