@@ -73,5 +73,5 @@
 
     <!-- Symbolic strings -->
     <string name="right_arrow">➡</string>
-    <string name="map_overview_close_symbol">⌵</string>
+    <string name="map_overview_close_symbol">✕</string>
 </resources>

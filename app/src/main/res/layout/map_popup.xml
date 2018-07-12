@@ -15,6 +15,9 @@
         android:minWidth="0dp"
         android:background="@android:color/background_light"
         android:text="@string/map_overview_close_symbol"
+        android:gravity="end|center_vertical"
+        android:paddingStart="10sp"
+        android:paddingEnd="10sp"
         android:textSize="20sp"
         android:textColor="@color/colorAccent"/>
 
