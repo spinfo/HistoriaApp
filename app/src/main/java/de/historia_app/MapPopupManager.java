@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -85,7 +86,6 @@ public class MapPopupManager {
             setSaveState(type, objId, activePopup);
             return activePopup;
         }
-        // add comment explaining null
         final View popupContainer = layoutInflater.inflate(R.layout.map_popup, null);
 
         // put the supplied view inside the popup view
@@ -144,8 +144,8 @@ public class MapPopupManager {
         View mapstopLayout = layoutInflater.inflate(R.layout.mapstop, null);
 
         // Bind mapstop view to a page loader
-        MapstopPageView pageView = (MapstopPageView) mapstopLayout.findViewById(R.id.mapstop_page);
-        TextView pageIndicatorView = (TextView) mapstopLayout.findViewById(R.id.mapstop_page_indicator);
+        MapstopPageView pageView = mapstopLayout.findViewById(R.id.mapstop_page);
+        LinearLayout pageIndicatorView = mapstopLayout.findViewById(R.id.mapstop_page_indicator);
         MapstopPageLoader pageLoader = new MapstopPageLoader(mapstop, pageView, pageIndicatorView);
 
         // actually display the mapstop as a popup window

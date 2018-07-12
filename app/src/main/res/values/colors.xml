@@ -5,4 +5,5 @@
     <color name="colorAccent">@android:color/holo_blue_dark</color>
 
     <color name="dividerColor">#8F8F8F</color>
+    <color name="inactive">#AFAFAF</color>
 </resources>

@@ -14,13 +14,13 @@
         android:layout_weight="6"
         android:fadeScrollbars="false" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/mapstop_page_indicator"
-        android:background="@android:color/white"
-        android:layout_width="match_parent"
-        android:layout_height="50dip"
-        android:textSize="21sp"
+        android:orientation="horizontal"
         android:gravity="center"
+        android:background="@android:color/white"
+        android:layout_height="40dp"
+        android:layout_width="match_parent"
         android:layout_weight="1"/>
 
 </LinearLayout>
