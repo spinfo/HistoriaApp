@@ -17,10 +17,11 @@ public class HtmlContentCompletion {
             "<html>" +
                 "<head>" +
                     "<meta charset=\"UTF-8\">" +
-                    "<style>" +
-                        "img { max-width: 95%; height: auto !important; }" +
-                        "figure { max-width: 100%; margin: 1em 0 1em; }" +
-                    "</style>" +
+                    "<style>\n" +
+                        "img { max-width: 95%; height: auto !important; }\n" +
+                        "figure { max-width: 100%; margin: 1em 0 1em; }\n" +
+                        "body { font-family: serif; line-height: 150%; }\n" +
+                    "</style>\n" +
                 "</head>" +
                 "<body>" +
                     REPLACE_ME +
