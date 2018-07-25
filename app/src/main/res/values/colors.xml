@@ -6,4 +6,5 @@
 
     <color name="dividerColor">#8F8F8F</color>
     <color name="inactive">#AFAFAF</color>
+    <color name="clickable_background">#EFEFEF</color>
 </resources>

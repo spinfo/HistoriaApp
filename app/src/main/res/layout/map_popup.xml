@@ -5,21 +5,18 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <Button
+    <ImageView
         android:id="@+id/map_popup_dismiss"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:minHeight="35dp"
-        android:minWidth="0dp"
-        android:background="@android:color/background_light"
-        android:text="@string/map_overview_close_symbol"
+        android:minWidth="25dp"
         android:gravity="end|center_vertical"
-        android:paddingStart="10sp"
-        android:paddingEnd="10sp"
-        android:textSize="20sp"
-        android:textColor="@color/colorAccent"/>
+        android:src="@drawable/ic_keyboard_arrow_down_accent_24dp"
+        android:background="@color/clickable_background"
+        android:contentDescription="@string/keyboard_arrow_down_descriptor" />
 
     <RelativeLayout
         android:id="@+id/map_popup_content"

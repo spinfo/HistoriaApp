@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -45,7 +46,7 @@ public class MapPopupManager {
 
     // values to compute the dimensions of the popup
     private static final float POPUP_WIDTH_RATIO = 1.00f;
-    private static final float POPUP_HEIGHT_RATIO = 0.95f;
+    private static final float POPUP_HEIGHT_RATIO = 1.00f;
 
     // the state needed to save/recreate a popup: The popup's type and the id of the
     // object in question (either Mapstop, Area or Tour)
@@ -118,8 +119,8 @@ public class MapPopupManager {
         });
 
         // get the popup window button and set it to dismiss the popup
-        Button button = (Button) popupContainer.findViewById(R.id.map_popup_dismiss);
-        button.setOnClickListener(new View.OnClickListener() {
+        ImageView dismissButton = (ImageView) popupContainer.findViewById(R.id.map_popup_dismiss);
+        dismissButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popup.dismiss();
