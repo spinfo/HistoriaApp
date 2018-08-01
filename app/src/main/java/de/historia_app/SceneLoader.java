@@ -16,13 +16,14 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.Serializable;
 
 import de.historia_app.data.Coordinate;
 import de.historia_app.data.Mapstop;
 import de.historia_app.data.Scene;
 import de.historia_app.data.Tour;
 
-public class SceneLoader {
+public class SceneLoader implements Serializable {
 
     private static final String LOG_TAG = SceneLoader.class.getSimpleName();
 
@@ -47,7 +48,7 @@ public class SceneLoader {
         loadScene(this.currentIndex + offset);
     }
 
-    private void loadScene(int sceneIndex) {
+    protected void loadScene(int sceneIndex) {
         try {
             Scene scene = this.tour.getScenes().get(sceneIndex);
             loadSrc(scene);
@@ -138,5 +139,9 @@ public class SceneLoader {
 
     private void removeCoordinates() {
         coordinateContainer.removeAllViews();
+    }
+
+    protected int getCurrentIndex() {
+        return currentIndex;
     }
 }

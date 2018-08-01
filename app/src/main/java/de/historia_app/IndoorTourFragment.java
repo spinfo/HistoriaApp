@@ -1,6 +1,8 @@
 package de.historia_app;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +17,8 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import java.io.Serializable;
 
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.Tour;
@@ -34,6 +38,7 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
     private ImageButton closeButton;
     private MapPopupManager popupManager;
     private Tour tour;
+    private SceneLoader sceneLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +60,14 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
 
         popupManager = new MapPopupManager(indoorFragmentView);
 
-        final SceneLoader sceneLoader = new SceneLoader(tour, sceneView, scrollView, coordinateContainer, popupManager);
+        sceneLoader = new SceneLoader(tour, sceneView, scrollView, coordinateContainer, popupManager);
+
+        if (savedInstanceState != null && savedInstanceState.containsKey("current_index")) {
+            int currentIndex = (int) savedInstanceState.get("current_index");
+            if (currentIndex > 0) {
+                sceneLoader.loadScene(currentIndex);
+            }
+        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
@@ -94,7 +106,21 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity)getActivity()).switchMainFragmentToMap(false);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Wollen Sie die Tour wirklich verlassen?");
+                builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                        ((MainActivity)getActivity()).switchMainFragmentToMap(false);
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
@@ -108,5 +134,11 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
 
     private SharedPreferences getPrefs() {
         return getActivity().getPreferences(Context.MODE_PRIVATE);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("current_index", sceneLoader.getCurrentIndex());
     }
 }
