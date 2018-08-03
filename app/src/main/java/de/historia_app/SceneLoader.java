@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -32,13 +33,15 @@ public class SceneLoader implements Serializable {
     private HorizontalScrollView scrollView;
     private RelativeLayout coordinateContainer;
     private int currentIndex = -1;
+    private TextView sceneNo;
     private MapPopupManager popupManager;
 
-    public SceneLoader(Tour tour, ImageView sceneView, HorizontalScrollView scrollView, RelativeLayout coordinateContainer, MapPopupManager popupManager) {
+    public SceneLoader(Tour tour, ImageView sceneView, HorizontalScrollView scrollView, RelativeLayout coordinateContainer, TextView sceneNo, MapPopupManager popupManager) {
         this.tour = tour;
         this.sceneView = sceneView;
         this.scrollView = scrollView;
         this.coordinateContainer = coordinateContainer;
+        this.sceneNo = sceneNo;
         this.popupManager = popupManager;
 
         loadScene(0);
@@ -54,6 +57,15 @@ public class SceneLoader implements Serializable {
             loadSrc(scene);
 
             this.currentIndex = sceneIndex;
+            this.sceneNo.setText(String.valueOf(this.currentIndex + 1).concat("/").concat(String.valueOf(this.tour.getScenes().size())));
+
+            this.sceneNo.setVisibility(View.VISIBLE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    sceneNo.setVisibility(View.GONE);
+                }
+            }, 2000);
         }
         catch (IndexOutOfBoundsException e) {
             Log.e(LOG_TAG, "Request for nonexistent scene: " + sceneIndex);
@@ -95,7 +107,7 @@ public class SceneLoader implements Serializable {
         }
 
         stop.setText(String.valueOf(stopNo));
-        stop.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+        stop.setTextSize(TypedValue.COMPLEX_UNIT_PX, 60);
         stop.setTypeface(stop.getTypeface(), Typeface.BOLD);
         stop.setPadding(0, 0, 0, 0);
         stop.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -112,11 +124,11 @@ public class SceneLoader implements Serializable {
             z = originalHeight / sceneHeight;
         }
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(120, 120);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(90, 90);
         float x = coordinate.getX();
         float y = coordinate.getY();
-        float left = x / z - 60;
-        float top = y / z - 120;
+        float left = x / z - 90;
+        float top = y / z - 90;
         params.setMargins((int)left, (int)top, 0, 0);
         stop.setLayoutParams(params);
 

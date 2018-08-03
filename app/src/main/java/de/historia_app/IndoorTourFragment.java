@@ -17,6 +17,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.io.Serializable;
 
@@ -32,6 +33,7 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
     private FrameLayout indoorFragmentView;
     private HorizontalScrollView scrollView;
     private ImageView sceneView;
+    private TextView sceneNo;
     private RelativeLayout coordinateContainer;
     private ImageButton previousButton;
     private ImageButton nextButton;
@@ -52,6 +54,7 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         indoorFragmentView = (FrameLayout) inflater.inflate(R.layout.fragment_indoor_tour, container, false);
         scrollView = (HorizontalScrollView) indoorFragmentView.findViewById(R.id.scroll_view);
+        sceneNo = (TextView) indoorFragmentView.findViewById(R.id.scene_no);
         sceneView = (ImageView) indoorFragmentView.findViewById(R.id.scene);
         coordinateContainer = (RelativeLayout) indoorFragmentView.findViewById(R.id.coordinate_container);
         previousButton = (ImageButton) indoorFragmentView.findViewById(R.id.previous_button);
@@ -60,7 +63,7 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
 
         popupManager = new MapPopupManager(indoorFragmentView);
 
-        sceneLoader = new SceneLoader(tour, sceneView, scrollView, coordinateContainer, popupManager);
+        sceneLoader = new SceneLoader(tour, sceneView, scrollView, coordinateContainer, sceneNo, popupManager);
 
         if (savedInstanceState != null && savedInstanceState.containsKey("current_index")) {
             int currentIndex = (int) savedInstanceState.get("current_index");
