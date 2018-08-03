@@ -11,6 +11,7 @@
         android:layout_height="match_parent"
         android:background="#000000"
         android:fillViewport="true"
+        android:fadeScrollbars="false"
         >
 
         <LinearLayout
@@ -83,6 +84,7 @@
             android:layout_alignParentStart="true"
             android:layout_alignParentBottom="true"
             android:scaleType="fitCenter"
+            android:visibility="gone"
             >
         </ImageButton>
 
@@ -120,6 +122,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="#55ffffff"
+        android:visibility="gone"
         >
 
         <ImageView

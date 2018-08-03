@@ -71,10 +71,16 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
             int currentIndex = (int) savedInstanceState.get("current_index");
             if (currentIndex > 0) {
                 sceneLoader.loadScene(currentIndex);
+
+                previousButton.setVisibility(View.VISIBLE);
+                if (currentIndex == tour.getScenes().size() - 1) {
+                    nextButton.setVisibility(View.GONE);
+                }
             }
         }
 
         if (savedInstanceState == null) {
+            swipeContainer.setVisibility(View.VISIBLE);
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -107,6 +113,13 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
             @Override
             public void onClick(View view) {
                 sceneLoader.changeScene(-1);
+
+                if (sceneLoader.getCurrentIndex() == 0) {
+                    previousButton.setVisibility(View.GONE);
+                }
+                if (sceneLoader.getCurrentIndex() < tour.getScenes().size() - 1) {
+                    nextButton.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -114,6 +127,13 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
             @Override
             public void onClick(View view) {
                 sceneLoader.changeScene(1);
+
+                if (sceneLoader.getCurrentIndex() > 0) {
+                    previousButton.setVisibility(View.VISIBLE);
+                }
+                if (sceneLoader.getCurrentIndex() == tour.getScenes().size() - 1) {
+                    nextButton.setVisibility(View.GONE);
+                }
             }
         });
 
