@@ -65,7 +65,7 @@ public class SceneLoader implements Serializable {
                 public void run() {
                     sceneNo.setVisibility(View.GONE);
                 }
-            }, 2000);
+            }, 3000);
         }
         catch (IndexOutOfBoundsException e) {
             Log.e(LOG_TAG, "Request for nonexistent scene: " + sceneIndex);

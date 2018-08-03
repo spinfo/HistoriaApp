@@ -115,4 +115,21 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/swipe_container"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#55ffffff"
+        >
+
+        <ImageView
+            android:id="@+id/swipe_overlay"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/swipe"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
+
 </FrameLayout>

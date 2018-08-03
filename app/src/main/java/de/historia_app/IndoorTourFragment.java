@@ -41,6 +41,7 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
     private MapPopupManager popupManager;
     private Tour tour;
     private SceneLoader sceneLoader;
+    private RelativeLayout swipeContainer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,7 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
         previousButton = (ImageButton) indoorFragmentView.findViewById(R.id.previous_button);
         nextButton = (ImageButton) indoorFragmentView.findViewById(R.id.next_button);
         closeButton = (ImageButton) indoorFragmentView.findViewById(R.id.close_button);
+        swipeContainer = (RelativeLayout) indoorFragmentView.findViewById(R.id.swipe_container);
 
         popupManager = new MapPopupManager(indoorFragmentView);
 
@@ -70,6 +72,15 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
             if (currentIndex > 0) {
                 sceneLoader.loadScene(currentIndex);
             }
+        }
+
+        if (savedInstanceState == null) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    swipeContainer.setVisibility(View.GONE);
+                }
+            }, 2000);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
