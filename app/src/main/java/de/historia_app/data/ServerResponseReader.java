@@ -124,6 +124,7 @@ public class ServerResponseReader {
         List<Scene> scenes = new ArrayList<>();
         List<Map<String, Object>> scenesInput = (List) map.get("scenes");
         if (scenesInput != null) {
+            int pos = 1;
             for (Map<String, Object> sceneInput : scenesInput) {
                 String sceneTest = yaml.dump(sceneInput);
                 Scene scene = (Scene) SCENE_YAML.load(sceneTest);
@@ -136,6 +137,8 @@ public class ServerResponseReader {
                     for (Mapstop newMapstop : mapstops) {
                         if (newMapstop.getId() == oldMapstop.getId()) {
                             newMapstop.setScene(scene);
+                            newMapstop.setPos(pos);
+                            pos++;
                             sceneMapstops.set(i, newMapstop);
                             break;
                         }

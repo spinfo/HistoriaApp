@@ -9,8 +9,8 @@ public abstract class UrlSchemes {
     // todo : change back
     public static final String SERVER_BASE_URI =
             //"https://historia-app.de/wp-content/uploads/smart-history-tours";
-            "http://historia.ililil.co/wp-content/uploads/smart-history-tours";
-            //"http://10.0.2.2:8000/wp-content/uploads/smart-history-tours";
+            //"http://historia.ililil.co/wp-content/uploads/smart-history-tours";
+            "http://10.0.2.2:8000/wp-content/uploads/smart-history-tours";
 
     public static final String AVAILABLE_TOURS_URL = SERVER_BASE_URI + "/tours.yaml";
 

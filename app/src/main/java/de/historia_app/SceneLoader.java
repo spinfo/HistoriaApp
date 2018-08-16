@@ -107,7 +107,7 @@ public class SceneLoader implements Serializable {
         }
 
         stop.setText(String.valueOf(stopNo));
-        stop.setTextSize(TypedValue.COMPLEX_UNIT_PX, 60);
+        stop.setTextSize(TypedValue.COMPLEX_UNIT_PX, 70);
         stop.setTypeface(stop.getTypeface(), Typeface.BOLD);
         stop.setPadding(0, 0, 0, 0);
         stop.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -124,11 +124,11 @@ public class SceneLoader implements Serializable {
             z = originalHeight / sceneHeight;
         }
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(90, 90);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
         float x = coordinate.getX();
         float y = coordinate.getY();
-        float left = x / z - 90;
-        float top = y / z - 90;
+        float left = x / z - 100;
+        float top = y / z - 100;
         params.setMargins((int)left, (int)top, 0, 0);
         stop.setLayoutParams(params);
 

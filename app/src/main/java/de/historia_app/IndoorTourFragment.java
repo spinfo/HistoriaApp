@@ -89,25 +89,31 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
             }, 2000);
         }
 
+        /*
+         * Causes some trouble
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
                 @Override
                 public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                    previousButton.setVisibility(View.GONE);
-                    nextButton.setVisibility(View.GONE);
-                    closeButton.setVisibility(View.GONE);
+                    //previousButton.setVisibility(View.GONE);
+                    //nextButton.setVisibility(View.GONE);
+                    //closeButton.setVisibility(View.GONE);
+                    final RelativeLayout buttonContainer = (RelativeLayout) indoorFragmentView.findViewById(R.id.button_container);
+                    buttonContainer.setVisibility(View.GONE);
 
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            previousButton.setVisibility(View.VISIBLE);
-                            nextButton.setVisibility(View.VISIBLE);
-                            closeButton.setVisibility(View.VISIBLE);
+                            //previousButton.setVisibility(View.VISIBLE);
+                            //nextButton.setVisibility(View.VISIBLE);
+                            //closeButton.setVisibility(View.VISIBLE);
+                            buttonContainer.setVisibility(View.VISIBLE);
                         }
                     }, 500);
                 }
             });
         }
+        */
 
         previousButton.setOnClickListener(new View.OnClickListener() {
             @Override
