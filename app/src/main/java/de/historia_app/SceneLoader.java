@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.Serializable;
 
 import de.historia_app.data.Coordinate;
+import de.historia_app.data.FileService;
 import de.historia_app.data.Mapstop;
 import de.historia_app.data.Scene;
 import de.historia_app.data.Tour;
@@ -73,12 +74,21 @@ public class SceneLoader implements Serializable {
     }
 
     private void loadSrc(final Scene scene) {
-        //File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "scenes");
-        File topDir = coordinateContainer.getContext().getFilesDir();
-        String path = topDir.getPath() + "/smart-history-tours/scenes";
-        File dir = new File(path);
-        Bitmap bm = BitmapFactory.decodeFile(dir.toString() + File.separator + scene.getName() + ".png");
-        sceneView.setImageBitmap(bm);
+        FileService fileService = new FileService(sceneView.getContext());
+        File sceneFile = new File(scene.getSrc());
+        String base = sceneFile.getName();
+
+        if(base.isEmpty()) {
+            Log.w(LOG_TAG, "Could not determine base for scene src: " + scene.getSrc());
+        } else {
+            File file = fileService.getFile(base);
+            if(file.exists()) {
+                Bitmap bm = BitmapFactory.decodeFile(file.getPath());
+                sceneView.setImageBitmap(bm);
+            } else {
+                Log.w(LOG_TAG, "No file for basename: " + base);
+            }
+        }
 
         removeCoordinates();
 

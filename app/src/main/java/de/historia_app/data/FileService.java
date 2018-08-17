@@ -112,11 +112,6 @@ public class FileService {
                 FileInputStream stream = new FileInputStream(tourFile);
                 Tour tour = ServerResponseReader.parseTour(stream);
                 tour.setVersion(record.getVersion());
-                if (tour.isIndoor()) {
-                    for (Scene scene : tour.getScenes()) {
-                        downloadScene(scene);
-                    }
-                }
                 if(data.saveTour(tour)) {
                     result = tour;
                     if(!data.saveLexiconEntries(tour.getLexiconEntries())) {
@@ -148,73 +143,6 @@ public class FileService {
             out.write(buffer, 0, len);
             len = in.read(buffer);
         }
-    }
-
-    /**
-     * Loads the scene view files from the server.
-     * Had to be implemented by a seperate download, because of sqlite blob size became too large otherwise.
-     *
-     * @param scene
-     */
-    protected void downloadScene(final Scene scene) {
-        new Thread(new Runnable() {
-            public void run(){
-            try {
-                // todo : remove replace
-                URL url = new URL(scene.getSrc().replace("localhost", "10.0.2.2"));
-
-                //File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "scenes");
-                File topDir = context.getFilesDir();
-                String path = topDir.getPath() + "/smart-history-tours/scenes";
-                File dir = new File(path);
-                Bitmap bm = BitmapFactory.decodeStream((InputStream) url.getContent());
-
-                boolean doSave = true;
-                if (!dir.exists()) {
-                    doSave = dir.mkdirs();
-                }
-
-                if (doSave) {
-                    saveBitmapToFile(dir, scene.getName() + ".png", bm, Bitmap.CompressFormat.PNG,100);
-                }
-                else {
-                    Log.e("app","Couldn't create target directory.");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            }
-        }).start();
-    }
-
-    /**
-     * @param dir you can get from many places like Environment.getExternalStorageDirectory() or mContext.getFilesDir() depending on where you want to save the image.
-     * @param fileName The file name.
-     * @param bm The Bitmap you want to save.
-     * @param format Bitmap.CompressFormat can be PNG,JPEG or WEBP.
-     * @param quality quality goes from 1 to 100. (Percentage).
-     * @return true if the Bitmap was saved successfully, false otherwise.
-     */
-    public boolean saveBitmapToFile(File dir, String fileName, Bitmap bm, Bitmap.CompressFormat format, int quality) {
-        File imageFile = new File(dir,fileName);
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(imageFile);
-            bm.compress(format,quality,fos);
-            fos.close();
-            return true;
-        }
-        catch (IOException e) {
-            Log.e("app", e.getMessage());
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        return false;
     }
 
 }
