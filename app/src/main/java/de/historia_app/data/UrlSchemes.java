@@ -12,7 +12,7 @@ public abstract class UrlSchemes {
             //"http://historia.ililil.co/wp-content/uploads/smart-history-tours";
             "http://10.0.2.2:8000/wp-content/uploads/smart-history-tours";
 
-    public static final String AVAILABLE_TOURS_URL = SERVER_BASE_URI + "/tours.yaml";
+    public static final String AVAILABLE_TOURS_URL = SERVER_BASE_URI + "/tours.v2.yaml";
 
     public static final String LEXICON = "lexicon://";
 
