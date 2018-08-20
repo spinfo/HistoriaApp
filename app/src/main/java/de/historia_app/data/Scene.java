@@ -106,6 +106,9 @@ public class Scene {
     public void setSrc(String src) { this.src = src; }
 
     public List<Mapstop> getMapstops() {
+        if(mapstops == null) {
+            return new ArrayList<>();
+        }
         return new ArrayList<>(mapstops);
     }
 
@@ -114,6 +117,9 @@ public class Scene {
     }
 
     public List<Coordinate> getCoordinates() {
+        if(coordinates == null) {
+            return new ArrayList<>();
+        }
         return new ArrayList<>(coordinates);
     }
 
