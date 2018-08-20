@@ -104,9 +104,14 @@ public class SceneLoader implements Serializable {
 
     private void showCoordinate(Coordinate coordinate) {
         TextView stop = new TextView(sceneView.getContext());
-        stop.setBackgroundResource(R.drawable.stop_marker);
-
         final Mapstop mapstop = coordinate.getMapstop();
+
+        if (mapstop.getType().equals(Mapstop.Type.Info.getRepresentation())) {
+            stop.setBackgroundResource(R.drawable.stop_marker_info);
+        } else {
+            stop.setBackgroundResource(R.drawable.stop_marker_route);
+        }
+
         stop.setId((int)mapstop.getId());
         int stopNo = 0;
         for (Mapstop tMapstop : coordinate.getScene().getMapstops()) {

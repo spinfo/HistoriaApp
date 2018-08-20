@@ -13,6 +13,22 @@ import java.util.List;
  */
 public class Mapstop {
 
+    public enum Type {
+        Info,
+        Route;
+
+        private String representation;
+
+        static {
+            Info.representation = "info";
+            Route.representation = "route";
+        }
+
+        public String getRepresentation() {
+            return representation;
+        }
+    };
+
     // server id of the mapstop
     @DatabaseField(columnName = "id", id = true, dataType = DataType.LONG)
     private long id;
@@ -31,6 +47,10 @@ public class Mapstop {
     // the scene the mapstop belongs to
     @DatabaseField(columnName = "scene", foreign = true, foreignAutoRefresh = true)
     private Scene scene;
+
+    // mapstop type for indoor tour scenes
+    @DatabaseField(columnName = "type")
+    private String type;
 
     // the coordinate the mapstop belongs to
     @DatabaseField(columnName = "coordinate", foreign = true, foreignAutoRefresh = true)
@@ -96,6 +116,12 @@ public class Mapstop {
     }
 
     public void setCoordinate(Coordinate coordinate) { this.coordinate = coordinate; }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) { this.type = type; }
 
     public String getName() {
         return name;

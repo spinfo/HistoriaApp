@@ -42,6 +42,7 @@ public class ServerResponseReader {
         TypeDescription sceneDescription = new TypeDescription(Scene.class);
         sceneDescription.putListPropertyType("mapstops", Mapstop.class);
         sceneDescription.putListPropertyType("coordinates", Coordinate.class);
+        sceneDescription.putListPropertyType("type", Mapstop.Type.class);
         SCENE_YAML = new Yaml(constructor);
     }
 
@@ -136,6 +137,7 @@ public class ServerResponseReader {
                     Mapstop oldMapstop = sceneMapstops.get(i);
                     for (Mapstop newMapstop : mapstops) {
                         if (newMapstop.getId() == oldMapstop.getId()) {
+                            newMapstop.setType(oldMapstop.getType());
                             newMapstop.setScene(scene);
                             newMapstop.setPos(pos);
                             pos++;
