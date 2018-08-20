@@ -5,6 +5,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,8 +47,21 @@ public class TourCollectionOnMap {
 
         // iterate over the tours provided
         for(Tour tour : tours) {
-
             final List<Mapstop> stops = tour.getMapstops();
+
+            if (tour.isIndoor()) {
+                Collections.sort(stops, new Comparator<Mapstop>() {
+                    @Override
+                    public int compare(Mapstop o1, Mapstop o2) {
+                    if (o1.getScene().getPos() == o2.getScene().getPos()) {
+                        return o1.getPos() - o2.getPos();
+                    }
+
+                    return o1.getScene().getPos() - o2.getScene().getPos();
+                    }
+                });
+            }
+
             boolean firstStop = true;
             for(final Mapstop stop : stops) {
                 // each mapstop in the tour is made a MapstopOnMap
@@ -72,6 +87,11 @@ public class TourCollectionOnMap {
 
                 // link stop and place together
                 placeOnMap.addMapstopOnMap(stopOnMap);
+
+                // on map only show first stop of indoor tours
+                if(tour.isIndoor()) {
+                    break;
+                }
             }
 
             // save a TourOnMap
