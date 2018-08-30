@@ -9,6 +9,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -33,13 +34,10 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.historia_app.data.Area;
 import de.historia_app.data.DataFacade;
-import de.historia_app.data.Mapstop;
 import de.historia_app.data.Place;
 import de.historia_app.data.Tour;
 import de.historia_app.mappables.PlaceOnMap;
@@ -89,7 +87,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         //important! set your user agent to prevent getting banned from the osm servers
         Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
@@ -99,7 +97,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // initialize the state of this fragment with a new map
         state = new MapState();
-        state.map = (MapView) mapFragmentView.findViewById(R.id.map);
+        state.map = mapFragmentView.findViewById(R.id.map);
 
         MapUtil.setMapDefaults(state.map);
 
@@ -167,12 +165,13 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         }
 
         // request location updates from the system
-        final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         try {
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0F, this);
+            if (locationManager != null) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0F, this);
+            }
         } catch (SecurityException e) {
-            Log.d(LOGTAG, "Caught Security exception for GPS update request.");
-            // do nothing if the user does not want to be followed
+            Log.i(LOGTAG, "Caught Security exception for GPS update request.");
         }
 
         // return the container for the map view
@@ -180,14 +179,14 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         // add the overlay showing the user's location and enable location options
         addUserLocationOptions(state.map);
 
         // make the link to the osm license clickable
-        createOSMLicenseLink(mapFragmentView.findViewById(R.id.osm_legal_reference));
+        setupOSMLicenseLinkForUserInteraction(mapFragmentView.findViewById(R.id.osm_legal_reference));
     }
 
     // Permanently save the basic map view on pause
@@ -200,7 +199,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     // This saves data not being needed between complete restarts (e.g. the open popup) and
     // therefore not in the SharedPreferences
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         // unlike the main map state, the popup state is saved in a bundle
@@ -210,13 +209,11 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         popupManager.dismissActivePopup();
     }
 
-    // Convenience method to get SharedPreferences in a standard way
     private SharedPreferences getPrefs() {
         return getActivity().getPreferences(Context.MODE_PRIVATE);
     }
 
-    // sets up the view as a link to the open street map license page
-    private void createOSMLicenseLink(final View view) {
+    private void setupOSMLicenseLinkForUserInteraction(final View view) {
         if(view == null) {
             Log.e(LOGTAG, "Cannot setup osm legal notice");
             return;
@@ -241,7 +238,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         userLocationOverlay.setOptionsMenuEnabled(true);
 
         // setup the button to center the map on the user's location
-        ImageButton btCenterMap = (ImageButton) mapFragmentView.findViewById(R.id.ic_center_map);
+        ImageButton btCenterMap = mapFragmentView.findViewById(R.id.ic_center_map);
         btCenterMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -257,8 +254,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         map.getOverlays().add(userLocationOverlay);
     }
 
-    // TODO: Rename? This seems to no longer get, only make
-    private List<Overlay> getOrMakeTourOverlays(MapView map, TourCollectionOnMap tourCollectionOnMap) {
+    private List<Overlay> makeTourOverlays(MapView map, TourCollectionOnMap tourCollectionOnMap) {
         List<Overlay> overlays = new ArrayList<>();
 
         // the tour's track is drawn with a polyline
@@ -291,7 +287,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             return Collections.emptyList();
         }
 
-        final List<TourOnMap> substituteList = new ArrayList<TourOnMap>(1);
+        final List<TourOnMap> substituteList = new ArrayList<>(1);
         substituteList.add(tourOnMap);
         return switchTourOverlays(substituteList);
     }
@@ -317,7 +313,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         }
         TourCollectionOnMap tourCollectionOnMap = new TourCollectionOnMap(tours);
 
-        final List<Overlay> overlays = getOrMakeTourOverlays(state.map, tourCollectionOnMap);
+        final List<Overlay> overlays = makeTourOverlays(state.map, tourCollectionOnMap);
         state.map.getOverlays().addAll(overlays);
 
         state.toursOnMap = toursOnMap;
