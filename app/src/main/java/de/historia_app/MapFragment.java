@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,15 +19,12 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import org.osmdroid.config.Configuration;
-import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,7 +42,7 @@ import de.historia_app.mappables.TourOnMap;
 /**
  * The fragment handling the map view
  */
-public class MapFragment extends Fragment implements MainActivity.MainActivityFragment, OnModelSelectionListener, LocationListener {
+public class MapFragment extends Fragment implements MainActivity.MainActivityFragment, OnModelSelectionListener {
 
     private static final String LOGTAG = MapFragment.class.getSimpleName();
 
@@ -74,10 +68,8 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     // if model selection are registered by this fragment they will be passed to this listener
     private OnModelSelectionListener onModelSelectionListener;
 
-    // the user's location (if recorded)
-    private Location userLocation;
+    private MapUpdatingGpsLocationProvider mapUpdatingGpsLocationProvider;
 
-    // default empty constructor
     public MapFragment() { }
 
      @Override
@@ -164,16 +156,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             popupManager.restorePopupStateFrom(savedInstanceState, this);
         }
 
-        // request location updates from the system
-        final LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        try {
-            if (locationManager != null) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0F, this);
-            }
-        } catch (SecurityException e) {
-            Log.i(LOGTAG, "Caught Security exception for GPS update request.");
-        }
-
         // return the container for the map view
         return mapFragmentView;
     }
@@ -189,11 +171,17 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         setupOSMLicenseLinkForUserInteraction(mapFragmentView.findViewById(R.id.osm_legal_reference));
     }
 
-    // Permanently save the basic map view on pause
     @Override
     public void onPause() {
         super.onPause();
+        mapUpdatingGpsLocationProvider.pauseListeningForLocationUpdates();
         MapStatePersistence.save(state, getPrefs(), data);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapUpdatingGpsLocationProvider.resumeListeningForLocationUpdates();
     }
 
     // This saves data not being needed between complete restarts (e.g. the open popup) and
@@ -230,28 +218,20 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     }
 
     private void addUserLocationOptions(final MapView map) {
-        GpsMyLocationProvider locationProvider = new GpsMyLocationProvider(getContext());
-
         // setup an overlay for the user's location
-        final MyLocationNewOverlay userLocationOverlay = new MyLocationNewOverlay(locationProvider, map);
-        userLocationOverlay.enableMyLocation();
-        userLocationOverlay.setOptionsMenuEnabled(true);
+        mapUpdatingGpsLocationProvider = new MapUpdatingGpsLocationProvider(map);
 
         // setup the button to center the map on the user's location
         ImageButton btCenterMap = mapFragmentView.findViewById(R.id.ic_center_map);
         btCenterMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(MapFragment.this.userLocation != null) {
-                    GeoPoint userPosition = new GeoPoint(MapFragment.this.userLocation);
-                    map.getController().animateTo(userPosition);
-                } else {
+                boolean successfullyCentered = mapUpdatingGpsLocationProvider.centerOnUser();
+                if (!successfullyCentered) {
                     Toast.makeText(getContext(), getString(R.string.no_location_available_message), Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
-        map.getOverlays().add(userLocationOverlay);
     }
 
     private List<Overlay> makeTourOverlays(MapView map, TourCollectionOnMap tourCollectionOnMap) {
@@ -428,29 +408,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     @Override
     public boolean reactToBackButtonPressed() {
         return false;
-    }
-
-
-    // METHODS for LocationListener interface
-
-    @Override
-    public void onLocationChanged(Location location) {
-        this.userLocation = location;
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        // do nothing
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-        // do nothing
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        // do nothing
     }
 
 }
