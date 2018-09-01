@@ -107,9 +107,9 @@ public class SceneLoader implements Serializable {
         final Mapstop mapstop = coordinate.getMapstop();
 
         if (mapstop.getType().equals(Mapstop.Type.Info.getRepresentation())) {
-            stop.setBackgroundResource(R.drawable.stop_marker_info);
+            stop.setBackgroundResource(R.drawable.stop_marker_blue);
         } else {
-            stop.setBackgroundResource(R.drawable.stop_marker_route);
+            stop.setBackgroundResource(R.drawable.stop_marker_white);
         }
 
         stop.setId((int)mapstop.getId());
