@@ -2,6 +2,7 @@ package de.historia_app.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
@@ -55,7 +56,19 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
-                          int oldVersion, int newVersion) {}
+                          int oldVersion, int newVersion) {
+        /*
+        try {
+            getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `pos` int NULL DEFAULT null");
+            getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `scene_id` int NULL DEFAULT null");
+            getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `coordinate_id` int NULL DEFAULT null");
+            getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `type` string NULL DEFAULT null");
+        }
+        catch (SQLException e) {
+            Log.e("upgrade failed", e.getMessage());
+        }
+        */
+    }
 
     public Dao<Place, Long> getPlaceDao() {
         if(placeDao == null) {
