@@ -157,4 +157,8 @@ public class Mapstop {
     public boolean hasPage(int pageNo) {
         return (pageNo <= this.getPageAmount() && pageNo > 0);
     }
+
+    public boolean isFirstInScene() {
+        return scene.getMapstops().get(0).getId() == getId();
+    }
 }

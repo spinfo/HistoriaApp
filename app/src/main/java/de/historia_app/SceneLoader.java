@@ -139,7 +139,7 @@ public class SceneLoader implements Serializable {
         params.setMargins((int)left, (int)top, 0, 0);
         stop.setLayoutParams(params);
 
-        if (mapstop.getPos() == 1) {
+        if (mapstop.isFirstInScene()) {
             DisplayMetrics displayMetrics = new DisplayMetrics();
             ((Activity)coordinateContainer.getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int screenWidth = displayMetrics.widthPixels;
