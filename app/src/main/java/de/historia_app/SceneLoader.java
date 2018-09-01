@@ -109,20 +109,12 @@ public class SceneLoader implements Serializable {
         if (mapstop.getType().equals(Mapstop.Type.Info.getRepresentation())) {
             stop.setBackgroundResource(R.drawable.stop_marker_blue);
         } else {
-            stop.setBackgroundResource(R.drawable.stop_marker_white);
+            stop.setBackgroundResource(R.drawable.stop_marker_gray);
         }
 
         stop.setId((int)mapstop.getId());
-        int stopNo = 0;
-        for (Mapstop tMapstop : coordinate.getScene().getMapstops()) {
-            stopNo++;
-            if (tMapstop.getId() == mapstop.getId()) {
-                break;
-            }
-        }
-
-        stop.setText(String.valueOf(stopNo));
-        stop.setTextSize(TypedValue.COMPLEX_UNIT_PX, 70);
+        stop.setText(String.valueOf(mapstop.getPos()));
+        stop.setTextSize(TypedValue.COMPLEX_UNIT_PX, 60);
         stop.setTypeface(stop.getTypeface(), Typeface.BOLD);
         stop.setPadding(0, 0, 0, 0);
         stop.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -147,7 +139,7 @@ public class SceneLoader implements Serializable {
         params.setMargins((int)left, (int)top, 0, 0);
         stop.setLayoutParams(params);
 
-        if (stopNo == 1) {
+        if (mapstop.getPos() == 1) {
             DisplayMetrics displayMetrics = new DisplayMetrics();
             ((Activity)coordinateContainer.getContext()).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int screenWidth = displayMetrics.widthPixels;
