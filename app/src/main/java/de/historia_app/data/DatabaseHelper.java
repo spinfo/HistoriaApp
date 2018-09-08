@@ -15,6 +15,8 @@ import de.historia_app.mappables.TourOnMap;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
+    private static final String LOGTAG = DatabaseHelper.class.getSimpleName();
+
     // TODO: Set the final name (this will change during development to avoid dealing with version changes, but must be fixed on release)
     private static final String DATABASE_NAME = "historia-app-dev-3.db";
     private static final int DATABASE_VERSION = 1;
@@ -57,17 +59,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
                           int oldVersion, int newVersion) {
-        /*
-        try {
-            getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `pos` int NULL DEFAULT null");
-            getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `scene_id` int NULL DEFAULT null");
-            getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `coordinate_id` int NULL DEFAULT null");
-            getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `type` string NULL DEFAULT null");
+        if (1 == oldVersion && 2 == newVersion) {
+            try {
+                getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `pos` int NULL DEFAULT null");
+                getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `scene` int NULL DEFAULT null");
+                getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `coordinate` int NULL DEFAULT null");
+                getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `type` string NULL DEFAULT null");
+                Log.i(LOGTAG, "Successfully upgraded database from version 1 to version 2.");
+            } catch (SQLException e) {
+                Log.e(LOGTAG, "Database upgrade from version 1 to version 2 failed: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
-        catch (SQLException e) {
-            Log.e("upgrade failed", e.getMessage());
-        }
-        */
     }
 
     public Dao<Place, Long> getPlaceDao() {
