@@ -65,14 +65,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
                 getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `scene` bigint NULL DEFAULT null");
                 getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `coordinate` bigint NULL DEFAULT null");
                 getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `type` string NULL DEFAULT null");
-                db.execSQL("create table "
-                        + getCoordinateDao().getTableName() + "("
-                        + "id bigint primary key autoincrement, "
-                        + "mapstop bigint, "
-                        + "scene bigint, "
-                        + "x float, "
-                        + "y float);"
-                );
+                TableUtils.createTable(connectionSource, Coordinate.class);
+                TableUtils.createTable(connectionSource, Scene.class);
                 Log.i(LOGTAG, "Successfully upgraded database from version 1 to version 2.");
             } catch (SQLException e) {
                 Log.e(LOGTAG, "Database upgrade from version 1 to version 2 failed: " + e.getMessage());
