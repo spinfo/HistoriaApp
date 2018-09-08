@@ -19,7 +19,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     // TODO: Set the final name (this will change during development to avoid dealing with version changes, but must be fixed on release)
     private static final String DATABASE_NAME = "historia-app-dev-3.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private Dao<Place, Long> placeDao = null;
     private Dao<Mapstop, Long> mapstopDao = null;
@@ -59,12 +59,20 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
                           int oldVersion, int newVersion) {
-        if (1 == oldVersion && 2 == newVersion) {
+        if (oldVersion == 1 && newVersion == 2) {
             try {
                 getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `pos` int NULL DEFAULT null");
                 getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `scene` bigint NULL DEFAULT null");
                 getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `coordinate` bigint NULL DEFAULT null");
                 getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `type` string NULL DEFAULT null");
+                db.execSQL("create table "
+                        + getCoordinateDao().getTableName() + "("
+                        + "id bigint primary key autoincrement, "
+                        + "mapstop bigint, "
+                        + "scene bigint, "
+                        + "x float, "
+                        + "y float);"
+                );
                 Log.i(LOGTAG, "Successfully upgraded database from version 1 to version 2.");
             } catch (SQLException e) {
                 Log.e(LOGTAG, "Database upgrade from version 1 to version 2 failed: " + e.getMessage());
