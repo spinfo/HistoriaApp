@@ -132,8 +132,17 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
                 Log.d(LOG_TAG, "No default tour found. Initializing example data.");
                 FileService fs = new FileService(this);
                 boolean result = fs.initializeExampleData("example-tour.zip");
-                boolean result2 = fs.initializeExampleData("example-indoor-tour.zip");
-                if(!result || !result2) {
+                if(!result) {
+                    ErrUtil.failInDebug(LOG_TAG, "Failed to initialize example data.");
+                }
+            }
+
+            Tour defaultIndoorTour = this.data.getDefaultIndoorTour();
+            if(defaultIndoorTour == null) {
+                Log.d(LOG_TAG, "No default indoor tour found. Initializing example data.");
+                FileService fs = new FileService(this);
+                boolean result = fs.initializeExampleData("example-indoor-tour.zip");
+                if(!result) {
                     ErrUtil.failInDebug(LOG_TAG, "Failed to initialize example data.");
                 }
             }
