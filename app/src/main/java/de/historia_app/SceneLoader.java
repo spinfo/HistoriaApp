@@ -107,18 +107,19 @@ public class SceneLoader implements Serializable {
         final Mapstop mapstop = coordinate.getMapstop();
 
         if (mapstop.getType().equals(Mapstop.Type.Info.getRepresentation())) {
-            stop.setBackgroundResource(R.drawable.stop_marker_blue);
+            stop.setBackgroundResource(R.drawable.stop_marker_white);
+            stop.setTextColor(Color.BLACK);
         } else {
-            stop.setBackgroundResource(R.drawable.stop_marker_gray);
+            stop.setBackgroundResource(R.drawable.stop_marker_blue);
+            stop.setTextColor(Color.WHITE);
         }
 
         stop.setId((int)mapstop.getId());
         stop.setText(String.valueOf(mapstop.getPos()));
         stop.setTextSize(TypedValue.COMPLEX_UNIT_PX, 60);
         stop.setTypeface(stop.getTypeface(), Typeface.BOLD);
-        stop.setPadding(0, 0, 0, 0);
+        stop.setPadding(0, 6, 0, 0);
         stop.setGravity(Gravity.CENTER_HORIZONTAL);
-        stop.setTextColor(Color.BLACK);
 
         float originalWidth = 960f;
         float originalHeight = 720f;
