@@ -304,7 +304,6 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     // has the provided place as a related object, switches the infowindow bubble to the mapstop
     // given by pos.
     private void reopenInfoWindowFor(final Place place, final int pos) {
-        // TODO: there should be a better way to do this, than looping over all overlays
         final long needle = place.getId();
         Object relatedObject;
         for (Overlay overlay : state.map.getOverlays()) {

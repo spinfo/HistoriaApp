@@ -243,16 +243,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         return -1;
     }
 
-
-    /**
-     * sets storage state and current cache size
-     */
-    private void updateStorageInfo(){
-        long cacheSize = updateStoragePrefreneces(this);
-    }
-
     // START PERMISSION CHECK
-    // TODO: The whole permission code could go to the map fragment probably
     private static final int REQUEST_CODE_ASK_MULTIPLE_PERMISSIONS = 124;
 
     private boolean checkMapPermissions() {
@@ -302,8 +293,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
                     // All Permissions Granted
                     Toast.makeText(MainActivity.this, "All permissions granted", Toast.LENGTH_SHORT).show();
 
-                    // TODO is this still needed?
-                    updateStorageInfo();
+                    updateStoragePrefreneces(this);
 
                     allGranted = true;
                 }
@@ -316,7 +306,6 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
 
         // Recreate activity to show the default map view
         if (allGranted) {
-            // TODO: can the next two lines be deleted?
             Intent intent = new Intent();
             intent.putExtra("afterPermissionsGrantedToken", true);
             MainActivity.this.finish();
@@ -501,7 +490,6 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         // do nothing
     }
 
-    // TODO this will need changing once we have more than one visible fragment (e.g. on bigger devices)
     public Fragment getVisibleFragment(){
         FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
 

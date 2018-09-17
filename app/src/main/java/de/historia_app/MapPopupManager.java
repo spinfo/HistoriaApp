@@ -54,7 +54,6 @@ public class MapPopupManager {
     private long activeObjId = NO_ACTIVE_OBJ;
 
     // the currently active popup if there is one
-    // TODO: It might be safer to have a promise for a popup here or something deferred
     private PopupWindow activePopup;
 
     // a check value to indicate that there is no active object

@@ -16,7 +16,6 @@ import de.historia_app.data.LexiconEntry;
 /**
  * A collection of letters (Character) and lexicon entries in a lexicon can be displayed with
  * this adapter.
- * TODO: Redo as a ExpandableListViewAdapter
  */
 public class LexiconAdapter extends ArrayAdapter<Object> {
 

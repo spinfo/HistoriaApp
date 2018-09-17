@@ -38,9 +38,6 @@ public class DatabaseTourInstaller {
         this.tourDao = dbHelper.getTourDao();
         this.pointDao = dbHelper.getGeopointDao();
         this.areaDao = dbHelper.getAreaDao();
-
-        // TODO: this could need some kind of a mutex structure, to make sure, that only one  installer is
-        // running at any time
     }
 
     /**
@@ -51,7 +48,6 @@ public class DatabaseTourInstaller {
      * @return  Whether the save went ok
      */
     boolean saveTour(Tour tour) {
-        // TODO: Use transaction here
         // (Would need some synchronization in case of multiple saves at the same time.)
         // But see NOTE below for one of the risks. This might easily break in the future
 

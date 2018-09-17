@@ -40,7 +40,6 @@ public class AvailableTours {
         return recordsByAreaId.get(areaId);
     }
 
-    // TODO: Temporary workaround, remove after reworking tour records list view
     public ArrayList<TourRecord> getAllRecords() {
         ArrayList<TourRecord> result = new ArrayList<>();
         for (Collection<TourRecord> records : recordsByAreaId.values()) {

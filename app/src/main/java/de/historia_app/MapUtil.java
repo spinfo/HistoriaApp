@@ -90,7 +90,6 @@ public abstract class MapUtil {
         return marker;
     }
 
-    // TODO: This is messy especially for Polyline that does not actually save points as GeoPoints. The results of this should probably be cached somewhere
     private static List<IGeoPoint> getGeoPointsFromOverlays(List<Overlay> overlays) {
         final List<IGeoPoint> result = new ArrayList<>();
 
