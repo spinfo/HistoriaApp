@@ -250,7 +250,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         MarkerInfoWindow window;
         Marker marker;
         for (PlaceOnMap placeOnMap : tourCollectionOnMap.getPlacesOnMap()) {
-            window = new PlaceMarkerInfoWindow(R.layout.map_my_bonuspack_bubble, map, this);
+            window = new PlaceMarkerInfoWindow(R.layout.mapstop_bubble, map, this);
             marker = MapUtil.makeMapstopMarker(getContext(), state.map, placeOnMap);
             marker.setInfoWindow(window);
             overlays.add(marker);
