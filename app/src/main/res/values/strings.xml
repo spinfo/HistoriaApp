@@ -54,8 +54,6 @@
     <!-- Strings related to the about page -->
     <string name="about_page_title">HistoriaApp, Über uns</string>
     <string name="app_version_template">Version %s</string>
-    <string name="about_page_asset_name">about_page.html</string>
-    <string name="about_page_unreachable">Lesefehler. Besuchen Sie zu Informationen über die App: historia-app.de</string>
 
     <!-- Letting the User choose programs -->
     <string name="choose_mail_program_title">Wählen Sie ein Mailprogramm</string>
@@ -75,4 +73,8 @@
     <string name="right_arrow">➡</string>
     <string name="map_overview_close_symbol">✕</string>
     <string name="keyboard_arrow_down_descriptor">A downwards facing arrowhead.</string>
+
+    <!-- Filenames -->
+    <string name="asset_app_article_styles">app-article.css</string>
+    <string name="asset_about_page">about_page.html</string>
 </resources>

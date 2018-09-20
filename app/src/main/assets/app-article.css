@@ -1,0 +1,67 @@
+body {
+    max-width: 720px;
+    font-family: sans-serif;
+    line-height: 160%;
+    letter-spacing: 0.015em;
+    font-size: smaller;
+    padding: 0 1rem;
+}
+
+h2 {
+    font-size: x-large;
+    margin: 1.2em 0;
+}
+
+h3, h4, h5, h6 {
+    margin: 1.5em 0 0.2em;
+    line-height: 200%;
+}
+
+h3 {
+    font-size: large;
+}
+
+h4 {
+    font-size: larger;
+}
+
+h5 {
+    font-size: medium;
+}
+
+p, hr {
+    margin: 0.5rem 0 1rem;
+}
+
+img {
+    max-width: 95%;
+    height: auto !important;
+}
+
+figure {
+    max-width: 100%;
+    margin: 1rem 0.5rem 1rem;
+}
+
+figcaption {
+    font-size: small;
+    color: #9f9f9f;
+}
+
+blockquote {
+    font-style: italic;
+    color: #404040;
+    margin-left: 2.5rem;
+}
+
+em {
+    color: #404040;
+}
+
+ul, ol {
+    padding: 0 0 0 2.5rem;
+}
+
+li {
+    line-height: 180%;
+}

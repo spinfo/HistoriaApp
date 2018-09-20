@@ -9,13 +9,15 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 /**
- * The App class at the moment only sets up general error handling. If an exception is thrown at
+ * The App class sets up general error handling. If an exception is thrown at
  * runtime, the app will be restarted with an error message in an Intent that is able to
  * communicate the failure. (Only if this is a DEBUG build)
  */
 public class App extends Application {
 
     private static final String LOG_TAG = App.class.getName();
+
+    private static Context context;
 
     // a reference to the default exception handler that we will replace
     private Thread.UncaughtExceptionHandler defaultExceptionHandler;
@@ -85,6 +87,16 @@ public class App extends Application {
 
         // setup our exception handler
         Thread.setDefaultUncaughtExceptionHandler(replacementExceptionHandler);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        context = this;
+    }
+
+    public static Context getContext() {
+        return context;
     }
 
 
