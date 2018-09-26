@@ -18,6 +18,8 @@ public class HtmlContentCompletion {
 
     private static final String CONTENT_GOES_GERE = "43608653-7f0c-4229-853d-3c7b3c0ecf7a";
     private static final String CSS_GOES_HERE = "d79ee39f-9107-44dc-a740-58cc3edc2e7f";
+    private static final String HEADING_GOES_HERE = "b3fc9141-fe1e-41b3-be30-43d1ea91ece8";
+
     private static final String HTML_TEMPLATE =
             "<html>" +
                 "<head>" +
@@ -30,6 +32,15 @@ public class HtmlContentCompletion {
                     CONTENT_GOES_GERE +
                 "</body>" +
             "</html>";
+    private static final String LEXICON_HEADING_TEMPLATE =
+            "<div style=\"text-align:center;margin-top:12px;\">" +
+                "<hr>" +
+                "<h1>" +
+                    HEADING_GOES_HERE +
+                "</h1>" +
+                "<hr>" +
+            "</div>";
+
 
 
     public static String wrapInPage(String innerHtml) {
@@ -68,11 +79,9 @@ public class HtmlContentCompletion {
         return content;
     }
 
-    public static String setTitle(String content, String title) {
+    public static String prefixTitleHtml(String content, String title) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<h1>");
-        sb.append(title);
-        sb.append("</h1>");
+        sb.append(LEXICON_HEADING_TEMPLATE.replaceFirst(HEADING_GOES_HERE, title));
         sb.append(content);
         return sb.toString();
     }
