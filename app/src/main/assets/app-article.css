@@ -69,6 +69,10 @@ a:link {
     color: #3c8eff;
 }
 
+a:visited {
+    color: #3071cc;
+}
+
 a:hover, a:active {
     color: #a5caff;
 }
