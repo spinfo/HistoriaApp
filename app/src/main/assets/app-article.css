@@ -64,3 +64,16 @@ ul, ol {
 li {
     line-height: 180%;
 }
+
+a:link {
+    color: #3c8eff;
+}
+
+a:hover, a:active {
+    color: #a5caff;
+}
+
+a[href^='http']::after {
+    margin: 0 0.2em;
+    content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAXklEQVQoka2QwQ3AMAwCs1N28k7eiZ3oI7IcU6efBomXOREyxhUZ2brTdNAcVB2BaJgCVcDAalJLXsB+iLAjm1pAwzHWHD3gWMcMg/ERMjKfFOHVqMEGqEM/gKP/6gE2f+h+Z5P45wAAAABJRU5ErkJggg==);
+}
