@@ -49,30 +49,25 @@ class MapstopPageLoader implements MapstopPageView.PageChangeListener {
         return params;
     }
 
+    @Override
     public void changePage(int offset) {
         loadPage(currentPage + offset);
     }
 
     private void loadPage(int pageNo) {
-        if (mapstop.hasPage(pageNo)) {
-            // do not re-load the current page
-            if (pageNo == currentPage) {
-                Log.w(LOG_TAG, "Attempt to re-open the current mapstop page: " + pageNo);
-                return;
-            }
-            // this somehow needs to be initialized here for audio/video to work
-            pageView.setWebChromeClient(new WebChromeClient());
-
-            // load the page content directly from string
-            final Page page = this.mapstop.getPages().get(pageNo - 1);
-            pageView.loadDataWithBaseURL(null, page.getPresentationContent(pageView.context), "text/html", "utf-8", null);
-
-            // setup the current page and indicators
-            currentPage = pageNo;
-            drawPageIndicatorView();
-        } else {
-            Log.e(LOG_TAG, "Request for nonexistent page: " + pageNo);
+        if (!mapstop.hasPage(pageNo) || pageNo == currentPage) {
+            return;
         }
+        currentPage = pageNo;
+        loadCurrentPage();
+    }
+
+    private void loadCurrentPage() {
+        final Page page = this.mapstop.getPages().get(currentPage - 1);
+        // the webChromeClient needs to be initialized here for audio/video to work
+        pageView.setWebChromeClient(new WebChromeClient());
+        pageView.loadDataWithBaseURL(null, page.getPresentationContent(pageView.context), "text/html", "utf-8", page.getHistoryUrl());
+        drawPageIndicatorView();
     }
 
     /**

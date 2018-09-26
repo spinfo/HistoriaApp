@@ -2,18 +2,12 @@
 package de.historia_app;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
-
-import de.historia_app.data.DataFacade;
-import de.historia_app.data.LexiconEntry;
-import de.historia_app.data.UrlSchemes;
 
 public class MapstopPageView extends WebView {
 
@@ -28,6 +22,8 @@ public class MapstopPageView extends WebView {
     GestureDetector gestureDetector;
 
     PageChangeListener pageChangeListener;
+
+
 
     public MapstopPageView(Context context) {
         super(context);

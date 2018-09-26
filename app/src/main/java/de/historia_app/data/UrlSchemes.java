@@ -15,6 +15,8 @@ public abstract class UrlSchemes {
 
     public static final String FILE = "file://";
 
+    public static final String MAPSTOP_PAGE = "page://";
+
     public static long parseLexiconEntryIdFromUrl(String url) {
         if(url.startsWith(LEXICON)) {
             try {
@@ -26,6 +28,10 @@ public abstract class UrlSchemes {
         }
         ErrUtil.failInDebug(LOG_TAG, "Invalid lexicon url: " + url);
         return 0L;
+    }
+
+    public static String pageUrl(String id) {
+        return MAPSTOP_PAGE + id;
     }
 
 }
