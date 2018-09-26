@@ -19,6 +19,7 @@ public class SimpleWebViewActivity extends AppCompatActivity {
 
         WebView webView = new WebView(this);
         webView.loadDataWithBaseURL(null, data, "text/html", "utf-8", null);
+        webView.setWebViewClient(new UrlSchemeRedirectingWebViewClient(this));
         this.setContentView(webView);
     }
 }
