@@ -170,7 +170,7 @@ public class MapPopupManager {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Object selected = parent.getItemAtPosition(position);
-                if(selected == null || !(selected instanceof Area)) {
+                if(!(selected instanceof Area)) {
                     ErrUtil.failInDebug(LOG_TAG, "Ignoring bad area selection.");
                 } else {
                     listener.onAreaSelected((Area) selected);
@@ -186,8 +186,7 @@ public class MapPopupManager {
         final ListView listView = (ListView) layoutInflater.inflate(R.layout.tour_or_mapstop_list, null);
 
         // connect to tour adapter
-        final List<Tour> tourData = area.getTours();
-        final Tour[] tours = tourData.toArray(new Tour[tourData.size()]);
+        final Tour[] tours = area.getTours().toArray(new Tour[0]);
         final TourArrayAdapter toursAdapter = new TourArrayAdapter(surface.getContext(), tours);
         listView.setAdapter(toursAdapter);
 

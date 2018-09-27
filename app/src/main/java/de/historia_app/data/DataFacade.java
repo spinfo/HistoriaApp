@@ -42,7 +42,7 @@ public class DataFacade {
 
     public Tour getTourById(long id) { return dbDataProvider.getTourById(id); }
 
-    public boolean saveTour(Tour tour) {
+    boolean saveTour(Tour tour) {
         return dbDataProvider.saveTour(tour, this.context);
     }
 
@@ -66,7 +66,7 @@ public class DataFacade {
         return dbDataProvider.getLexiconEntryById(id);
     }
 
-    public boolean saveLexiconEntries(List<LexiconEntry> entries) {
+    boolean saveLexiconEntries(List<LexiconEntry> entries) {
         return dbDataProvider.saveLexiconEntries(entries);
     }
 }
