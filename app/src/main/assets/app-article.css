@@ -6,15 +6,20 @@ body {
     padding: 0 1rem;
 }
 
-h2 {
+h1, h2, h3, h4, h5, h6 {
+    line-height: 200%;
+}
+
+h1, h2 {
     font-size: x-large;
-    margin: 1.2em 0;
+    margin: 0em 0 0.8em;
+    align: center;
 }
 
 h3, h4, h5, h6 {
-    margin: 1.5em 0 0.2em;
-    line-height: 200%;
+    margin: 1em 0 0em;
 }
+
 
 h3 {
     font-size: large;
@@ -29,7 +34,7 @@ h5 {
 }
 
 p, hr {
-    margin: 0.5rem 0 1rem;
+    margin: 0.35rem 0 1.15rem;
 }
 
 img {
