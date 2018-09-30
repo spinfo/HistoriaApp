@@ -37,7 +37,7 @@ public class LexiconEntry {
     }
 
     public String getContent() {
-        final String content = HtmlContentCompletion.setTitle(this.content, this.title);
+        final String content = HtmlContentCompletion.prefixTitleHtml(this.content, this.title);
         return HtmlContentCompletion.wrapInPage(content);
     }
 }

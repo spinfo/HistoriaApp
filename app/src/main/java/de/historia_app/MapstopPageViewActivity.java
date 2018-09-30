@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import de.historia_app.data.DataFacade;
@@ -30,7 +31,7 @@ public class MapstopPageViewActivity extends AppCompatActivity {
 
         // Bind mapstop view to a page loader
         MapstopPageView pageView = (MapstopPageView) mapstopLayout.findViewById(R.id.mapstop_page);
-        TextView pageIndicatorView = (TextView) mapstopLayout.findViewById(R.id.mapstop_page_indicator);
+        LinearLayout pageIndicatorView = (LinearLayout) mapstopLayout.findViewById(R.id.mapstop_page_indicator);
         MapstopPageLoader pageLoader = new MapstopPageLoader(mapstop, pageView, pageIndicatorView);
 
         this.setContentView(mapstopLayout);

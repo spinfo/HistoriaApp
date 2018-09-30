@@ -18,8 +18,6 @@ import de.historia_app.ErrUtil;
 /**
  * This basically is the reference implementation from:
  *      https://developer.android.com/training/basics/network-ops/connecting.html
- *
- * TODO: This can be greatly simplified
  */
 public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTask.Result> {
 

@@ -1,47 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@drawable/bonuspack_bubble" >
+    android:background="@drawable/bubble_white" >
     <ImageView android:id="@+id/bubble_image"
         android:layout_width="65dp"
-        android:layout_height="65dp"
-        android:visibility="gone" />
+        android:layout_height="65dp" />
     <LinearLayout
         android:id="@+id/map_my_bonuspack_bubble"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="5dp"
+        android:paddingStart="5dp"
         android:orientation="vertical" >
         <LinearLayout
+            android:id="@+id/bubble_tour_title_line_full"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
             android:orientation="horizontal" >
-            <TextView android:id="@+id/bubble_tour_title"
-                android:layout_width="wrap_content"
+            <TextView android:id="@+id/bubble_tour_title_full_width"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_gravity="left"
-                android:layout_weight="0"
+                android:layout_gravity="start"
+                android:layout_weight="5"
                 android:textColor="#8F8F8F"
                 android:textSize="12sp"
                 android:maxEms="13"
                 android:ellipsize="end"
                 android:maxLines="1"
                 />
-            <Space
-                android:layout_width="0dp"
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/bubble_tour_title_line_with_switcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
+            android:orientation="horizontal" >
+            <TextView android:id="@+id/bubble_tour_title_before_switch"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="4"/>
+                android:layout_gravity="start"
+                android:layout_weight="5"
+                android:textColor="#8F8F8F"
+                android:textSize="12sp"
+                android:maxEms="13"
+                android:ellipsize="end"
+                android:maxLines="1"
+                />
             <Button android:id="@+id/bubble_tour_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_weight="3"
+                android:layout_gravity="end"
                 android:minHeight="20dp"
                 android:minWidth="30dp"
+                android:paddingStart="8sp"
+                android:paddingEnd="8sp"
                 android:background="#00FFFFFF"
-                android:visibility="gone"
                 android:text="@string/right_arrow"
                 android:textSize="17sp" />
         </LinearLayout>
@@ -53,27 +69,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:textColor="#000000"
-                android:layout_gravity="left"
+                android:layout_gravity="start"
                 android:textStyle="bold"
                 android:maxEms="17"
                 android:minEms="17"/>
         </LinearLayout>
+        <!--osmdroid needs this element present even if we do not use it -->
         <TextView android:id="@+id/bubble_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#000000"
-            android:textSize="12sp"
-            android:maxEms="17"
-            android:minEms="17"
-            android:text="Description" />
+            android:textSize="0sp" />
         <TextView android:id="@+id/bubble_subdescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="5sp"
             android:textColor="#000000"
             android:textSize="13sp"
             android:maxEms="17"
-            android:minEms="17"
-            android:text="Address"
-            android:visibility="gone" />
+            android:minEms="17" />
     </LinearLayout>
 </LinearLayout>

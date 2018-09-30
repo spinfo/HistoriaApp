@@ -78,7 +78,6 @@ public class ServerResponseReader {
         String accessibility = (String) map.get("accessibility");
         String author = (String) map.get("author");
 
-        // TODO: Snake yaml should be able to handle this correctly, without int casting
         Long id = Long.valueOf((int) map.get("id"));
 
         Integer walkLength = (Integer) map.get("walkLength");
@@ -112,7 +111,6 @@ public class ServerResponseReader {
         List<Mapstop> mapstops = new ArrayList<>();
         List<Map<String, Object>> mapstopsInput = (List) map.get("mapstops");
         for(Map<String, Object> mapstopInput : mapstopsInput) {
-            // TODO: There should be a better way to do this (not dumping, then loading)
             String mapstopTest = yaml.dump(mapstopInput);
             Mapstop mapstop = (Mapstop) MAPSTOP_YAML.load(mapstopTest);
             if (!mapstop.hasPages()) {
@@ -163,7 +161,6 @@ public class ServerResponseReader {
         // handle the Area
         Area area = new Area();
         Map<String, Object> areaInput = (Map) map.get("area");
-        // TODO: Snake yaml should be able to handle this correctly, without int casting
         area.setId(Long.valueOf((int) areaInput.get(("id"))));
         area.setName((String) areaInput.get("name"));
         List<Double> coords = (List<Double>) areaInput.get("point1");
@@ -201,7 +198,6 @@ public class ServerResponseReader {
             List<Map<String, Object>> entriesInput = (List) map.get("lexiconEntries");
             List<LexiconEntry> entries = new ArrayList<>(entriesInput.size());
             for(Map<String, Object> entryInput : entriesInput) {
-                // TODO: There should be a better way to do this (not dumping, then loading)
                 LexiconEntry entry = (LexiconEntry) LEXICON_ENTRY_YAML.load(yaml.dump(entryInput));
                 entries.add(entry);
             }

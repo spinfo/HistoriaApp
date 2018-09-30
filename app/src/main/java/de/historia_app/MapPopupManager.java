@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -45,8 +47,8 @@ public class MapPopupManager {
     private final LayoutInflater layoutInflater;
 
     // values to compute the dimensions of the popup
-    private static final float POPUP_WIDTH_RATIO = 0.85f;
-    private static final float POPUP_HEIGHT_RATIO = 0.90f;
+    private static final float POPUP_WIDTH_RATIO = 1.00f;
+    private static final float POPUP_HEIGHT_RATIO = 1.00f;
 
     // the state needed to save/recreate a popup: The popup's type and the id of the
     // object in question (either Mapstop, Area or Tour)
@@ -54,7 +56,6 @@ public class MapPopupManager {
     private long activeObjId = NO_ACTIVE_OBJ;
 
     // the currently active popup if there is one
-    // TODO: It might be safer to have a promise for a popup here or something deferred
     private PopupWindow activePopup;
 
     // a check value to indicate that there is no active object
@@ -87,7 +88,6 @@ public class MapPopupManager {
             setSaveState(type, objId, activePopup);
             return activePopup;
         }
-        // add comment explaining null
         final View popupContainer = layoutInflater.inflate(R.layout.map_popup, null);
 
         // put the supplied view inside the popup view
@@ -105,11 +105,13 @@ public class MapPopupManager {
                 if (width == 0 || height == 0) {
                     ErrUtil.failInDebug(LOG_TAG, "Bad popup dimensions: " + width + "/" + height);
                     setSaveStateNil();
+                } else {
+                    popup.setWidth(width);
+                    popup.setHeight(height);
                 }
-                popup.setWidth(width);
-                popup.setHeight(height);
                 popup.setFocusable(true);
-                popup.showAtLocation(surface, Gravity.CENTER, 0, 0);
+                popup.setAnimationStyle(R.style.mapPopupAnimation);
+                popup.showAtLocation(surface, Gravity.BOTTOM, 0, 0);
 
                 // this should only be done after the popup is actually shown
                 setBackgroundDimmed(true);
@@ -118,8 +120,8 @@ public class MapPopupManager {
         });
 
         // get the popup window button and set it to dismiss the popup
-        Button button = (Button) popupContainer.findViewById(R.id.map_popup_dismiss);
-        button.setOnClickListener(new View.OnClickListener() {
+        ImageView dismissButton = (ImageView) popupContainer.findViewById(R.id.map_popup_dismiss);
+        dismissButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 popup.dismiss();
@@ -144,8 +146,8 @@ public class MapPopupManager {
         View mapstopLayout = layoutInflater.inflate(R.layout.mapstop, null);
 
         // Bind mapstop view to a page loader
-        MapstopPageView pageView = (MapstopPageView) mapstopLayout.findViewById(R.id.mapstop_page);
-        TextView pageIndicatorView = (TextView) mapstopLayout.findViewById(R.id.mapstop_page_indicator);
+        MapstopPageView pageView = mapstopLayout.findViewById(R.id.mapstop_page);
+        LinearLayout pageIndicatorView = mapstopLayout.findViewById(R.id.mapstop_page_indicator);
         MapstopPageLoader pageLoader = new MapstopPageLoader(mapstop, pageView, pageIndicatorView);
 
         // actually display the mapstop as a popup window
@@ -170,7 +172,7 @@ public class MapPopupManager {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Object selected = parent.getItemAtPosition(position);
-                if(selected == null || !(selected instanceof Area)) {
+                if(!(selected instanceof Area)) {
                     ErrUtil.failInDebug(LOG_TAG, "Ignoring bad area selection.");
                 } else {
                     listener.onAreaSelected((Area) selected);
@@ -186,8 +188,7 @@ public class MapPopupManager {
         final ListView listView = (ListView) layoutInflater.inflate(R.layout.tour_or_mapstop_list, null);
 
         // connect to tour adapter
-        final List<Tour> tourData = area.getTours();
-        final Tour[] tours = tourData.toArray(new Tour[tourData.size()]);
+        final Tour[] tours = area.getTours().toArray(new Tour[0]);
         final TourArrayAdapter toursAdapter = new TourArrayAdapter(surface.getContext(), tours);
         listView.setAdapter(toursAdapter);
 

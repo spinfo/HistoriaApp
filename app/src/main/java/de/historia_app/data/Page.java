@@ -95,4 +95,8 @@ public class Page {
         String content = HtmlContentCompletion.replaceMediaitems(getContent(), getMedia(), context);
         return HtmlContentCompletion.wrapInPage(content);
     }
+
+    public String getHistoryUrl() {
+        return UrlSchemes.pageUrl(String.valueOf(id));
+    }
 }

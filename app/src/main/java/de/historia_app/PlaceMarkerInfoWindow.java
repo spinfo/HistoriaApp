@@ -67,12 +67,15 @@ public class PlaceMarkerInfoWindow extends MarkerInfoWindow {
 
         final PlaceOnMap placeOnMap = getPlaceOnMap();
 
-        // if this place has more than one mapstop add a button to switch between them
-        if(placeOnMap.getMapstopsOnMap().size() > 1) {
-            Button btnTourSwitch = (Button) mView.findViewById(R.id.bubble_tour_switch);
-            btnTourSwitch.setVisibility(View.VISIBLE);
-
-            btnTourSwitch.setOnClickListener(new View.OnClickListener() {
+        // only one title line is shown depending on whether the view has more than one mapstop
+        LinearLayout fullLine = mView.findViewById(R.id.bubble_tour_title_line_full);
+        LinearLayout withSwitcher = mView.findViewById(R.id.bubble_tour_title_line_with_switcher);
+        if(placeOnMap.getMapstopsOnMap().size() <= 1) {
+            withSwitcher.setVisibility(View.GONE);
+        } else {
+            fullLine.setVisibility(View.GONE);
+            Button tourSwitchButton = (Button) withSwitcher.findViewById(R.id.bubble_tour_switch);
+            tourSwitchButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     pos = ((pos + 1) >= placeOnMap.getMapstopsOnMap().size()) ? 0 : (pos + 1);
@@ -114,15 +117,18 @@ public class PlaceMarkerInfoWindow extends MarkerInfoWindow {
     }
 
     private void populateViews(Mapstop mapstop) {
-        TextView tourTitle = (TextView) mView.findViewById(R.id.bubble_tour_title);
-        tourTitle.setText(mapstop.getTour().getName().toUpperCase());
+        setTourTitleOn((TextView) mView.findViewById(R.id.bubble_tour_title_before_switch), mapstop);
+        setTourTitleOn((TextView) mView.findViewById(R.id.bubble_tour_title_full_width), mapstop);
 
-        TextView title = (TextView) mView.findViewById(R.id.bubble_title);
-        title.setText(mapstop.getName());
+        ((TextView) mView.findViewById(R.id.bubble_title)).setText(mapstop.getName());
 
         TextView subdescription = (TextView) mView.findViewById(R.id.bubble_subdescription);
         subdescription.setText(mapstop.getDescription());
         subdescription.setVisibility(View.VISIBLE);
+    }
+
+    private void setTourTitleOn(TextView tv, Mapstop mapstop) {
+        tv.setText(mapstop.getTour().getName().toUpperCase());
     }
 
     @Override

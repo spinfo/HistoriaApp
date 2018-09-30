@@ -7,16 +7,18 @@
     android:foreground="@drawable/customborder"
     >
 
-    <Button
+    <ImageView
         android:id="@+id/map_popup_dismiss"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:text="@string/letter_X"/>
+        android:minHeight="35dp"
+        android:minWidth="25dp"
+        android:gravity="end|center_vertical"
+        android:src="@drawable/ic_keyboard_arrow_down_accent_24dp"
+        android:background="@color/clickable_background"
+        android:contentDescription="@string/keyboard_arrow_down_descriptor" />
 
     <RelativeLayout
         android:id="@+id/map_popup_content"

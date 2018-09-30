@@ -17,7 +17,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String LOGTAG = DatabaseHelper.class.getSimpleName();
 
-    // TODO: Set the final name (this will change during development to avoid dealing with version changes, but must be fixed on release)
     private static final String DATABASE_NAME = "historia-app-dev-3.db";
     private static final int DATABASE_VERSION = 2;
 

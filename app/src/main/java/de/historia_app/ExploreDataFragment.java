@@ -120,7 +120,7 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
             View noEntriesView = view.findViewById(R.id.no_lexicon_entries);
             ((ViewManager)noEntriesView.getParent()).removeView(noEntriesView);
 
-            // fill the list of entries
+            // fill the list of lexicon entries
             ArrayList<Object> lexData = LexiconAdapter.makeData(lexicon);
             LexiconAdapter lexiconAdapter = new LexiconAdapter(getContext(), lexData);
             ListView lexiconList = (ListView) view.findViewById(R.id.lexicon_list);
@@ -129,11 +129,9 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Object obj = parent.getItemAtPosition(position);
-                    // react to click on lexicon entries by showing the activity, else do nothing
+                    // react to click on lexicon entries by showing the activity
                     if (LexiconEntry.class.equals(obj.getClass())) {
                         Intent intent = new Intent(getActivity(), SimpleWebViewActivity.class);
-
-                        // put lexicon entry content into the intent and render by the web view activity
                         final String content = ((LexiconEntry) obj).getContent();
                         intent.putExtra(getResources().getString(R.string.extra_key_simple_web_view_data), content);
                         getActivity().startActivity(intent);

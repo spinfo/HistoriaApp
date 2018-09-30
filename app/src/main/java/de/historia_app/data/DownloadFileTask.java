@@ -22,8 +22,6 @@ import de.historia_app.ErrUtil;
  *      https://developer.android.com/training/basics/network-ops/connecting.html
  *
  * but extended to use
- *
- * TODO: This can be greatly simplified
  */
 public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.Result> {
 
@@ -207,11 +205,6 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
             long total = 0;
             int count;
             while ((count = stream.read(data)) != -1) {
-                // TODO: allow canceling with back button? , below might be relevant
-                /*if (isCancelled()) {
-                    input.close();
-                    return null;
-                }*/
                 total += count;
                 // publishing the progress....
                 if (this.maxBytes > 0) // only if total length is known

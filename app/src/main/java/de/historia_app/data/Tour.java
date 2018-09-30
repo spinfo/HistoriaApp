@@ -99,7 +99,6 @@ public class Tour implements Serializable {
 
     protected Tour() {}
 
-    // TODO: Remove
     public Tour(String name, List<Mapstop> mapstops, Type type, long id, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author, String introduction, List<PersistentGeoPoint> track, List<Scene> scenes) {
         this.name = name;
         this.mapstops = mapstops;
