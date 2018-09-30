@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.os.Build;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -18,8 +18,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.io.Serializable;
 
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.Tour;
@@ -45,6 +43,7 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         super.onCreate(savedInstanceState);
         this.data = new DataFacade(this.getContext());
         this.tour = (Tour) getArguments().get("tour");
@@ -146,6 +145,7 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Wollen Sie die Tour wirklich verlassen?");
                 builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -180,5 +180,10 @@ public class IndoorTourFragment extends Fragment implements MainActivity.MainAct
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("current_index", sceneLoader.getCurrentIndex());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }
