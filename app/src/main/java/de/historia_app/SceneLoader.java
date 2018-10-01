@@ -58,15 +58,17 @@ public class SceneLoader implements Serializable {
             loadSrc(scene);
 
             this.currentIndex = sceneIndex;
-            this.sceneNo.setText(String.valueOf(this.currentIndex + 1).concat("/").concat(String.valueOf(this.tour.getScenes().size())));
+            this.sceneNo.setText(String.valueOf(this.currentIndex + 1).concat("\n").concat(String.valueOf(this.tour.getScenes().size())));
 
             this.sceneNo.setVisibility(View.VISIBLE);
+            /*
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     sceneNo.setVisibility(View.GONE);
                 }
             }, 3000);
+            */
         }
         catch (IndexOutOfBoundsException e) {
             Log.e(LOG_TAG, "Request for nonexistent scene: " + sceneIndex);
@@ -116,9 +118,9 @@ public class SceneLoader implements Serializable {
 
         stop.setId((int)mapstop.getId());
         stop.setText(String.valueOf(mapstop.getPos()));
-        stop.setTextSize(TypedValue.COMPLEX_UNIT_PX, 60);
+        stop.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 26);
         stop.setTypeface(stop.getTypeface(), Typeface.BOLD);
-        stop.setPadding(0, 6, 0, 0);
+        stop.setPadding(0, 0, 0, 0);
         stop.setGravity(Gravity.CENTER_HORIZONTAL);
 
         float originalWidth = 960f;
@@ -132,11 +134,13 @@ public class SceneLoader implements Serializable {
             z = originalHeight / sceneHeight;
         }
 
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(100, 100);
+        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, sceneView.getContext().getResources().getDisplayMetrics());
+        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, sceneView.getContext().getResources().getDisplayMetrics());
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
         float x = coordinate.getX();
         float y = coordinate.getY();
-        float left = x / z - 100;
-        float top = y / z - 100;
+        float left = x / z - width;
+        float top = y / z - height;
         params.setMargins((int)left, (int)top, 0, 0);
         stop.setLayoutParams(params);
 
