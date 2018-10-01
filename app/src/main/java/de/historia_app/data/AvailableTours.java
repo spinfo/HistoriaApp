@@ -47,6 +47,4 @@ public class AvailableTours {
         }
         return result;
     }
-
-
 }

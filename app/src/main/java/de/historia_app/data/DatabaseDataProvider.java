@@ -83,6 +83,34 @@ public class DatabaseDataProvider {
         }
     }
 
+    long getTourVersion(long tourId, long defaultTo) {
+        try {
+            String[] result = dbHelper.getTourDao().queryBuilder()
+                    .selectColumns("version").where().idEq(tourId)
+                    .queryRaw().getFirstResult();
+            if (result == null || result.length == 0 || result[0] == null) {
+                return defaultTo;
+            }
+            return Long.parseLong(result[0]);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    TourRecord.InstallStatus determineInstallStatus(TourRecord record) {
+        long defaultVersion = -1L;
+        TourRecord.InstallStatus result;
+        long versionInstalled = getTourVersion(record.getTourId(), defaultVersion);
+        if (versionInstalled == defaultVersion) {
+            result = TourRecord.InstallStatus.NOT_INSTALLED;
+        } else  if (versionInstalled == record.getVersion()) {
+            result = TourRecord.InstallStatus.UP_TO_DATE;
+        } else {
+            result = TourRecord.InstallStatus.UPDATE_AVAILABLE;
+        }
+        return result;
+    }
+
     /**
      * Get the amount of tours in the area without fetching them.
      *

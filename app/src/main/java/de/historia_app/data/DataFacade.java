@@ -46,6 +46,10 @@ public class DataFacade {
         return dbDataProvider.saveTour(tour, this.context);
     }
 
+    public TourRecord.InstallStatus determineInstallStatus(TourRecord record) {
+        return dbDataProvider.determineInstallStatus(record);
+    }
+
     public List<TourOnMap> getToursOnMap() {
         return dbDataProvider.getToursOnMap();
     }

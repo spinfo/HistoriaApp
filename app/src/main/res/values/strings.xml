@@ -77,4 +77,10 @@
     <!-- Filenames -->
     <string name="asset_app_article_styles">app-article.css</string>
     <string name="asset_about_page">about_page.html</string>
+
+    <!-- content descriptions for tour downloads -->
+    <string name="download_icon_general_description">Tour-Status unbekannt</string>
+    <string name="download_icon_up_to_data">Up to date</string>
+    <string name="download_icon_not_installed">Nicht installiert</string>
+    <string name="download_icon_update_available">Ein Update liegt vor</string>
 </resources>
