@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -42,7 +42,7 @@ public class TourRecordAdapter extends ArrayAdapter<TourRecord> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.tour_record_meta, parent, false);
         }
 
-        ImageView icon = convertView.findViewById(R.id.tour_record_icon);
+        ImageButton icon = convertView.findViewById(R.id.tour_record_icon);
         icon.setImageResource(determineIconFor(status));
 
         final Spinner spinner = (Spinner) convertView.findViewById(R.id.tour_record_spinner);
@@ -51,8 +51,7 @@ public class TourRecordAdapter extends ArrayAdapter<TourRecord> {
         adapter.addAll(texts);
         spinner.setAdapter(adapter);
 
-        View iconView = convertView.findViewById(R.id.tour_record_icon_area);
-        iconView.setOnClickListener(new View.OnClickListener() {
+        icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 spinner.performClick();
