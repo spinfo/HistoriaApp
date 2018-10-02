@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -22,9 +23,12 @@ public class TourRecordAdapter extends ArrayAdapter<TourRecord> {
 
     private final DataFacade data;
 
+    private final Context context;
+
     public TourRecordAdapter(Context context, ArrayList<TourRecord> records) {
         super(context, 0, records);
-        data = new DataFacade(context);
+        this.context = context;
+        this.data = new DataFacade(context);
     }
 
     @NonNull
@@ -34,13 +38,26 @@ public class TourRecordAdapter extends ArrayAdapter<TourRecord> {
         TourRecord record = super.getItem(position);
         InstallStatus status = data.determineInstallStatus(record);
 
-        // if we do not have a view to convert, get one
         if(convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.tour_record_meta, parent, false);
         }
 
         ImageView icon = convertView.findViewById(R.id.tour_record_icon);
         icon.setImageResource(determineIconFor(status));
+
+        final Spinner spinner = (Spinner) convertView.findViewById(R.id.tour_record_spinner);
+        String[] texts = { "bla", "blubb" };
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item);
+        adapter.addAll(texts);
+        spinner.setAdapter(adapter);
+
+        View iconView = convertView.findViewById(R.id.tour_record_icon_area);
+        iconView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                spinner.performClick();
+            }
+        });
 
         // set the tour title on the title view
         TextView nameView = (TextView) convertView.findViewById(R.id.tour_record_name);

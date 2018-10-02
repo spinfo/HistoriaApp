@@ -177,7 +177,7 @@ public class TourDownloadFragment extends Fragment implements MainActivity.MainA
         tourRecordListView.setAdapter(adapter);
 
         // on click of a tour record, the download starts
-        tourRecordListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /* tourRecordListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 TourRecord record = (TourRecord) parent.getItemAtPosition(position);
@@ -187,7 +187,7 @@ public class TourDownloadFragment extends Fragment implements MainActivity.MainA
                 DownloadFileTask task = new DownloadFileTask(callback, getContext().getCacheDir(), 300000, maxSize);
                 task.execute(record.getMediaUrl());
             }
-        });
+        }); */
     }
 
     private void retrieveAvailableTours() {

@@ -31,7 +31,7 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/tour_record_icon_layout"
+        android:id="@+id/tour_record_icon_area"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
@@ -42,6 +42,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"/>
+        <Spinner
+            android:id="@+id/tour_record_spinner"
+            android:layout_width="match_parent"
+            android:layout_below="@id/tour_record_icon"
+            android:layout_height="0dp" />
     </RelativeLayout>
 
 </LinearLayout>
