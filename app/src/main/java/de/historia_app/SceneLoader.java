@@ -118,9 +118,9 @@ public class SceneLoader implements Serializable {
 
         stop.setId((int)mapstop.getId());
         stop.setText(String.valueOf(mapstop.getPos()));
-        stop.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 26);
+        stop.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24);
         stop.setTypeface(stop.getTypeface(), Typeface.BOLD);
-        stop.setPadding(0, 0, 0, 0);
+        stop.setPadding(0, calcPixelFromDp(3), calcPixelFromDp(1), 0);
         stop.setGravity(Gravity.CENTER_HORIZONTAL);
 
         float originalWidth = 960f;
@@ -134,8 +134,8 @@ public class SceneLoader implements Serializable {
             z = originalHeight / sceneHeight;
         }
 
-        int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, sceneView.getContext().getResources().getDisplayMetrics());
-        int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 40, sceneView.getContext().getResources().getDisplayMetrics());
+        int width = calcPixelFromDp(40);
+        int height = calcPixelFromDp(40);
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width, height);
         float x = coordinate.getX();
         float y = coordinate.getY();
@@ -167,5 +167,9 @@ public class SceneLoader implements Serializable {
 
     protected int getCurrentIndex() {
         return currentIndex;
+    }
+
+    private int calcPixelFromDp(int value) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, sceneView.getContext().getResources().getDisplayMetrics());
     }
 }
