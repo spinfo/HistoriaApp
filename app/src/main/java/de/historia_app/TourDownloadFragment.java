@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,11 +26,6 @@ import de.historia_app.data.FileService;
 import de.historia_app.data.TourRecord;
 import de.historia_app.data.UrlSchemes;
 
-/**
- * This fragment connects to the backend and:
- *      1. Downloads a list of available tours.
- *      2. When asked to, downloads a
- */
 public class TourDownloadFragment extends Fragment implements MainActivity.MainActivityFragment {
 
     private static final String LOG_TAG = TourDownloadFragment.class.getSimpleName();
@@ -79,69 +75,6 @@ public class TourDownloadFragment extends Fragment implements MainActivity.MainA
         }
     }
 
-    // A class to define what happens during and after the download of a tour
-    private class TourDownloadCallback implements DownloadCallback<File> {
-
-        // A text view to update and it's text during initialization of the callback
-        TextView tvTourRecordItem;
-        CharSequence baseText;
-
-        // The tour record referenced
-        TourRecord record;
-
-        // The maximum of bytes to read (used for displaying progress)
-        int maxBytes;
-
-        // get a the download callback with a text view to update
-        private TourDownloadCallback(TextView tvTourRecordItem, TourRecord record, int maxBytes) {
-            this.tvTourRecordItem = tvTourRecordItem;
-            this.baseText = tvTourRecordItem.getText();
-            this.record = record;
-            this.maxBytes = maxBytes;
-        }
-
-        // hand the received File to the File Service for installation
-        @Override
-        public void updateFromDownload(File result) {
-            if(result == null) {
-                Toast.makeText(getActivity(), getString(R.string.tour_download_failed), Toast.LENGTH_LONG).show();
-                TourDownloadFragment.this.availableTours = new AvailableTours();
-            } else {
-                FileService fileService = new FileService(getContext());
-                fileService.installTour(result, record);
-            }
-        }
-
-        @Override
-        public NetworkInfo getActiveNetworkInfo() {
-            ConnectivityManager connectivityManager =
-                    (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-            return connectivityManager.getActiveNetworkInfo();
-        }
-
-        @Override
-        public void onProgressUpdate(int progressCode, int percentComplete) {
-            final String newText = baseText + " - lädt... (" + percentComplete + " %)";
-            updateTextViewOnUI(newText);
-        }
-
-        @Override
-        public void finishDownloading() {
-            final String newText = baseText.toString();
-            updateTextViewOnUI(newText);
-            Toast.makeText(getContext(), "Tour installiert", Toast.LENGTH_SHORT).show();
-        }
-
-        private void updateTextViewOnUI(final String newText) {
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    tvTourRecordItem.setText(newText);
-                }
-            });
-        }
-    }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -173,7 +106,7 @@ public class TourDownloadFragment extends Fragment implements MainActivity.MainA
             ErrUtil.failInDebug(LOG_TAG, "The tour records view should be present.");
             return;
         }
-        TourRecordAdapter adapter = new TourRecordAdapter(this.getContext(), availableTours.getAllRecords());
+        TourRecordAdapter adapter = new TourRecordAdapter(getActivity(), availableTours.getAllRecords());
         tourRecordListView.setAdapter(adapter);
 
         // on click of a tour record, the download starts

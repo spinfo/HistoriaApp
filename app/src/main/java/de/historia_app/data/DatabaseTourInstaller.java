@@ -64,13 +64,10 @@ public class DatabaseTourInstaller {
         // restored on error
         if(oldTour != null) {
             // set tour's mapstops manually for re-insertion as they are not eager-fetched
-            // NOTE: The big ugly assumption here is, that everything else IS eager-fetched...
+            // NOTE: The assumption here is, that everything else is eager-fetched.
             oldTour.setMapstops(oldTour.getMapstops());
-
-            boolean deleteOk = deleteTour(oldTour);
+            boolean deleteOk = safeDeleteTour(oldTour);
             if(!deleteOk) {
-                boolean insertAfterFailedDeleteOk = createOrUpdateTour(oldTour);
-                Log.w(TAG, "Status of reinsert after a failed delete: " + insertAfterFailedDeleteOk);
                 return false;
             }
         }
@@ -85,6 +82,16 @@ public class DatabaseTourInstaller {
         }
 
         return insertOk;
+    }
+
+    public boolean safeDeleteTour(Tour tour) {
+        boolean deleteOk = deleteTour(tour);
+        if(!deleteOk) {
+            boolean insertAfterFailedDeleteOk = createOrUpdateTour(tour);
+            Log.i(TAG, "Delete of tour failed. Re-inserting tour returned: " + insertAfterFailedDeleteOk);
+            return false;
+        }
+        return true;
     }
 
 

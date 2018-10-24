@@ -12,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 
 import de.historia_app.ErrUtil;
@@ -21,6 +22,8 @@ public class FileService {
     private static final String LOG_TAG = FileService.class.getSimpleName();
 
     private static final String TOUR_FILE_PREFIX = "shtm-tour-";
+
+    private static final String TOUR_DELETE_FOLDER_PREFIX = "shtm-tour-delete-";
 
     private Context context;
 
@@ -45,15 +48,28 @@ public class FileService {
         String path = topDir.getPath() + "/smart-history-tours";
         mainContentDir = new File(path);
         Log.i(LOG_TAG, "Using as main content dir: " + mainContentDir.getAbsolutePath());
+        return createDirectoryIfNotExists(mainContentDir);
+    }
+
+    private boolean createDirectoryIfNotExists(File file) {
         try {
-            if(!mainContentDir.exists()) {
-                mainContentDir.mkdir();
+            if(!file.exists()) {
+                return file.mkdir();
             }
         } catch (SecurityException e) {
-            Log.e(LOG_TAG, "Error while creating main content dir: " + e.getMessage());
+            Log.e(LOG_TAG, "Error while creating directory at '" + file.getPath() + "': " + e.getMessage());
             return false;
         }
-        return (mainContentDir.exists() && mainContentDir.isDirectory());
+        return (file.exists() && file.isDirectory());
+    }
+
+    public boolean initializeExampleDataIfNeeded() {
+        DataFacade data = new DataFacade(context);
+        if (data.getDefaultTour() == null) {
+            return initializeExampleData();
+        } else {
+            return true;
+        }
     }
 
     public boolean initializeExampleData() {
@@ -77,6 +93,11 @@ public class FileService {
             return false;
         }
         return true;
+    }
+
+    public File determineSaveLocation(Mediaitem mediaitem) {
+        File guidFile = new File(mediaitem.getGuid());
+        return getFile(guidFile.getName());
     }
 
     public Tour installTour(File file, TourRecord record) {
@@ -118,9 +139,68 @@ public class FileService {
         } else {
             ErrUtil.failInDebug(LOG_TAG, "No tour file after unpacking the archive: " );
         }
-        // TODO: The deletion of orphanded files should be handled here
 
         return result;
+    }
+
+    public boolean removeTour(Tour tour) {
+
+        DataFacade data = new DataFacade(context);
+        DatabaseTourInstaller installer = new DatabaseTourInstaller(context);
+
+        File tmpDir = moveTourFilesToDeletionLocation(tour);
+        boolean dbDeleteOK = installer.safeDeleteTour(tour);
+        if (!dbDeleteOK) {
+            // restore saved files here
+            return false;
+        }
+
+        // deleteFile(tmpDir);
+        initializeExampleDataIfNeeded();
+        return true;
+    }
+
+    // Recursive delete to easily clean directories before deleting themselves
+    private static boolean deleteFile(File element) {
+        if (element.listFiles() != null) {
+            for (File sub : element.listFiles()) {
+                deleteFile(sub);
+            }
+        }
+        return element.delete();
+    }
+
+    private File moveTourFilesToDeletionLocation(Tour tour) {
+        File tmpDir = null;
+        try {
+            tmpDir = createTempDir(TOUR_DELETE_FOLDER_PREFIX, ".tmp");
+            List<Mediaitem> mediaitems = (new DataFacade(context)).getMediaitemsFor(tour);
+            for (Mediaitem mediaitem : mediaitems) {
+                File old = determineSaveLocation(mediaitem);
+                boolean ok = old.renameTo(new File(tmpDir, old.getName()));
+                if (!ok) {
+                    Log.w(LOG_TAG, "Unable to move file '" + old.getPath() + "' to temp dir.");
+                } else {
+                    Log.d(LOG_TAG, "Moved file: " + old.getName());
+                }
+            }
+
+        } catch (IOException e) {
+            Log.d(LOG_TAG, "Failed to move tour files to deletion directory: " + e.getMessage());
+        }
+        return tmpDir;
+    }
+
+    private File createTempDir(String prefix, String suffix) throws  IOException {
+        final File temp;
+        temp = File.createTempFile(prefix, null, context.getCacheDir());
+        if(!(temp.delete())) {
+            throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
+        }
+        if(!(temp.mkdir())) {
+            throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
+        }
+        return temp;
     }
 
     private String getTourFilePath(TourRecord record) {

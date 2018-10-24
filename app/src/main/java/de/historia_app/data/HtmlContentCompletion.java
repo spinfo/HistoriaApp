@@ -59,21 +59,13 @@ public class HtmlContentCompletion {
 
         FileService fileService = new FileService(context);
         for(Mediaitem mediaitem : media) {
-            // Treat the mediaitem guid as a file to get the basename
-            File guidFile = new File(mediaitem.getGuid());
-            String base = guidFile.getName();
-
-            if(base.isEmpty()) {
-                Log.w(LOG_TAG, "Could not determine base for guid: " + mediaitem.getGuid());
+            File file = fileService.determineSaveLocation(mediaitem);
+            if(file.exists()) {
+                String replacement = UrlSchemes.FILE + file.getAbsolutePath();
+                Log.d(LOG_TAG, "Replacing: '" + mediaitem.getGuid() + "' with '" + replacement + "'");
+                content = content.replaceAll(mediaitem.getGuid(), replacement);
             } else {
-                File file = fileService.getFile(base);
-                if(file.exists()) {
-                    String replacement = UrlSchemes.FILE + file.getAbsolutePath();
-                    Log.d(LOG_TAG, "Replacing: '" + mediaitem.getGuid() + "' with '" + replacement + "'");
-                    content = content.replaceAll(mediaitem.getGuid(), replacement);
-                } else {
-                    Log.w(LOG_TAG, "No file for basename: " + base);
-                }
+                Log.w(LOG_TAG, "No file for mediaitem: " + mediaitem.getGuid());
             }
         }
         return content;

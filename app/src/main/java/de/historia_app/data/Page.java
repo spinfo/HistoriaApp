@@ -14,8 +14,6 @@ import java.util.List;
  */
 public class Page {
 
-    private static final String LOG_TAG = Page.class.getSimpleName();
-
     // the server's id value for this page
     @DatabaseField(columnName = "id", id = true)
     private long id;

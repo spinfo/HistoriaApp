@@ -73,4 +73,8 @@ public class DataFacade {
     boolean saveLexiconEntries(List<LexiconEntry> entries) {
         return dbDataProvider.saveLexiconEntries(entries);
     }
+
+    public List<Mediaitem> getMediaitemsFor(Tour tour) {
+        return dbDataProvider.getMediaitemsFor(tour);
+    }
 }

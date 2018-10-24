@@ -6,9 +6,11 @@ import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -211,6 +213,18 @@ public class DatabaseDataProvider {
             ErrUtil.failInDebug(LOG_TAG, e);
             return null;
         }
+    }
+
+
+    public List<Mediaitem> getMediaitemsFor(Tour tour) {
+        // since the connection mapstop-page-mediaitem is eagerly fetched, no special query is needed
+        List<Mediaitem> result = new ArrayList<>();
+        for (Mapstop mapstop : tour.getMapstops()) {
+            for (Page page : mapstop.getPages()) {
+                result.addAll(page.getMedia());
+            }
+        }
+        return result;
     }
 
 }

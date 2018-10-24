@@ -4,7 +4,8 @@
     android:orientation="horizontal"
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
-    style="@style/listViewTopItem">
+    style="@style/listViewTopItem"
+    android:descendantFocusability="blocksDescendants">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
         android:layout_width="0dp"
@@ -45,11 +46,6 @@
             android:padding="12sp"
             android:background="@null"
             android:tint="@drawable/blueish_to_whiteish_on_press"/>
-        <Spinner
-            android:id="@+id/tour_record_spinner"
-            android:layout_width="match_parent"
-            android:layout_below="@id/tour_record_icon"
-            android:layout_height="0dp"/>
     </RelativeLayout>
 
 </LinearLayout>
