@@ -65,7 +65,7 @@ public class UrlSchemeRedirectingWebViewClient extends WebViewClient {
 
     private Intent newLexiconEntryPageViewIntent(LexiconEntry entry) {
         Intent intent = new Intent(context, SimpleWebViewActivity.class);
-        intent.putExtra(context.getString(R.string.extra_key_simple_web_view_data), entry.getContent());
+        intent.putExtra(context.getString(R.string.extra_key_simple_web_view_data), entry.getContent(context));
         return intent;
     }
 }

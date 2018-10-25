@@ -43,16 +43,16 @@ public class HtmlContentCompletion {
 
 
 
-    public static String wrapInPage(String innerHtml) {
+    public static String wrapInPage(Context context, String innerHtml) {
         if(innerHtml == null) {
             innerHtml = "";
         }
-        String styles = AssetHelper.readAsset(App.getContext().getString(R.string.asset_app_article_styles));
+        String styles = AssetHelper.readAsset(context, context.getString(R.string.asset_app_article_styles));
         String withStyles = HTML_TEMPLATE.replaceFirst(CSS_GOES_HERE, styles);
         return withStyles.replaceFirst(CONTENT_GOES_GERE, innerHtml);
     }
 
-    public static String replaceMediaitems(String content, List<Mediaitem> media, Context context) {
+    public static String replaceMediaitems(Context context, String content, List<Mediaitem> media) {
         if(media == null || media.isEmpty()) {
             return content;
         }

@@ -1,5 +1,7 @@
 package de.historia_app.data;
 
+import android.content.Context;
+
 import com.j256.ormlite.field.DatabaseField;
 
 /**
@@ -36,8 +38,8 @@ public class LexiconEntry {
         return title;
     }
 
-    public String getContent() {
+    public String getContent(Context context) {
         final String content = HtmlContentCompletion.prefixTitleHtml(this.content, this.title);
-        return HtmlContentCompletion.wrapInPage(content);
+        return HtmlContentCompletion.wrapInPage(context, content);
     }
 }

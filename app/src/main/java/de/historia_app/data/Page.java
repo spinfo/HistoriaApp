@@ -90,8 +90,8 @@ public class Page {
     }
 
     public String getPresentationContent(Context context) {
-        String content = HtmlContentCompletion.replaceMediaitems(getContent(), getMedia(), context);
-        return HtmlContentCompletion.wrapInPage(content);
+        String content = HtmlContentCompletion.replaceMediaitems(context, getContent(), getMedia());
+        return HtmlContentCompletion.wrapInPage(context, content);
     }
 
     public String getHistoryUrl() {

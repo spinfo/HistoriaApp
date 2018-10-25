@@ -46,6 +46,6 @@ public class AboutPageAcitvity extends AppCompatActivity {
     }
 
     private String getAboutPageContent() {
-        return AssetHelper.readAsset(getString(R.string.asset_about_page));
+        return AssetHelper.readAsset(this, getString(R.string.asset_about_page));
     }
 }
