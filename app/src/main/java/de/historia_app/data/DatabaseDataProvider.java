@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.TableUtils;
@@ -23,7 +24,7 @@ public class DatabaseDataProvider {
 
     private DatabaseHelper dbHelper;
 
-    public DatabaseDataProvider(Context context) {
+    DatabaseDataProvider(Context context) {
         this.dbHelper = new DatabaseHelper(context);
     }
 
@@ -85,7 +86,7 @@ public class DatabaseDataProvider {
         }
     }
 
-    long getTourVersion(long tourId, long defaultTo) {
+    private long getTourVersion(long tourId, long defaultTo) {
         try {
             String[] result = dbHelper.getTourDao().queryBuilder()
                     .selectColumns("version").where().idEq(tourId)
@@ -139,10 +140,21 @@ public class DatabaseDataProvider {
 
     List<TourOnMap> getToursOnMap() {
         try {
+            deleteInvalidToursOnMap();
             return dbHelper.getTourOnMapDao().queryForAll();
         } catch (SQLException e) {
             ErrUtil.failInDebug(LOG_TAG, e);
             return Collections.emptyList();
+        }
+    }
+
+    private void deleteInvalidToursOnMap() {
+        try {
+            DeleteBuilder<TourOnMap, Long> builder = dbHelper.getTourOnMapDao().deleteBuilder();
+            builder.where().notIn("tour", dbHelper.getTourDao().queryForAll());
+            builder.delete();
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
         }
     }
 
