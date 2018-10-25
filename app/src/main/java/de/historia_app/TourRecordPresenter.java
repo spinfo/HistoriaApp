@@ -1,6 +1,9 @@
 package de.historia_app;
 
 import android.content.Context;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.Locale;
 
@@ -43,11 +46,6 @@ public class TourRecordPresenter {
         return result;
     }
 
-    public String simpleMessage() {
-        String message = "Tour \"%s\" (%.2f MB)";
-        return String.format(Locale.getDefault(), message, record.getName(), record.getDownloadSize() / 1000000.0);
-    }
-
     public String title() {
         return record.getName();
     }
@@ -59,6 +57,14 @@ public class TourRecordPresenter {
         sb.append(String.format(Locale.getDefault(), "%.2f", (record.getDownloadSize() / 1000000.0)));
         sb.append(" MB)");
         return sb.toString();
+    }
+
+    public void populateTextAreaView(View view) {
+        TextView nameView = (TextView) view.findViewById(R.id.tour_record_name);
+        nameView.setText(title());
+
+        TextView essentialsView = (TextView) view.findViewById(R.id.tour_record_essentials);
+        essentialsView.setText(essentialsText());
     }
 
     public boolean showsDeleteOption() {

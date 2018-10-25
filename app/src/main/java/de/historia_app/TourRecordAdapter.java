@@ -18,7 +18,6 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.DownloadCallback;
@@ -128,13 +127,8 @@ public class TourRecordAdapter extends ArrayAdapter<TourRecord> {
         icon.setOnClickListener(listener);
         convertView.setOnClickListener(listener);
 
-        // set the tour title on the title view
-        TextView nameView = (TextView) convertView.findViewById(R.id.tour_record_name);
-        nameView.setText(recordPresenter.title());
-
-        // set the other record infos on the essentials View
-        TextView essentialsView = (TextView) convertView.findViewById(R.id.tour_record_essentials);
-        essentialsView.setText(recordPresenter.essentialsText());
+        final View textAreaView = convertView.findViewById(R.id.tour_record_text_area);
+        recordPresenter.populateTextAreaView(textAreaView);
 
         return convertView;
     }

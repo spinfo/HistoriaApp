@@ -5,7 +5,11 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Layout;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 public class TourRecordDialogFragment extends DialogFragment {
 
@@ -38,7 +42,11 @@ public class TourRecordDialogFragment extends DialogFragment {
     private Dialog createDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setCancelable(true);
-        builder.setMessage(recordPresenter.simpleMessage());
+
+        View textArea = LayoutInflater.from(getActivity()).inflate(R.layout.tour_record_text_area, null);
+        textArea.setPaddingRelative(20, 20, 20, 20);
+        recordPresenter.populateTextAreaView(textArea);
+        builder.setView(textArea);
 
         if (recordPresenter.showsDeleteOption()) {
             builder.setNegativeButton(getString(R.string.uninstall_tour), new DialogInterface.OnClickListener() {

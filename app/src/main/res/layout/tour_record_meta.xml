@@ -6,30 +6,12 @@
     android:layout_width="match_parent"
     style="@style/listViewTopItem"
     android:descendantFocusability="blocksDescendants">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
+
+    <include
+        layout="@layout/tour_record_text_area"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="4">
-
-        <TextView
-            android:id="@+id/tour_record_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textColor="@android:color/holo_blue_dark"
-            style="@style/listViewTextItem"
-            />
-
-        <TextView
-            android:id="@+id/tour_record_essentials"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textStyle="italic"
-            style="@style/listViewTextItem"
-            />
-
-    </LinearLayout>
+        android:layout_weight="4"/>
 
     <RelativeLayout
         android:id="@+id/tour_record_icon_area"
