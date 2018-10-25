@@ -83,4 +83,9 @@
     <string name="download_icon_up_to_data">Up to date</string>
     <string name="download_icon_not_installed">Nicht installiert</string>
     <string name="download_icon_update_available">Ein Update liegt vor</string>
+    <string name="uninstall_tour">Löschen</string>
+    <string name="reinstall_tour">Erneut installieren</string>
+    <string name="install_tour">Installieren</string>
+    <string name="update_tour">Update</string>
+    <string name="unable_to_edit_tour">Die Tour kann leider nicht gelöscht/installiert werden.</string>
 </resources>

@@ -1,0 +1,75 @@
+package de.historia_app;
+
+import android.content.Context;
+
+import java.util.Locale;
+
+import de.historia_app.data.DataFacade;
+import de.historia_app.data.TourRecord;
+
+public class TourRecordPresenter {
+
+    private TourRecord record;
+
+    private String installButtonText;
+
+    private int statusIconResource;
+
+    private TourRecord.InstallStatus status;
+
+    private TourRecordPresenter(TourRecord record) {
+        this.record = record;
+    }
+
+    public static TourRecordPresenter create(Context context, TourRecord record) {
+        TourRecordPresenter result = new TourRecordPresenter(record);
+
+        result.status = (new DataFacade(context)).determineInstallStatus(record);
+        switch (result.status) {
+            case NOT_INSTALLED:
+                result.statusIconResource = R.drawable.download_circular_button_symbol;
+                result.installButtonText = context.getString(R.string.install_tour);
+                break;
+            case UP_TO_DATE:
+                result.statusIconResource = R.drawable.verification_sign_in_a_circle_outline;
+                result.installButtonText = context.getString(R.string.reinstall_tour);
+                break;
+            case UPDATE_AVAILABLE:
+                result.statusIconResource = R.drawable.circular_arrow_with_clockwise_rotation;
+                result.installButtonText = context.getString(R.string.update_tour);
+                break;
+        }
+
+        return result;
+    }
+
+    public String simpleMessage() {
+        String message = "Tour \"%s\" (%.2f MB)";
+        return String.format(Locale.getDefault(), message, record.getName(), record.getDownloadSize() / 1000000.0);
+    }
+
+    public String title() {
+        return record.getName();
+    }
+
+    public String essentialsText() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(record.getAreaName());
+        sb.append(" - (");
+        sb.append(String.format(Locale.getDefault(), "%.2f", (record.getDownloadSize() / 1000000.0)));
+        sb.append(" MB)");
+        return sb.toString();
+    }
+
+    public boolean showsDeleteOption() {
+        return status != TourRecord.InstallStatus.NOT_INSTALLED;
+    }
+
+    public String getInstallButtonText() {
+        return installButtonText;
+    }
+
+    public int getStatusIconResource() {
+        return statusIconResource;
+    }
+}
