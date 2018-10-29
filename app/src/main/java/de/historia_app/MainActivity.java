@@ -189,24 +189,22 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         return mapFragment;
     }
 
-    private ExploreDataFragment switchMainFragmentToExploreData(boolean addToBackStack) {
+    private void switchMainFragmentToExploreData(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         ExploreDataFragment exploreFragment = (ExploreDataFragment) fragmentManager.findFragmentByTag(EXPLORE_FRAGMENT_TAG);
         if (exploreFragment == null) {
             exploreFragment = new ExploreDataFragment();
         }
         setupFragmentAsMainFragment(exploreFragment, EXPLORE_FRAGMENT_TAG, addToBackStack);
-        return exploreFragment;
     }
 
-    private TourDownloadFragment switchMainFragmentToTourDownload(boolean addToBackStack) {
+    private void switchMainFragmentToTourDownloadAreaSelection(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        TourDownloadFragment downloadFragment = (TourDownloadFragment) fragmentManager.findFragmentByTag(TOUR_DOWNLOAD_FRAGMENT_TAG);
+        TourDownloadAreaSelectionFragment downloadFragment = (TourDownloadAreaSelectionFragment) fragmentManager.findFragmentByTag(TOUR_DOWNLOAD_FRAGMENT_TAG);
         if (downloadFragment == null) {
-            downloadFragment = new TourDownloadFragment();
+            downloadFragment = new TourDownloadAreaSelectionFragment();
         }
         setupFragmentAsMainFragment(downloadFragment, TOUR_DOWNLOAD_FRAGMENT_TAG, addToBackStack);
-        return downloadFragment;
     }
 
     // replace the fragment and add (if wished) add this action to the transaction back stack
@@ -416,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
                 toggleNavDrawerItemToExploreMap(false, null);
                 break;
             case LOAD_TOUR:
-                switchMainFragmentToTourDownload(true);
+                switchMainFragmentToTourDownloadAreaSelection(true);
                 toggleNavDrawerItemToExploreMap(false, null);
                 break;
             case ABOUT:

@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.DownloadCallback;
@@ -93,15 +94,11 @@ public class TourRecordAdapter extends ArrayAdapter<TourRecord> {
         }
     }
 
-    private final DataFacade data;
-
     private final Activity activity;
 
-    public TourRecordAdapter(Activity activity, ArrayList<TourRecord> records) {
-        super(activity, 0, records);
+    TourRecordAdapter(Activity activity, List<TourRecord> records) {
+        super(activity, 0, records.toArray(new TourRecord[records.size()]));
         this.activity = activity;
-        this.data = new DataFacade(activity);
-
     }
 
     @NonNull

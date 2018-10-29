@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
@@ -14,6 +15,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import de.historia_app.ErrUtil;
 import de.historia_app.mappables.TourOnMap;
@@ -239,4 +242,21 @@ public class DatabaseDataProvider {
         return result;
     }
 
+
+    public Set<Long> getTourIdsInArea(long areaId) {
+        QueryBuilder<Tour, Long> builder = dbHelper.getTourDao().queryBuilder();
+        Set<Long> result = new TreeSet<>();
+        try {
+            GenericRawResults<String[]> results = builder.selectColumns("id").where().eq("area", areaId).queryRaw();
+            for (String[] row : results.getResults()) {
+                if (row != null && row.length == 1) {
+                    result.add(Long.valueOf(row[0]));
+                }
+            }
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
+            result = Collections.emptySet();
+        }
+        return result;
+    }
 }
