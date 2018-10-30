@@ -120,12 +120,24 @@ public class TourDownloadAreaSelectionFragment extends Fragment implements MainA
         }
 
         private String descriptionLine(AreaDownloadStatus status) {
-            String template = "%d/%d installiert (%.2f MB)";
+            return descriptionLineInstalledToursPart(status)
+                    + descriptionLineDownloadSizePart(status.getDownloadedToursSize());
+        }
+
+        private String descriptionLineInstalledToursPart(AreaDownloadStatus status) {
+            String template = "%d/%d installiert";
             return String.format(Locale.getDefault(), template,
                     status.getDownloadedToursAmount(),
-                    status.getAvailableToursAmount(),
-                    (status.getDownloadedToursSize() / 1000000.0));
+                    status.getAvailableToursAmount());
+        }
 
+        private String descriptionLineDownloadSizePart(long size) {
+            if (size == 0L) {
+                return "";
+            } else {
+                String template = " (%.2f MB)";
+                return String.format(Locale.getDefault(), template, (size / 1000000.0));
+            }
         }
     }
 }
