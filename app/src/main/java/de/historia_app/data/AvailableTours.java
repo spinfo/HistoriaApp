@@ -2,13 +2,15 @@ package de.historia_app.data;
 
 
 import android.content.Context;
-import android.provider.ContactsContract;
 
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -59,7 +61,20 @@ public class AvailableTours {
         for (long areaId : getAreaIds()) {
             result.add(buildAreaDownloadStatus(context, areaId));
         }
+        sortAreaDownloadStatus(result);
         return result;
+    }
+
+    private void sortAreaDownloadStatus(List<AreaDownloadStatus> list) {
+        Collections.sort(list, new Comparator<AreaDownloadStatus>() {
+            final Collator collator = Collator.getInstance(Locale.getDefault());
+            @Override
+            public int compare(AreaDownloadStatus o1, AreaDownloadStatus o2) {
+                String s1 = o1.getName() == null ? "" : o1.getName();
+                String s2 = o2.getName() == null ? "" : o2.getName();
+                return collator.compare(s1, s2);
+            }
+        });
     }
 
     private String getName(long areaId) {
