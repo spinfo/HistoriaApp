@@ -85,7 +85,18 @@ public class SceneLoader implements Serializable {
         } else {
             File file = fileService.getFile(base);
             if(file.exists()) {
-                Bitmap bm = BitmapFactory.decodeFile(file.getPath());
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                int inSampleSize = 1;
+                Bitmap bm = null;
+                while (bm == null) {
+                    try {
+                        options.inSampleSize = inSampleSize;
+                        bm = BitmapFactory.decodeFile(file.getPath(), options);
+                    } catch (OutOfMemoryError e) {
+                        Log.e(LOG_TAG, e.toString());
+                        inSampleSize *= 2;
+                    }
+                }
                 sceneView.setImageBitmap(bm);
             } else {
                 Log.w(LOG_TAG, "No file for basename: " + base);
