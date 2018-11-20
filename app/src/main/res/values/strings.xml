@@ -8,6 +8,7 @@
     <string name="extra_key_popup_obj_id">popup_obj_id</string>
     <string name="extra_key_simple_web_view_data">simple_web_view_data</string>
     <string name="extra_key_restart_error_message">restart_error_message</string>
+    <string name="extra_key_map_fragment_action">mapfragment_action</string>
 
     <!-- General names -->
     <string name="name_mapstop">Station</string>
@@ -24,7 +25,9 @@
     <string name="menu_explore_data">Lesemodus</string>
     <string name="menu_download_tours">Touren laden</string>
     <string name="menu_options_general">Optionen</string>
-    <string name="menu_about">Über uns</string>
+    <string name="menu_about">Über die App</string>
+    <string name="menu_impressum">Impressum</string>
+    <string name="menu_privacy">Datenschutz</string>
 
     <!-- Strings for the dialog popup -->
     <string name="dialog_popup_ok">OK</string>
@@ -69,7 +72,7 @@
     <string name="lexicon">Lexikon</string>
     <string name="no_lexicon_entries">Keine Lexikon-Einträge vorhanden</string>
 
-    <!-- Symbolic strings -->
+    <!-- Strings describing symbols -->
     <string name="right_arrow">➡</string>
     <string name="map_overview_close_symbol">✕</string>
     <string name="keyboard_arrow_down_descriptor">A downwards facing arrowhead.</string>

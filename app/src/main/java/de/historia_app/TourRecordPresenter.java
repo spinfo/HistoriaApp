@@ -63,7 +63,7 @@ public class TourRecordPresenter {
     }
 
     private String updateText() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         return dateFormat.format(new Date(record.getVersionMillis()));
     }
 

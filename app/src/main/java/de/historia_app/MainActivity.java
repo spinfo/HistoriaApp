@@ -55,7 +55,7 @@ import de.historia_app.mappables.PlaceOnMap;
  *      - an ExploreDataFragment to display tours and stops etc, but not on a map
  *      - a TourDownloadFragment to download new tours
  */
-public class MainActivity extends AppCompatActivity implements OnModelSelectionListener {
+public class MainActivity extends AppCompatActivity implements OnModelSelectionListener, MapActionProvider {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -75,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
 
     // the normal toolbar title (i.e. when the drawer is not toggled)
     private String defaultToolbarTitle;
+
+    // the next action that we should communicate to the map fragment
+    private MapFragment.MapAction nexMapAction = MapFragment.MapAction.UNDEFINED;
 
     // an interface for the Fragments created by this class
     interface MainActivityFragment {
@@ -183,9 +186,9 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         if (mapFragment == null) {
             mapFragment = new MapFragment();
         }
-
         // setup this activity to listen to selections made from the map fragment
         mapFragment.setOnModelSelectionListener(this);
+        mapFragment.mapActionProvider = this;
         setupFragmentAsMainFragment(mapFragment, MAP_FRAGMENT_TAG, addToBackStack);
         return mapFragment;
     }
@@ -360,35 +363,15 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
     private ArrayList<NavDrawerItem> createDefaultNavDrawerItems() {
         final NavDrawerItem[] navItems = {
                 new NavDrawerItem(NavDrawerItem.ID.SELECT_AREA, getString(R.string.menu_select_area), false),
+                new NavDrawerItem(NavDrawerItem.ID.EXPLORE_AREA, getString(R.string.menu_explore_area), false),
                 new NavDrawerItem(NavDrawerItem.ID.SELECT_TOUR, getString(R.string.menu_select_tour), false),
                 new NavDrawerItem(NavDrawerItem.ID.EXPLORE_DATA, getString(R.string.menu_explore_data), false),
                 new NavDrawerItem(NavDrawerItem.ID.LOAD_TOUR, getString(R.string.menu_download_tours), false),
                 new NavDrawerItem(NavDrawerItem.ID.ABOUT, getString(R.string.menu_about), false),
-                new NavDrawerItem(NavDrawerItem.ID.IMPRESSUM, "Impressum", false),
-                new NavDrawerItem(NavDrawerItem.ID.PRIVACY_POLICY, "Datenschutz", false)
+                new NavDrawerItem(NavDrawerItem.ID.IMPRESSUM, getString(R.string.menu_impressum), false),
+                new NavDrawerItem(NavDrawerItem.ID.PRIVACY_POLICY, getString(R.string.menu_privacy), false)
         };
-
         return new ArrayList<>(Arrays.asList(navItems));
-    }
-
-    private void toggleNavDrawerItemToExploreMap(boolean enable, Area area) {
-        if(navDrawerAdapter == null || navDrawerAdapter.getItem(1) == null) {
-            Log.e(LOG_TAG, "Drawer items not or wrongly initialized");
-            return;
-        }
-
-        boolean itemIsPresent = (navDrawerAdapter.getItem(1).getId() == NavDrawerItem.ID.EXPLORE_AREA);
-
-        if(enable && !itemIsPresent) {
-            final String title = getString(R.string.menu_explore_area);
-            final NavDrawerItem item  = new NavDrawerItem(NavDrawerItem.ID.EXPLORE_AREA, title, true);
-            item.setRelatedObject(area);
-            navDrawerItems.add(1, item);
-            navDrawerAdapter.notifyDataSetChanged();
-        } else if(!enable && itemIsPresent) {
-            navDrawerItems.remove(1);
-            navDrawerAdapter.notifyDataSetChanged();
-        }
     }
 
     // React to a click on a nav drawer item
@@ -397,31 +380,24 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
             Log.e(LOG_TAG, "No drawer item to select");
             return;
         }
-        final MapFragment mapFragment;
 
         switch (item.getId()) {
             case SELECT_AREA:
-                mapFragment = switchMainFragmentToMap(true);
-                mapFragment.showAreaSelection();
+                showMapFragmentAndDo(MapFragment.MapAction.SHOW_AREA_SELECTION);
                 break;
             case EXPLORE_AREA:
-                mapFragment = switchMainFragmentToMap(true);
-                mapFragment.onAreaSelected((Area) item.getRelatedObject());
+                showMapFragmentAndDo(MapFragment.MapAction.DISPLAY_CURRENT_AREA);
                 break;
             case SELECT_TOUR:
-                mapFragment = switchMainFragmentToMap(true);
-                mapFragment.showTourSelection();
+                showMapFragmentAndDo(MapFragment.MapAction.SHOW_TOUR_SELECTION);
                 break;
             case EXPLORE_DATA:
                 switchMainFragmentToExploreData(true);
-                toggleNavDrawerItemToExploreMap(false, null);
                 break;
             case LOAD_TOUR:
                 switchMainFragmentToTourDownloadAreaSelection(true);
-                toggleNavDrawerItemToExploreMap(false, null);
                 break;
             case ABOUT:
-                toggleNavDrawerItemToExploreMap(false, null);
                 final Intent intent = new Intent(MainActivity.this, AboutPageAcitvity.class);
                 MainActivity.this.startActivity(intent);
                 break;
@@ -437,6 +413,16 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         }
 
         mDrawerLayout.closeDrawers();
+    }
+
+    private void showMapFragmentAndDo(MapFragment.MapAction action) {
+        nexMapAction = action;
+        MapFragment mapFragment = switchMainFragmentToMap(true);
+        // if the map fragment is already visible the action is directly induced, else the fragment
+        // will call for the action and execute it on it's own time
+        if (mapFragment.isVisible()) {
+            mapFragment.setupMapAccordingToAction();
+        }
     }
 
     private void startSimpleWebViewActivityWithAsset(String assetName) {
@@ -480,14 +466,11 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         if(area != null) {
             this.setDefaultActionBarTitleWithSuffix(area.getName());
         }
-        // disable the nav drawer item to explore the current map
-        toggleNavDrawerItemToExploreMap(false, null);
     }
 
     @Override
     public void onTourSelected(Tour tour) {
-        // setup the nav drawer item to explore the current map
-        toggleNavDrawerItemToExploreMap(true, tour.getArea());
+        // do nothing
     }
 
     @Override
@@ -503,6 +486,14 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
     @Override
     public void onMapstopSwitched(int position) {
         // do nothing
+    }
+
+    @Override
+    public MapFragment.MapAction nextAction() {
+        // an action is only communicated once, then turned to the default again
+        MapFragment.MapAction result = nexMapAction;
+        nexMapAction = MapFragment.MapAction.UNDEFINED;
+        return result;
     }
 
     public Fragment getVisibleFragment(){

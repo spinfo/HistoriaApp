@@ -46,6 +46,12 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
     private static final String LOGTAG = MapFragment.class.getSimpleName();
 
+    protected enum MapAction {
+        UNDEFINED, SHOW_AREA_SELECTION, SHOW_TOUR_SELECTION, DISPLAY_CURRENT_AREA
+    }
+
+    protected MapActionProvider mapActionProvider;
+
     // the state of the map view that will be persisted on view destruction/after closing the app
     public static class MapState {
         Area area;
@@ -116,29 +122,12 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         };
         state.map.getOverlays().add(touchOverlay);
 
-        // initialize from saved preferences or else start with the default tour
+        // initialize from saved preferences or else start with defaults
         try {
             MapStatePersistence.load(state, getPrefs(), data, this.getContext());
-            switchTourOverlays(state.toursOnMap);
-            if (state.placeTapped != null) {
-                reopenInfoWindowFor(state.placeTapped, state.mapstopSwitchedPos);
-            }
-            Log.d(LOGTAG, "Loaded state from prefs.");
         } catch (MapStatePersistence.InconsistentMapStateException e) {
             Log.d(LOGTAG, "Could not load map state. Will use defaults. Message: " + e.message);
-            List<Overlay> tourOverlays = Collections.emptyList();
-            final Tour defaultTour = data.getDefaultTour();
-            if(defaultTour != null) {
-                state.area = defaultTour.getArea();
-                tourOverlays = switchTourOverlays(new TourOnMap(defaultTour));
-            }
-            if(tourOverlays.isEmpty()) {
-                Log.w(LOGTAG, "No overlays to zoom to, using default.");
-                state.area = data.getDefaultArea();
-                MapUtil.zoomToDefaultLocation(state.map);
-            } else {
-                MapUtil.zoomToOverlays(state.map, tourOverlays);
-            }
+            setupMapForDefaultView();
         }
 
         // pass the now selected area up to the model selection listener
@@ -182,6 +171,7 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
     public void onResume() {
         super.onResume();
         mapUpdatingGpsLocationProvider.resumeListeningForLocationUpdates();
+        setupMapAccordingToAction();
     }
 
     // This saves data not being needed between complete restarts (e.g. the open popup) and
@@ -195,6 +185,52 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
 
         // dismiss the active popup, else it will be memory-leaked
         popupManager.dismissActivePopup();
+    }
+
+    public void setupMapAccordingToAction() {
+        setMapToState();
+        if (mapActionProvider == null) {
+            Log.w(LOGTAG, "No action provided.");
+        } else {
+            MapAction nextAction = mapActionProvider.nextAction();
+            Log.d(LOGTAG, "next map action: " + nextAction);
+            switch (nextAction) {
+                case SHOW_TOUR_SELECTION:
+                    showTourSelection();
+                    break;
+                case SHOW_AREA_SELECTION:
+                    showAreaSelection();
+                    break;
+                case DISPLAY_CURRENT_AREA:
+                    displayCurrentArea();
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private void setMapToState() {
+        switchTourOverlays(state.toursOnMap);
+        if (state.placeTapped != null) {
+            reopenInfoWindowFor(state.placeTapped, state.mapstopSwitchedPos);
+        }
+    }
+
+    private void setupMapForDefaultView() {
+        List<Overlay> tourOverlays = Collections.emptyList();
+        final Tour defaultTour = data.getDefaultTour();
+        if(defaultTour != null) {
+            state.area = defaultTour.getArea();
+            tourOverlays = switchTourOverlays(new TourOnMap(defaultTour));
+        }
+        if(tourOverlays.isEmpty()) {
+            Log.w(LOGTAG, "No overlays to zoom to, using default.");
+            state.area = data.getDefaultArea();
+            MapUtil.zoomToDefaultLocation(state.map);
+        } else {
+            MapUtil.zoomToOverlays(state.map, tourOverlays);
+        }
     }
 
     private SharedPreferences getPrefs() {
@@ -331,15 +367,28 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
         }
     }
 
-    public void showTourSelection() {
+    private void showTourSelection() {
         if(state.area == null) {
             ErrUtil.failInDebug(LOGTAG, "No area given to select tours for.");
         }
         popupManager.showTourSelection(state.area, this);
     }
 
-    public void showAreaSelection() {
+    private void showAreaSelection() {
         popupManager.showAreaSelection(this);
+    }
+
+    private void displayCurrentArea() {
+        if (!isDisplayingArea() && state.area != null) {
+            onAreaSelected(state.area);
+        }
+    }
+
+    private boolean isDisplayingArea() {
+        if (state.toursOnMap == null) {
+            return  false;
+        }
+        return state.toursOnMap.size() > 1;
     }
 
     @Override

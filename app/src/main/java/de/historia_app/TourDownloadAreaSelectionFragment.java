@@ -129,7 +129,7 @@ public class TourDownloadAreaSelectionFragment extends Fragment implements MainA
         }
 
         private String lastUpdateLine(AreaDownloadStatus status) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY", Locale.getDefault());
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
             return dateFormat.format(new Date(status.getLastVersionMillis()));
         }
 
