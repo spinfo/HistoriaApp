@@ -12,6 +12,8 @@ public class AreaDownloadStatus {
 
     private long downloadedToursSize;
 
+    private long lastVersion;
+
     AreaDownloadStatus(long areaId) {
         this.areaId = areaId;
         this.name = "";
@@ -53,5 +55,17 @@ public class AreaDownloadStatus {
 
     void setDownloadedToursSize(long downloadedToursSize) {
         this.downloadedToursSize = downloadedToursSize;
+    }
+
+    public long getLastVersion() {
+        return lastVersion;
+    }
+
+    public long getLastVersionMillis() {
+        return lastVersion * 1000;
+    }
+
+    void setLastVersion(long lastVersion) {
+        this.lastVersion = lastVersion;
     }
 }

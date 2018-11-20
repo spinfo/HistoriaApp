@@ -15,6 +15,14 @@
         />
 
     <TextView
+        android:id="@+id/tour_record_version"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/listViewTextItem"
+        android:textSize="12sp"
+        />
+
+    <TextView
         android:id="@+id/tour_record_essentials"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

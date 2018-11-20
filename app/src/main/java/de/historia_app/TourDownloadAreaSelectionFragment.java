@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 
@@ -104,9 +111,11 @@ public class TourDownloadAreaSelectionFragment extends Fragment implements MainA
             }
 
             TextView titleView = convertView.findViewById(R.id.tour_download_area_meta_title_line);
+            TextView lastUpdateView = convertView.findViewById(R.id.tour_download_area_meta_last_update);
             TextView descView = convertView.findViewById(R.id.tour_download_area_meta_description);
 
             titleView.setText(status.getName());
+            lastUpdateView.setText(lastUpdateLine(status));
             descView.setText(descriptionLine(status));
 
             convertView.setOnClickListener(new View.OnClickListener() {
@@ -117,6 +126,11 @@ public class TourDownloadAreaSelectionFragment extends Fragment implements MainA
             });
 
             return convertView;
+        }
+
+        private String lastUpdateLine(AreaDownloadStatus status) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY", Locale.getDefault());
+            return dateFormat.format(new Date(status.getLastVersionMillis()));
         }
 
         private String descriptionLine(AreaDownloadStatus status) {

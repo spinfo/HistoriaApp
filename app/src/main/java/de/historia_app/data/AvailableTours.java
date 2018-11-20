@@ -67,12 +67,9 @@ public class AvailableTours {
 
     private void sortAreaDownloadStatus(List<AreaDownloadStatus> list) {
         Collections.sort(list, new Comparator<AreaDownloadStatus>() {
-            final Collator collator = Collator.getInstance(Locale.getDefault());
             @Override
             public int compare(AreaDownloadStatus o1, AreaDownloadStatus o2) {
-                String s1 = o1.getName() == null ? "" : o1.getName();
-                String s2 = o2.getName() == null ? "" : o2.getName();
-                return collator.compare(s1, s2);
+                return -1 * (Long.valueOf(o1.getLastVersion()).compareTo(o2.getLastVersion()));
             }
         });
     }
@@ -90,16 +87,21 @@ public class AvailableTours {
 
         int tours = 0;
         int size = 0;
+        long lastVersion = 0;
         for (TourRecord record : records) {
             if (installedIds.contains(record.getTourId())) {
                 tours += 1;
                 size += record.getDownloadSize();
+            }
+            if (lastVersion < record.getVersion()) {
+                lastVersion = record.getVersion();
             }
         }
         result.setDownloadedToursAmount(tours);
         result.setDownloadedToursSize(size);
         result.setName(getName(areaId));
         result.setAvailableToursAmount(availableToursAmount(areaId));
+        result.setLastVersion(lastVersion);
 
         return result;
     }

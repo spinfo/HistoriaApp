@@ -5,8 +5,11 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import de.historia_app.data.AreaDownloadStatus;
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.TourRecord;
 
@@ -50,7 +53,7 @@ public class TourRecordPresenter {
         return record.getName();
     }
 
-    public String essentialsText() {
+    private String essentialsText() {
         StringBuilder sb = new StringBuilder();
         sb.append(record.getAreaName());
         sb.append(" - (");
@@ -59,11 +62,19 @@ public class TourRecordPresenter {
         return sb.toString();
     }
 
+    private String updateText() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY", Locale.getDefault());
+        return dateFormat.format(new Date(record.getVersionMillis()));
+    }
+
     public void populateTextAreaView(View view) {
-        TextView nameView = (TextView) view.findViewById(R.id.tour_record_name);
+        TextView nameView = view.findViewById(R.id.tour_record_name);
         nameView.setText(title());
 
-        TextView essentialsView = (TextView) view.findViewById(R.id.tour_record_essentials);
+        TextView updateView = view.findViewById(R.id.tour_record_version);
+        updateView.setText(updateText());
+
+        TextView essentialsView = view.findViewById(R.id.tour_record_essentials);
         essentialsView.setText(essentialsText());
     }
 

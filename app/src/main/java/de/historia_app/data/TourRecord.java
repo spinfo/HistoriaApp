@@ -52,6 +52,10 @@ public class TourRecord {
         return version;
     }
 
+    public long getVersionMillis() {
+        return version * 1000;
+    }
+
     public void setVersion(long version) {
         this.version = version;
     }
