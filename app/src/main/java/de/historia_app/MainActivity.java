@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.historia_app.data.Area;
+import de.historia_app.data.AssetHelper;
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.FileService;
 import de.historia_app.data.Tour;
@@ -362,7 +363,9 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
                 new NavDrawerItem(NavDrawerItem.ID.SELECT_TOUR, getString(R.string.menu_select_tour), false),
                 new NavDrawerItem(NavDrawerItem.ID.EXPLORE_DATA, getString(R.string.menu_explore_data), false),
                 new NavDrawerItem(NavDrawerItem.ID.LOAD_TOUR, getString(R.string.menu_download_tours), false),
-                new NavDrawerItem(NavDrawerItem.ID.ABOUT, getString(R.string.menu_about), false)
+                new NavDrawerItem(NavDrawerItem.ID.ABOUT, getString(R.string.menu_about), false),
+                new NavDrawerItem(NavDrawerItem.ID.IMPRESSUM, "Impressum", false),
+                new NavDrawerItem(NavDrawerItem.ID.PRIVACY_POLICY, "Datenschutz", false)
         };
 
         return new ArrayList<>(Arrays.asList(navItems));
@@ -422,6 +425,12 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
                 final Intent intent = new Intent(MainActivity.this, AboutPageAcitvity.class);
                 MainActivity.this.startActivity(intent);
                 break;
+            case IMPRESSUM:
+                startSimpleWebViewActivityWithAsset(getString(R.string.asset_impressum));
+                break;
+            case PRIVACY_POLICY:
+                startSimpleWebViewActivityWithAsset(getString(R.string.asset_privacy));
+                break;
             default:
                 Toast.makeText(this, "Selected: " + item.getTitle(), Toast.LENGTH_SHORT).show();
                 break;
@@ -429,6 +438,14 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
 
         mDrawerLayout.closeDrawers();
     }
+
+    private void startSimpleWebViewActivityWithAsset(String assetName) {
+        final Intent intent = new Intent(MainActivity.this, SimpleWebViewActivity.class);
+        final String data = AssetHelper.readAsset(MainActivity.this, assetName);
+        intent.putExtra(getString(R.string.extra_key_simple_web_view_data), data);
+        MainActivity.this.startActivity(intent);
+    }
+
     // END drawer menu
 
     @Override

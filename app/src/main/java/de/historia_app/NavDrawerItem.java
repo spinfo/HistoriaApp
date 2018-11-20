@@ -11,7 +11,9 @@ public class NavDrawerItem {
         SELECT_TOUR,
         EXPLORE_DATA,
         LOAD_TOUR,
-        ABOUT
+        ABOUT,
+        IMPRESSUM,
+        PRIVACY_POLICY
     }
 
     private final ID id;

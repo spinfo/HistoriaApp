@@ -77,6 +77,8 @@
     <!-- Filenames -->
     <string name="asset_app_article_styles">app-article.css</string>
     <string name="asset_about_page">about_page.html</string>
+    <string name="asset_privacy">privacy_policy.html</string>
+    <string name="asset_impressum">impressum.html</string>
 
     <!-- content descriptions for tour downloads -->
     <string name="download_icon_general_description">Tour-Status unbekannt</string>
