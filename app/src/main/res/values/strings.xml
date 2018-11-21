@@ -21,9 +21,9 @@
     <string name="menu_title">Menü</string>
     <string name="menu_select_area">Karte wechseln</string>
     <string name="menu_explore_area">Karte erkunden</string>
-    <string name="menu_select_tour">Touren wählen</string>
-    <string name="menu_explore_data">Lesemodus</string>
-    <string name="menu_download_tours">Touren laden</string>
+    <string name="menu_select_tour">Tour starten</string>
+    <string name="menu_explore_data">Bibliothek</string>
+    <string name="menu_download_tours">Magazin</string>
     <string name="menu_options_general">Optionen</string>
     <string name="menu_about">Über die App</string>
     <string name="menu_impressum">Impressum</string>
