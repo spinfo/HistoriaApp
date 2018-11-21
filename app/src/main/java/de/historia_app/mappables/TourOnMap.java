@@ -1,6 +1,7 @@
 package de.historia_app.mappables;
 
 import com.j256.ormlite.field.DatabaseField;
+
 import de.historia_app.data.Tour;
 
 /**

@@ -14,7 +14,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-
 import de.historia_app.ErrUtil;
 
 public class FileService {

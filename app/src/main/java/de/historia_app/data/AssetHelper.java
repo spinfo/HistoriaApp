@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import de.historia_app.App;
-import de.historia_app.R;
-
 public class AssetHelper {
 
     private static final String TAG = AssetHelper.class.getSimpleName();

@@ -28,14 +28,13 @@ import de.historia_app.data.DataFacade;
 import de.historia_app.data.Mapstop;
 import de.historia_app.data.Tour;
 
-import static android.support.test.espresso.matcher.ViewMatchers.*;
-import static android.support.test.espresso.assertion.ViewAssertions.*;
-import static android.support.test.espresso.action.ViewActions.*;
 import static android.support.test.espresso.Espresso.*;
-import static java.lang.Thread.sleep;
-import static org.hamcrest.Matchers.*;
-
-import static org.junit.Assert.*;
+import static android.support.test.espresso.action.ViewActions.*;
+import static android.support.test.espresso.assertion.ViewAssertions.*;
+import static android.support.test.espresso.matcher.ViewMatchers.*;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Instrumentation test, which will execute on an Android device.

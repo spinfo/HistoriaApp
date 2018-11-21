@@ -1,25 +1,16 @@
 package de.historia_app;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import java.util.List;
 
 import de.historia_app.data.AvailableTours;
 import de.historia_app.data.AvailableToursDownloadCallback;
-import de.historia_app.data.ServerResponseReader;
-import de.historia_app.data.DownloadCallback;
 import de.historia_app.data.DownloadStringTask;
-import de.historia_app.data.TourRecord;
 import de.historia_app.data.UrlSchemes;
 
 public class TourDownloadFragment extends Fragment implements MainActivity.MainActivityFragment {

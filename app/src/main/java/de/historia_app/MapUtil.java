@@ -18,10 +18,7 @@ import org.osmdroid.views.overlay.Polyline;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.historia_app.data.Mapstop;
-import de.historia_app.data.Tour;
 import de.historia_app.mappables.PlaceOnMap;
-import de.historia_app.mappables.TourOnMap;
 
 public abstract class MapUtil {
 

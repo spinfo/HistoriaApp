@@ -13,10 +13,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.historia_app.data.Area;
 import de.historia_app.data.DataFacade;
