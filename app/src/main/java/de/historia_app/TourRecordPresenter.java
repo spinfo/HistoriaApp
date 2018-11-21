@@ -2,14 +2,11 @@ package de.historia_app;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import de.historia_app.data.AreaDownloadStatus;
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.TourRecord;
 
@@ -62,9 +59,9 @@ public class TourRecordPresenter {
         return sb.toString();
     }
 
-    private String updateText() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        return dateFormat.format(new Date(record.getVersionMillis()));
+    public static String updateText(long timestamp) {
+        Date d = new Date(timestamp);
+        return String.format(Locale.getDefault(), "Update: %td.%tm.%tY", d, d, d);
     }
 
     public void populateTextAreaView(View view) {
@@ -72,7 +69,7 @@ public class TourRecordPresenter {
         nameView.setText(title());
 
         TextView updateView = view.findViewById(R.id.tour_record_version);
-        updateView.setText(updateText());
+        updateView.setText(updateText(record.getVersionSeconds()));
 
         TextView essentialsView = view.findViewById(R.id.tour_record_essentials);
         essentialsView.setText(essentialsText());

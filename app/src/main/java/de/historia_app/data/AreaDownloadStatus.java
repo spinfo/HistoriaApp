@@ -61,7 +61,7 @@ public class AreaDownloadStatus {
         return lastVersion;
     }
 
-    public long getLastVersionMillis() {
+    public long getLastVersionSeconds() {
         return lastVersion * 1000;
     }
 

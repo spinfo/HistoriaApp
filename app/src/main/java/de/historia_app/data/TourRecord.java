@@ -52,7 +52,7 @@ public class TourRecord {
         return version;
     }
 
-    public long getVersionMillis() {
+    public long getVersionSeconds() {
         return version * 1000;
     }
 
