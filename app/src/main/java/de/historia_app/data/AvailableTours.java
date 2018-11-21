@@ -67,9 +67,13 @@ public class AvailableTours {
 
     private void sortAreaDownloadStatus(List<AreaDownloadStatus> list) {
         Collections.sort(list, new Comparator<AreaDownloadStatus>() {
+            final Collator collator = Collator.getInstance(Locale.getDefault());
+
             @Override
             public int compare(AreaDownloadStatus o1, AreaDownloadStatus o2) {
-                return -1 * (Long.valueOf(o1.getLastVersion()).compareTo(o2.getLastVersion()));
+                String s1 = o1.getName() == null ? "" : o1.getName();
+                String s2 = o2.getName() == null ? "" : o2.getName();
+                return collator.compare(s1, s2);
             }
         });
     }
