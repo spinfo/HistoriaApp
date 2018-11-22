@@ -6,6 +6,7 @@ import com.j256.ormlite.field.ForeignCollectionField;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -14,13 +15,14 @@ import java.util.List;
 /**
  * Data object for a Tour which is part of an area and contains Mapstops
  */
-public class Tour {
+public class Tour implements Serializable {
 
     public enum Type {
         RoundTour,
         Tour,
         PublicTransportTour,
-        BikeTour;
+        BikeTour,
+        IndoorTour;
 
         private String representation;
 
@@ -29,6 +31,7 @@ public class Tour {
             Tour.representation = "Spaziergang";
             PublicTransportTour.representation = "ÖPNV-Tour";
             BikeTour.representation = "Fahrrad-Tour";
+            IndoorTour.representation = "Indoor-Tour";
         }
 
         public String getRepresentation() {
@@ -48,6 +51,9 @@ public class Tour {
 
     @ForeignCollectionField(columnName = "mapstops")
     private Collection<Mapstop> mapstops;
+
+    @ForeignCollectionField(columnName = "scenes")
+    private Collection<Scene> scenes;
 
     @DatabaseField(columnName = "area", foreign = true, foreignAutoRefresh = true)
     private Area area;
@@ -93,7 +99,7 @@ public class Tour {
 
     protected Tour() {}
 
-    public Tour(String name, List<Mapstop> mapstops, Type type, long id, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author, String introduction, List<PersistentGeoPoint> track) {
+    public Tour(String name, List<Mapstop> mapstops, Type type, long id, int walkLength, int duration, String tagWhat, String tagWhen, String tagWhere, Date createdAt, String accessibility, String author, String introduction, List<PersistentGeoPoint> track, List<Scene> scenes) {
         this.name = name;
         this.mapstops = mapstops;
         this.type = type;
@@ -108,6 +114,7 @@ public class Tour {
         this.author = author;
         this.intro = introduction;
         this.track = track;
+        this.scenes = scenes;
     }
 
     public long getId() {
@@ -140,6 +147,14 @@ public class Tour {
 
     public void setMapstops(Collection<Mapstop> mapstops) {
         this.mapstops = mapstops;
+    }
+
+    public List<Scene> getScenes() {
+        return new ArrayList<>(scenes);
+    }
+
+    public void setScenes(Collection<Scene> scenes) {
+        this.scenes = scenes;
     }
 
     public Area getArea() {
@@ -265,4 +280,6 @@ public class Tour {
     void setLexiconEntries(List<LexiconEntry> lexiconEntries) {
         this.lexiconEntries = lexiconEntries;
     }
+
+    public boolean isIndoor() { return this.type == Tour.Type.IndoorTour; }
 }

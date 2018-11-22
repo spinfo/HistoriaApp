@@ -13,9 +13,28 @@ import java.util.List;
  */
 public class Mapstop {
 
+    public enum Type {
+        Info,
+        Route;
+
+        private String representation;
+
+        static {
+            Info.representation = "info";
+            Route.representation = "route";
+        }
+
+        public String getRepresentation() {
+            return representation;
+        }
+    };
+
     // server id of the mapstop
     @DatabaseField(columnName = "id", id = true, dataType = DataType.LONG)
     private long id;
+
+    @DatabaseField(columnName = "pos")
+    private int pos;
 
     // the place the mapstop is displayed on
     @DatabaseField(columnName = "place", foreign = true, foreignAutoRefresh = true)
@@ -24,6 +43,18 @@ public class Mapstop {
     // the tour the mapstop belongs to
     @DatabaseField(columnName = "tour", foreign = true, foreignAutoRefresh = true)
     private Tour tour;
+
+    // the scene the mapstop belongs to
+    @DatabaseField(columnName = "scene", foreign = true, foreignAutoRefresh = true)
+    private Scene scene;
+
+    // mapstop type for indoor tour scenes
+    @DatabaseField(columnName = "type")
+    private String type;
+
+    // the coordinate the mapstop belongs to
+    @DatabaseField(columnName = "coordinate", foreign = true, foreignAutoRefresh = true)
+    private Coordinate coordinate;
 
     // the mapstops name as shown to the user
     @DatabaseField(columnName = "name")
@@ -48,6 +79,14 @@ public class Mapstop {
         this.id = id;
     }
 
+    public int getPos() {
+        return pos;
+    }
+
+    public void setPos(int pos) {
+        this.pos = pos;
+    }
+
     public Place getPlace() {
         return place;
     }
@@ -63,6 +102,26 @@ public class Mapstop {
     public void setTour(Tour tour) {
         this.tour = tour;
     }
+
+    public Scene getScene() {
+        return scene;
+    }
+
+    public void setScene(Scene scene) {
+        this.scene = scene;
+    }
+
+    public Coordinate getCoordinate() {
+        return coordinate;
+    }
+
+    public void setCoordinate(Coordinate coordinate) { this.coordinate = coordinate; }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) { this.type = type; }
 
     public String getName() {
         return name;
@@ -92,8 +151,14 @@ public class Mapstop {
         this.pages = pages;
     }
 
+    public boolean hasPages() { return this.pages != null && this.getPageAmount() > 0; }
+
     // pages are 1-indexed in the views. Check that the page exists
     public boolean hasPage(int pageNo) {
         return (pageNo <= this.getPageAmount() && pageNo > 0);
+    }
+
+    public boolean isFirstInScene() {
+        return scene.getMapstops().get(0).getId() == getId();
     }
 }

@@ -1,5 +1,6 @@
 package de.historia_app;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -20,6 +21,7 @@ import de.historia_app.data.Area;
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.Mapstop;
 import de.historia_app.data.Tour;
+import de.historia_app.data.Scene;
 
 public class MapPopupManager {
 
@@ -241,10 +243,13 @@ public class MapPopupManager {
     }
 
     private void setBackgroundDimmed(boolean shallDim) {
-        if (shallDim) {
-            surface.getForeground().setAlpha(200);
-        } else {
-            surface.getForeground().setAlpha(0);
+        Drawable foreground = surface.getForeground();
+        if (foreground != null) {
+            if (shallDim) {
+                foreground.setAlpha(200);
+            } else {
+                foreground.setAlpha(0);
+            }
         }
     }
 

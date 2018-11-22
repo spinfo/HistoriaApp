@@ -6,10 +6,13 @@ public abstract class UrlSchemes {
 
     private static final String LOG_TAG = UrlSchemes.class.getSimpleName();
 
+    // todo : change back
     public static final String SERVER_BASE_URI =
-            "https://historia-app.de/wp-content/uploads/smart-history-tours";
+            //"https://historia-app.de/wp-content/uploads/smart-history-tours";
+            "http://historia.ililil.co/wp-content/uploads/smart-history-tours";
+            //"http://10.0.2.2:8000/wp-content/uploads/smart-history-tours";
 
-    public static final String AVAILABLE_TOURS_URL = SERVER_BASE_URI + "/tours.yaml";
+    public static final String AVAILABLE_TOURS_URL = SERVER_BASE_URI + "/tours.v2.yaml";
 
     public static final String LEXICON = "lexicon://";
 

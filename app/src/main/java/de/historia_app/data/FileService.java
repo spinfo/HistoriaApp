@@ -1,6 +1,9 @@
 package de.historia_app.data;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.util.Log;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -65,24 +68,28 @@ public class FileService {
     public boolean initializeExampleDataIfNeeded() {
         DataFacade data = new DataFacade(context);
         if (data.getDefaultTour() == null) {
-            return initializeExampleData();
+            return initializeExampleData("example-tour.zip");
         } else {
             return true;
         }
     }
 
-    public boolean initializeExampleData() {
+    public boolean initializeExampleData(String filename) {
         try {
             // Read the assets file to a temp file
             File temp = File.createTempFile(TOUR_FILE_PREFIX, "", context.getCacheDir());
             FileOutputStream outputStream = new FileOutputStream(temp);
-            InputStream exampleIs = context.getAssets().open("example-tour.zip");
+            InputStream exampleIs = context.getAssets().open(filename);
             copy(exampleIs, outputStream);
             outputStream.close();
 
             // Create a dummy tour record so that the tour file can be found
             TourRecord record = new TourRecord();
-            record.setVersion(0L);
+            if (filename.equals("example-indoor-tour.zip")) {
+                record.setVersion(1L);
+            } else {
+                record.setVersion(0L);
+            }
             record.setAreaId(0L);
 
             // hand everything to install

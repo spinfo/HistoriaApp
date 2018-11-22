@@ -2,6 +2,7 @@ package de.historia_app.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
@@ -14,8 +15,10 @@ import de.historia_app.mappables.TourOnMap;
 
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
+    private static final String LOGTAG = DatabaseHelper.class.getSimpleName();
+
     private static final String DATABASE_NAME = "historia-app-dev-3.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private Dao<Place, Long> placeDao = null;
     private Dao<Mapstop, Long> mapstopDao = null;
@@ -24,6 +27,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private Dao<Tour, Long> tourDao = null;
     private Dao<PersistentGeoPoint, Long> geopointDao = null;
     private Dao<Area, Long> areaDao = null;
+    private Dao<Scene, Long> sceneDao = null;
+    private Dao<Coordinate, Long> coordinateDao = null;
     private Dao<TourOnMap, Long> tourOnMapDao = null;
     private Dao<LexiconEntry, Long> lexiconEntryDao = null;
 
@@ -41,6 +46,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, Tour.class);
             TableUtils.createTable(connectionSource, PersistentGeoPoint.class);
             TableUtils.createTable(connectionSource, Area.class);
+            TableUtils.createTable(connectionSource, Scene.class);
+            TableUtils.createTable(connectionSource, Coordinate.class);
             TableUtils.createTable(connectionSource, TourOnMap.class);
             TableUtils.createTable(connectionSource, LexiconEntry.class);
         } catch (SQLException e){
@@ -50,7 +57,22 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource,
-                          int oldVersion, int newVersion) {}
+                          int oldVersion, int newVersion) {
+        if (oldVersion == 1 && newVersion == 2) {
+            try {
+                getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `pos` int NULL DEFAULT null");
+                getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `scene` bigint NULL DEFAULT null");
+                getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `coordinate` bigint NULL DEFAULT null");
+                getMapstopDao().executeRaw("ALTER TABLE " + getMapstopDao().getTableName() + " ADD COLUMN `type` string NULL DEFAULT null");
+                TableUtils.createTable(connectionSource, Coordinate.class);
+                TableUtils.createTable(connectionSource, Scene.class);
+                Log.i(LOGTAG, "Successfully upgraded database from version 1 to version 2.");
+            } catch (SQLException e) {
+                Log.e(LOGTAG, "Database upgrade from version 1 to version 2 failed: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 
     public Dao<Place, Long> getPlaceDao() {
         if(placeDao == null) {
@@ -101,6 +123,20 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         return areaDao;
     }
 
+    public Dao<Scene, Long> getSceneDao() {
+        if(sceneDao == null) {
+            sceneDao = getMyDaoRuntimeExcept(Scene.class);
+        }
+        return sceneDao;
+    }
+
+    public Dao<Coordinate, Long> getCoordinateDao() {
+        if(coordinateDao == null) {
+            coordinateDao = getMyDaoRuntimeExcept(Coordinate.class);
+        }
+        return coordinateDao;
+    }
+
     public Dao<TourOnMap, Long> getTourOnMapDao() {
         if(tourOnMapDao == null) {
             tourOnMapDao = getMyDaoRuntimeExcept(TourOnMap.class);
@@ -135,6 +171,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
         tourDao = null;
         geopointDao = null;
         areaDao = null;
+        sceneDao = null;
         tourOnMapDao = null;
         lexiconEntryDao = null;
 
