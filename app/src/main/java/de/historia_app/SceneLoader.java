@@ -92,6 +92,11 @@ public class SceneLoader implements Serializable {
                     try {
                         options.inSampleSize = inSampleSize;
                         bm = BitmapFactory.decodeFile(file.getPath(), options);
+                        if (bm.getWidth() > 4000) {
+                            inSampleSize *= 2;
+                            bm = null;
+                            continue;
+                        }
                     } catch (OutOfMemoryError e) {
                         Log.e(LOG_TAG, e.toString());
                         inSampleSize *= 2;
