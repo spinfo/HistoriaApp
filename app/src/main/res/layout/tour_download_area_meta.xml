@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    style="@style/listViewTopItem">
+
+    <TextView
+        android:id="@+id/tour_download_area_meta_title_line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_blue_dark"
+        android:textStyle="bold"
+        style="@style/listViewTextItem"
+        />
+
+    <TextView
+        android:id="@+id/tour_download_area_meta_last_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/listViewTextItem"
+        android:textSize="12sp"
+        />
+
+    <TextView
+        android:id="@+id/tour_download_area_meta_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/listViewTextItem"
+        />
+</LinearLayout>

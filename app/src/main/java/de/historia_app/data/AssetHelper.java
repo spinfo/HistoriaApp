@@ -8,20 +8,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import de.historia_app.App;
-import de.historia_app.R;
-
 public class AssetHelper {
 
     private static final String TAG = AssetHelper.class.getSimpleName();
 
-    public static String readAsset(String filename) {
+    public static String readAsset(Context context, String filename) {
         InputStream in = null;
         BufferedReader buffer = null;
 
         try {
             StringBuilder sb = new StringBuilder();
-            in = App.getContext().getAssets().open(filename);
+            in = context.getAssets().open(filename);
             buffer = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String str;
             while ((str = buffer.readLine()) != null) {

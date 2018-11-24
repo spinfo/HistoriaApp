@@ -5,12 +5,18 @@ import android.content.Context;
 import android.util.Log;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.GenericRawResults;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import de.historia_app.ErrUtil;
 import de.historia_app.mappables.TourOnMap;
@@ -21,7 +27,7 @@ public class DatabaseDataProvider {
 
     private DatabaseHelper dbHelper;
 
-    public DatabaseDataProvider(Context context) {
+    DatabaseDataProvider(Context context) {
         this.dbHelper = new DatabaseHelper(context);
     }
 
@@ -99,6 +105,34 @@ public class DatabaseDataProvider {
         }
     }
 
+    private long getTourVersion(long tourId, long defaultTo) {
+        try {
+            String[] result = dbHelper.getTourDao().queryBuilder()
+                    .selectColumns("version").where().idEq(tourId)
+                    .queryRaw().getFirstResult();
+            if (result == null || result.length == 0 || result[0] == null) {
+                return defaultTo;
+            }
+            return Long.parseLong(result[0]);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    TourRecord.InstallStatus determineInstallStatus(TourRecord record) {
+        long defaultVersion = -1L;
+        TourRecord.InstallStatus result;
+        long versionInstalled = getTourVersion(record.getTourId(), defaultVersion);
+        if (versionInstalled == defaultVersion) {
+            result = TourRecord.InstallStatus.NOT_INSTALLED;
+        } else  if (versionInstalled == record.getVersion()) {
+            result = TourRecord.InstallStatus.UP_TO_DATE;
+        } else {
+            result = TourRecord.InstallStatus.UPDATE_AVAILABLE;
+        }
+        return result;
+    }
+
     /**
      * Get the amount of tours in the area without fetching them.
      *
@@ -125,10 +159,21 @@ public class DatabaseDataProvider {
 
     List<TourOnMap> getToursOnMap() {
         try {
+            deleteInvalidToursOnMap();
             return dbHelper.getTourOnMapDao().queryForAll();
         } catch (SQLException e) {
             ErrUtil.failInDebug(LOG_TAG, e);
             return Collections.emptyList();
+        }
+    }
+
+    private void deleteInvalidToursOnMap() {
+        try {
+            DeleteBuilder<TourOnMap, Long> builder = dbHelper.getTourOnMapDao().deleteBuilder();
+            builder.where().notIn("tour", dbHelper.getTourDao().queryForAll());
+            builder.delete();
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
         }
     }
 
@@ -201,4 +246,33 @@ public class DatabaseDataProvider {
         }
     }
 
+
+    public List<Mediaitem> getMediaitemsFor(Tour tour) {
+        // since the connection mapstop-page-mediaitem is eagerly fetched, no special query is needed
+        List<Mediaitem> result = new ArrayList<>();
+        for (Mapstop mapstop : tour.getMapstops()) {
+            for (Page page : mapstop.getPages()) {
+                result.addAll(page.getMedia());
+            }
+        }
+        return result;
+    }
+
+
+    public Set<Long> getTourIdsInArea(long areaId) {
+        QueryBuilder<Tour, Long> builder = dbHelper.getTourDao().queryBuilder();
+        Set<Long> result = new TreeSet<>();
+        try {
+            GenericRawResults<String[]> results = builder.selectColumns("id").where().eq("area", areaId).queryRaw();
+            for (String[] row : results.getResults()) {
+                if (row != null && row.length == 1) {
+                    result.add(Long.valueOf(row[0]));
+                }
+            }
+        } catch (SQLException e) {
+            ErrUtil.failInDebug(LOG_TAG, e);
+            result = Collections.emptySet();
+        }
+        return result;
+    }
 }

@@ -3,6 +3,7 @@ package de.historia_app.data;
 import android.content.Context;
 
 import java.util.List;
+import java.util.Set;
 
 import de.historia_app.mappables.TourOnMap;
 
@@ -48,6 +49,10 @@ public class DataFacade {
         return dbDataProvider.saveTour(tour, this.context);
     }
 
+    public TourRecord.InstallStatus determineInstallStatus(TourRecord record) {
+        return dbDataProvider.determineInstallStatus(record);
+    }
+
     public List<TourOnMap> getToursOnMap() {
         return dbDataProvider.getToursOnMap();
     }
@@ -70,5 +75,13 @@ public class DataFacade {
 
     boolean saveLexiconEntries(List<LexiconEntry> entries) {
         return dbDataProvider.saveLexiconEntries(entries);
+    }
+
+    public List<Mediaitem> getMediaitemsFor(Tour tour) {
+        return dbDataProvider.getMediaitemsFor(tour);
+    }
+
+    public Set<Long> getTourIdsInArea(long areaId) {
+        return  dbDataProvider.getTourIdsInArea(areaId);
     }
 }

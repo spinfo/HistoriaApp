@@ -86,8 +86,13 @@ public class MapUpdatingGpsLocationProvider implements IMyLocationProvider, Loca
 
     private boolean startLocationProvider() {
         try {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_DELAY_TILL_UPDATE, MIN_DISTANCE_FOR_UPDATE, this);
-            return true;
+            if (locationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER)) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_DELAY_TILL_UPDATE, MIN_DISTANCE_FOR_UPDATE, this);
+                return true;
+            } else {
+                Log.w(TAG, "GPS location provider not supported.");
+                return false;
+            }
         } catch (SecurityException e) {
             Log.i(TAG, "Not listening for gps updates as that raised a Security Exception.");
             return false;

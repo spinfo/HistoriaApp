@@ -132,7 +132,7 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
                     // react to click on lexicon entries by showing the activity
                     if (LexiconEntry.class.equals(obj.getClass())) {
                         Intent intent = new Intent(getActivity(), SimpleWebViewActivity.class);
-                        final String content = ((LexiconEntry) obj).getContent();
+                        final String content = ((LexiconEntry) obj).getContent(getContext());
                         intent.putExtra(getResources().getString(R.string.extra_key_simple_web_view_data), content);
                         getActivity().startActivity(intent);
                     }

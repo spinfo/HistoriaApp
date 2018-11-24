@@ -33,8 +33,7 @@
         </activity>
         <activity android:name=".SimpleWebViewActivity" />
         <activity android:name=".MapstopPageViewActivity" />
-        <activity android:name=".TourDownloadFragment" />
-        <activity android:name=".AboutPageAcitvity"></activity>
+        <activity android:name=".AboutPageAcitvity"/>
     </application>
 
 </manifest>

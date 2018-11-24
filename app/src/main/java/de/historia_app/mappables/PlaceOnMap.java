@@ -3,7 +3,6 @@ package de.historia_app.mappables;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.historia_app.data.Mapstop;
 import de.historia_app.data.Place;
 
 /**

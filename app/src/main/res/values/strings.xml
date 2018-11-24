@@ -8,6 +8,7 @@
     <string name="extra_key_popup_obj_id">popup_obj_id</string>
     <string name="extra_key_simple_web_view_data">simple_web_view_data</string>
     <string name="extra_key_restart_error_message">restart_error_message</string>
+    <string name="extra_key_map_fragment_action">mapfragment_action</string>
 
     <!-- General names -->
     <string name="name_mapstop">Station</string>
@@ -20,11 +21,13 @@
     <string name="menu_title">Menü</string>
     <string name="menu_select_area">Karte wechseln</string>
     <string name="menu_explore_area">Karte erkunden</string>
-    <string name="menu_select_tour">Touren wählen</string>
-    <string name="menu_explore_data">Lesemodus</string>
-    <string name="menu_download_tours">Touren laden</string>
+    <string name="menu_select_tour">Tour starten</string>
+    <string name="menu_explore_data">Bibliothek</string>
+    <string name="menu_download_tours">Magazin</string>
     <string name="menu_options_general">Optionen</string>
-    <string name="menu_about">Über uns</string>
+    <string name="menu_about">Über die App</string>
+    <string name="menu_impressum">Impressum</string>
+    <string name="menu_privacy">Datenschutz</string>
 
     <!-- Strings for the dialog popup -->
     <string name="dialog_popup_ok">Starten</string>
@@ -69,7 +72,7 @@
     <string name="lexicon">Lexikon</string>
     <string name="no_lexicon_entries">Keine Lexikon-Einträge vorhanden</string>
 
-    <!-- Symbolic strings -->
+    <!-- Strings describing symbols -->
     <string name="right_arrow">➡</string>
     <string name="letter_X">X</string>
 
@@ -84,4 +87,17 @@
     <!-- Filenames -->
     <string name="asset_app_article_styles">app-article.css</string>
     <string name="asset_about_page">about_page.html</string>
+    <string name="asset_privacy">privacy_policy.html</string>
+    <string name="asset_impressum">impressum.html</string>
+
+    <!-- content descriptions for tour downloads -->
+    <string name="download_icon_general_description">Tour-Status unbekannt</string>
+    <string name="download_icon_up_to_data">Up to date</string>
+    <string name="download_icon_not_installed">Nicht installiert</string>
+    <string name="download_icon_update_available">Ein Update liegt vor</string>
+    <string name="uninstall_tour">Löschen</string>
+    <string name="reinstall_tour">Erneut installieren</string>
+    <string name="install_tour">Installieren</string>
+    <string name="update_tour">Update</string>
+    <string name="unable_to_edit_tour">Die Tour kann leider nicht gelöscht/installiert werden.</string>
 </resources>

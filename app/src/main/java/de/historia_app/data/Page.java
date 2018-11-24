@@ -14,8 +14,6 @@ import java.util.List;
  */
 public class Page {
 
-    private static final String LOG_TAG = Page.class.getSimpleName();
-
     // the server's id value for this page
     @DatabaseField(columnName = "id", id = true)
     private long id;
@@ -92,8 +90,8 @@ public class Page {
     }
 
     public String getPresentationContent(Context context) {
-        String content = HtmlContentCompletion.replaceMediaitems(getContent(), getMedia(), context);
-        return HtmlContentCompletion.wrapInPage(content);
+        String content = HtmlContentCompletion.replaceMediaitems(context, getContent(), getMedia());
+        return HtmlContentCompletion.wrapInPage(context, content);
     }
 
     public String getHistoryUrl() {

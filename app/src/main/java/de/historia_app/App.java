@@ -17,8 +17,6 @@ public class App extends Application {
 
     private static final String LOG_TAG = App.class.getName();
 
-    private static Context context;
-
     // a reference to the default exception handler that we will replace
     private Thread.UncaughtExceptionHandler defaultExceptionHandler;
 
@@ -88,16 +86,5 @@ public class App extends Application {
         // setup our exception handler
         Thread.setDefaultUncaughtExceptionHandler(replacementExceptionHandler);
     }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        context = this;
-    }
-
-    public static Context getContext() {
-        return context;
-    }
-
 
 }

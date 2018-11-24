@@ -4,11 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
-import de.historia_app.App;
 import de.historia_app.R;
 
 
@@ -43,37 +40,29 @@ public class HtmlContentCompletion {
 
 
 
-    public static String wrapInPage(String innerHtml) {
+    public static String wrapInPage(Context context, String innerHtml) {
         if(innerHtml == null) {
             innerHtml = "";
         }
-        String styles = AssetHelper.readAsset(App.getContext().getString(R.string.asset_app_article_styles));
+        String styles = AssetHelper.readAsset(context, context.getString(R.string.asset_app_article_styles));
         String withStyles = HTML_TEMPLATE.replaceFirst(CSS_GOES_HERE, styles);
         return withStyles.replaceFirst(CONTENT_GOES_GERE, innerHtml);
     }
 
-    public static String replaceMediaitems(String content, List<Mediaitem> media, Context context) {
+    public static String replaceMediaitems(Context context, String content, List<Mediaitem> media) {
         if(media == null || media.isEmpty()) {
             return content;
         }
 
         FileService fileService = new FileService(context);
         for(Mediaitem mediaitem : media) {
-            // Treat the mediaitem guid as a file to get the basename
-            File guidFile = new File(mediaitem.getGuid());
-            String base = guidFile.getName();
-
-            if(base.isEmpty()) {
-                Log.w(LOG_TAG, "Could not determine base for guid: " + mediaitem.getGuid());
+            File file = fileService.determineSaveLocation(mediaitem);
+            if(file.exists()) {
+                String replacement = UrlSchemes.FILE + file.getAbsolutePath();
+                Log.d(LOG_TAG, "Replacing: '" + mediaitem.getGuid() + "' with '" + replacement + "'");
+                content = content.replaceAll(mediaitem.getGuid(), replacement);
             } else {
-                File file = fileService.getFile(base);
-                if(file.exists()) {
-                    String replacement = UrlSchemes.FILE + file.getAbsolutePath();
-                    Log.d(LOG_TAG, "Replacing: '" + mediaitem.getGuid() + "' with '" + replacement + "'");
-                    content = content.replaceAll(mediaitem.getGuid(), replacement);
-                } else {
-                    Log.w(LOG_TAG, "No file for basename: " + base);
-                }
+                Log.w(LOG_TAG, "No file for mediaitem: " + mediaitem.getGuid());
             }
         }
         return content;

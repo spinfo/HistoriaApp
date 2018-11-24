@@ -1,14 +1,9 @@
 package de.historia_app;
 
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.MailTo;
-import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -46,6 +41,6 @@ public class AboutPageAcitvity extends AppCompatActivity {
     }
 
     private String getAboutPageContent() {
-        return AssetHelper.readAsset(getString(R.string.asset_about_page));
+        return AssetHelper.readAsset(this, getString(R.string.asset_about_page));
     }
 }

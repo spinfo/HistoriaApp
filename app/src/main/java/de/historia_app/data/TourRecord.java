@@ -5,6 +5,12 @@ package de.historia_app.data;
  */
 public class TourRecord {
 
+    public enum InstallStatus {
+        NOT_INSTALLED,
+        UPDATE_AVAILABLE,
+        UP_TO_DATE,
+    }
+
     // id of the record (not the tour) assigned by the server
     private long id;
 
@@ -44,6 +50,10 @@ public class TourRecord {
 
     public long getVersion() {
         return version;
+    }
+
+    public long getVersionSeconds() {
+        return version * 1000;
     }
 
     public void setVersion(long version) {
@@ -97,4 +107,5 @@ public class TourRecord {
     public void setDownloadSize(int downloadSize) {
         this.downloadSize = downloadSize;
     }
+
 }
