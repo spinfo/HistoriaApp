@@ -126,12 +126,10 @@ public class DatabaseTourInstaller {
                 scene.setTour(tour);
                 for (Mapstop mapstop : scene.getMapstops()) {
                     mapstop.setScene(scene);
-                    // todo : mapstop.setPage() etc. ?
                     mapstopDao.createOrUpdate(mapstop);
                 }
                 for (Coordinate coordinate : scene.getCoordinates()) {
                     coordinate.setScene(scene);
-                    // todo : coordinate.setMapstop(...); ?
                     coordinateDao.createOrUpdate(coordinate);
                 }
                 sceneDao.createOrUpdate(scene);

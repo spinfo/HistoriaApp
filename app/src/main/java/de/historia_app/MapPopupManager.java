@@ -21,7 +21,6 @@ import de.historia_app.data.Area;
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.Mapstop;
 import de.historia_app.data.Tour;
-import de.historia_app.data.Scene;
 
 public class MapPopupManager {
 

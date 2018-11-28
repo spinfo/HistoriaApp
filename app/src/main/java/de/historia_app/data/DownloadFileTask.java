@@ -13,7 +13,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import java.net.HttpURLConnection;
+import javax.net.ssl.HttpsURLConnection;
 
 import de.historia_app.ErrUtil;
 
@@ -86,8 +86,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
     protected DownloadFileTask.Result doInBackground(String... urls) {
         Result result = null;
         if (!isCancelled() && urls != null && urls.length > 0) {
-            // todo : remove
-            String urlString = urls[0].replace("localhost", "10.0.2.2");
+            String urlString = urls[0];
             try {
                 File resultFile = downloadUrl(urlString, this.readTimeoutMilliseconds, this.maxBytes);
                 if (resultFile != null) {
@@ -152,14 +151,12 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
             return null;
         }
 
-        // todo : change back to https
-        HttpURLConnection connection = null;
+        HttpsURLConnection connection = null;
         InputStream stream = null;
         File result = null;
         try {
-            // todo : back to https
             URL url = new URL(urlStr);
-            connection = (HttpURLConnection) url.openConnection();
+            connection = (HttpsURLConnection) url.openConnection();
 
             // set timeouts
             connection.setConnectTimeout(3000);
@@ -172,7 +169,7 @@ public class DownloadFileTask extends AsyncTask<String, Void, DownloadFileTask.R
             connection.connect();
             publishProgress(DownloadCallback.Progress.CONNECT_SUCCESS, 0);
             int responseCode = connection.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
+            if (responseCode != HttpsURLConnection.HTTP_OK) {
                 throw new IOException("HTTP error code: " + responseCode);
             }
             // Retrieve the response body as an InputStream.

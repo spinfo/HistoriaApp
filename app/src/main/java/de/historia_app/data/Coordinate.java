@@ -1,7 +1,5 @@
 package de.historia_app.data;
 
-import android.graphics.Point;
-
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 

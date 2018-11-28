@@ -1,9 +1,6 @@
 package de.historia_app.data;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.util.Log;
 
 import net.lingala.zip4j.core.ZipFile;
@@ -68,7 +65,7 @@ public class FileService {
     public boolean initializeExampleDataIfNeeded() {
         DataFacade data = new DataFacade(context);
         if (data.getDefaultTour() == null) {
-            return initializeExampleData();
+            return initializeExampleData("example-tour.zip");
         } else {
             return true;
         }
