@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -26,6 +28,7 @@ import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,6 +37,7 @@ import de.historia_app.data.Area;
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.Place;
 import de.historia_app.data.Tour;
+import de.historia_app.data.Scene;
 import de.historia_app.mappables.PlaceOnMap;
 import de.historia_app.mappables.TourCollectionOnMap;
 import de.historia_app.mappables.TourOnMap;
@@ -397,8 +401,16 @@ public class MapFragment extends Fragment implements MainActivity.MainActivityFr
             Log.w(LOGTAG, "Not selecting null tour.");
             return;
         }
-        List<Overlay> overlays = switchTourOverlays(new TourOnMap(tour));
-        MapUtil.zoomToOverlays(state.map, overlays);
+
+        if (tour.isIndoor()) {
+            IndoorTourFragment indoorTourFragment = ((MainActivity)getActivity()).switchMainFragmentToIndoorTour(false);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("tour", tour);
+            indoorTourFragment.setArguments(bundle);
+        } else {
+            List<Overlay> overlays = switchTourOverlays(new TourOnMap(tour));
+            MapUtil.zoomToOverlays(state.map, overlays);
+        }
 
         // pass the change on
         if(onModelSelectionListener != null) {

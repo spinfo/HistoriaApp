@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
     private static final String MAP_FRAGMENT_TAG = "map_fragment";
     private static final String EXPLORE_FRAGMENT_TAG = "explore_data_fragment";
     private static final String TOUR_DOWNLOAD_FRAGMENT_TAG = "tour_download_fragment";
+    private static final String INDOOR_TOUR_FRAGMENT_TAG = "indoor_tour_fragment";
 
     // variables to interact with the main menu in the navigation drawer
     private DrawerLayout mDrawerLayout;
@@ -134,7 +135,17 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
             if(defaultTour == null) {
                 Log.d(LOG_TAG, "No default tour found. Initializing example data.");
                 FileService fs = new FileService(this);
-                boolean result = fs.initializeExampleData();
+                boolean result = fs.initializeExampleData("example-tour.zip");
+                if(!result) {
+                    ErrUtil.failInDebug(LOG_TAG, "Failed to initialize example data.");
+                }
+            }
+
+            Tour defaultIndoorTour = this.data.getDefaultIndoorTour();
+            if(defaultIndoorTour == null) {
+                Log.d(LOG_TAG, "No default indoor tour found. Initializing example data.");
+                FileService fs = new FileService(this);
+                boolean result = fs.initializeExampleData("example-indoor-tour.zip");
                 if(!result) {
                     ErrUtil.failInDebug(LOG_TAG, "Failed to initialize example data.");
                 }
@@ -180,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         }
     }
 
-    private MapFragment switchMainFragmentToMap(boolean addToBackStack) {
+    protected MapFragment switchMainFragmentToMap(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         MapFragment mapFragment = (MapFragment) fragmentManager.findFragmentByTag(MAP_FRAGMENT_TAG);
         if (mapFragment == null) {
@@ -202,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
         setupFragmentAsMainFragment(exploreFragment, EXPLORE_FRAGMENT_TAG, addToBackStack);
     }
 
+
     private void switchMainFragmentToTourDownloadAreaSelection(boolean addToBackStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         TourDownloadAreaSelectionFragment downloadFragment = (TourDownloadAreaSelectionFragment) fragmentManager.findFragmentByTag(TOUR_DOWNLOAD_FRAGMENT_TAG);
@@ -209,6 +221,16 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
             downloadFragment = new TourDownloadAreaSelectionFragment();
         }
         setupFragmentAsMainFragment(downloadFragment, TOUR_DOWNLOAD_FRAGMENT_TAG, addToBackStack);
+    }
+
+    protected IndoorTourFragment switchMainFragmentToIndoorTour(boolean addToBackStack) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        IndoorTourFragment indoorTourFragment = (IndoorTourFragment) fragmentManager.findFragmentByTag(INDOOR_TOUR_FRAGMENT_TAG);
+        if (indoorTourFragment == null) {
+            indoorTourFragment = new IndoorTourFragment();
+        }
+        setupFragmentAsMainFragment(indoorTourFragment, INDOOR_TOUR_FRAGMENT_TAG, addToBackStack);
+        return indoorTourFragment;
     }
 
     // replace the fragment and add (if wished) add this action to the transaction back stack

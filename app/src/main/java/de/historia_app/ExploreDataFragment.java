@@ -3,6 +3,7 @@ package de.historia_app;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,6 +17,8 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import de.historia_app.data.Area;
@@ -142,6 +145,18 @@ public class ExploreDataFragment extends Fragment implements MainActivity.MainAc
 
     private ListAdapter getMapstopListAdapterForTour(Tour tour) {
         List<Mapstop> mapstopData = tour.getMapstops();
+        if (tour.isIndoor()) {
+            Collections.sort(mapstopData, new Comparator<Mapstop>() {
+                @Override
+                public int compare(Mapstop o1, Mapstop o2) {
+                    if (o1.getScene().getPos() == o2.getScene().getPos()) {
+                        return o1.getPos() - o2.getPos();
+                    }
+
+                    return o1.getScene().getPos() - o2.getScene().getPos();
+                }
+            });
+        }
         Mapstop[] mapstops = mapstopData.toArray(new Mapstop[mapstopData.size()]);
         return new MapstopArrayAdapter(getContext(), mapstops);
     }

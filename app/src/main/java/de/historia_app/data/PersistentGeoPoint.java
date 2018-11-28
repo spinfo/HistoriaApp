@@ -6,11 +6,13 @@ import com.j256.ormlite.table.DatabaseTable;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
 
+import java.io.Serializable;
+
 /**
  * A class implementing the IGeoPoint interface, but that we can also save with ormlite.
  */
 @DatabaseTable(tableName = "geopoint")
-class PersistentGeoPoint implements IGeoPoint {
+class PersistentGeoPoint implements IGeoPoint, Serializable {
 
     @DatabaseField(columnName = "id", generatedId = true)
     private long id;

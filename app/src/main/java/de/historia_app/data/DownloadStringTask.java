@@ -11,7 +11,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import javax.net.ssl.HttpsURLConnection;
+import java.net.HttpURLConnection;
 
 import de.historia_app.ErrUtil;
 
@@ -143,12 +143,12 @@ public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTa
             return "";
         }
 
-        HttpsURLConnection connection = null;
+        HttpURLConnection connection = null;
         InputStream stream = null;
         String result = "";
         try {
             URL url = new URL(urlStr);
-            connection = (HttpsURLConnection) url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
 
             // set timeouts
             connection.setConnectTimeout(3000);
@@ -161,7 +161,7 @@ public class DownloadStringTask extends AsyncTask<String, Void, DownloadStringTa
             connection.connect();
             publishProgress(DownloadCallback.Progress.CONNECT_SUCCESS, 0);
             int responseCode = connection.getResponseCode();
-            if (responseCode != HttpsURLConnection.HTTP_OK) {
+            if (responseCode != HttpURLConnection.HTTP_OK) {
                 throw new IOException("HTTP error code: " + responseCode);
             }
             // Retrieve the response body as an InputStream.

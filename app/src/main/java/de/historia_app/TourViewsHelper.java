@@ -5,6 +5,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 
 import de.historia_app.data.Mapstop;
@@ -61,10 +64,24 @@ public abstract class TourViewsHelper {
         final LinearLayout mapstopList =
                 (LinearLayout) tourIntro.findViewById(R.id.tour_intro_mapstop_list);
 
+        List<Mapstop> mapstops = tour.getMapstops();
+        if (tour.isIndoor()) {
+            Collections.sort(mapstops, new Comparator<Mapstop>() {
+                @Override
+                public int compare(Mapstop o1, Mapstop o2) {
+                    if (o1.getScene().getPos() == o2.getScene().getPos()) {
+                        return o1.getPos() - o2.getPos();
+                    }
+
+                    return o1.getScene().getPos() - o2.getScene().getPos();
+                }
+            });
+        }
+
         TextView textView;
         String text;
         int position = 1;
-        for (final Mapstop mapstop : tour.getMapstops()) {
+        for (final Mapstop mapstop : mapstops) {
             textView = new TextView(tourIntro.getContext());
 
             text = String.format(Locale.getDefault(), "%2d. %s", position, mapstop.getName());
