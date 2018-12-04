@@ -7,7 +7,7 @@ public abstract class UrlSchemes {
     private static final String LOG_TAG = UrlSchemes.class.getSimpleName();
 
     public static final String SERVER_BASE_URI =
-            "https://stadtsprachen-app.de/wp-content/uploads/smart-history-tours";
+            "https://stadtsprachenapp.de/wp-content/uploads/smart-history-tours";
 
     public static final String AVAILABLE_TOURS_URL = SERVER_BASE_URI + "/tours.v2.yaml";
 
