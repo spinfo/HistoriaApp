@@ -82,11 +82,7 @@ public class FileService {
 
             // Create a dummy tour record so that the tour file can be found
             TourRecord record = new TourRecord();
-            if (filename.equals("example-indoor-tour.zip")) {
-                record.setVersion(1L);
-            } else {
-                record.setVersion(0L);
-            }
+            record.setVersion(0L);
             record.setAreaId(0L);
 
             // hand everything to install
