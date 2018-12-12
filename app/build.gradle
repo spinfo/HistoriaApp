@@ -7,8 +7,8 @@ android {
         applicationId "de.stadtsprachenapp"
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 10
-        versionName "0.10"
+        versionCode 11
+        versionName "0.11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
