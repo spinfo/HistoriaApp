@@ -18,7 +18,7 @@ public class HtmlContentCompletion {
     private static final String HEADING_GOES_HERE = "b3fc9141-fe1e-41b3-be30-43d1ea91ece8";
 
     private static final String HTML_TEMPLATE =
-            "<html>" +
+            "<html lang=\"de-DE\">" +
                 "<head>" +
                     "<meta charset=\"UTF-8\">" +
                     "<style>\n" +
