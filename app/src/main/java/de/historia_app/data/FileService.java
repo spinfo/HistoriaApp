@@ -65,13 +65,15 @@ public class FileService {
     public boolean initializeExampleDataIfNeeded() {
         DataFacade data = new DataFacade(context);
         if (data.getDefaultTour() == null) {
-            return initializeExampleData("example-tour.zip");
+            boolean res1 = initializeExampleData("example-tour.zip", 105L, 1546376701L);
+            boolean res2 = initializeExampleData("example-indoor-tour.zip", 106L, 1546376718L);
+            return (res1 && res2);
         } else {
             return true;
         }
     }
 
-    public boolean initializeExampleData(String filename) {
+    public boolean initializeExampleData(String filename, long fakeId, long fakeVersion) {
         try {
             // Read the assets file to a temp file
             File temp = File.createTempFile(TOUR_FILE_PREFIX, "", context.getCacheDir());
@@ -82,7 +84,8 @@ public class FileService {
 
             // Create a dummy tour record so that the tour file can be found
             TourRecord record = new TourRecord();
-            record.setVersion(0L);
+            record.setTourId(fakeId);
+            record.setVersion(fakeVersion);
             record.setAreaId(0L);
 
             // hand everything to install

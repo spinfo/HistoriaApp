@@ -131,14 +131,9 @@ public class MainActivity extends AppCompatActivity implements OnModelSelectionL
             this.data = new DataFacade(this);
 
             // if there is no data yet, set it up
-            Tour defaultTour = this.data.getDefaultTour();
-            if(defaultTour == null) {
-                Log.d(LOG_TAG, "No default tour found. Initializing example data.");
-                FileService fs = new FileService(this);
-                boolean result = fs.initializeExampleData("example-tour.zip");
-                if(!result) {
-                    ErrUtil.failInDebug(LOG_TAG, "Failed to initialize example data.");
-                }
+            boolean result = (new FileService(this)).initializeExampleDataIfNeeded();
+            if(!result) {
+                ErrUtil.failInDebug(LOG_TAG, "Failed to initialize example data.");
             }
 
             setContentView(R.layout.activity_main);

@@ -81,22 +81,6 @@ public class DatabaseDataProvider {
         }
     }
 
-    Tour getDefaultIndoorTour() {
-        try {
-            // the default tour belongs to the default area, return null if there is none
-            Area area = getDefaultArea();
-            if(area == null) {
-                return null;
-            }
-            // return the first tour of the default area
-            Dao<Tour, Long> tourDao = dbHelper.getTourDao();
-            PreparedQuery<Tour> query = tourDao.queryBuilder().where().eq("name", "Probetour").prepare();
-            return tourDao.queryForFirst(query);
-        }  catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     Tour getTourById(long id) {
         try {
             return dbHelper.getTourDao().queryForId(id);

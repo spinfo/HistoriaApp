@@ -41,8 +41,6 @@ public class DataFacade {
 
     public Tour getDefaultTour() { return dbDataProvider.getDefaultTour(); }
 
-    public Tour getDefaultIndoorTour() { return dbDataProvider.getDefaultIndoorTour(); }
-
     public Tour getTourById(long id) { return dbDataProvider.getTourById(id); }
 
     boolean saveTour(Tour tour) {
