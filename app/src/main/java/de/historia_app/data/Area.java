@@ -23,8 +23,7 @@ public class Area implements Serializable, AreaSortUtil.ObjectWithName {
 
     // The tours within this area, not to be fetched eagerly as they do some eager fetching
     // themselves.
-    // Tours for an area are fetched in the reversed order of their creation date on the server.
-    @ForeignCollectionField(columnName = "tours", orderColumnName = "created_at", orderAscending = false)
+    @ForeignCollectionField(columnName = "tours", orderColumnName = "version", orderAscending = false)
     private Collection<Tour> tours;
 
     // One corner of the area's rectangle
