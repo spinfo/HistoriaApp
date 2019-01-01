@@ -1,6 +1,6 @@
 package de.historia_app.data;
 
-public class AreaDownloadStatus {
+public class AreaDownloadStatus implements AreaSortUtil.ObjectWithName {
 
     private long areaId;
 

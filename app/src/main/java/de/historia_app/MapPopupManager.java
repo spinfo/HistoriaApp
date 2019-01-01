@@ -18,6 +18,7 @@ import android.widget.PopupWindow;
 import java.util.ArrayList;
 
 import de.historia_app.data.Area;
+import de.historia_app.data.AreaSortUtil;
 import de.historia_app.data.DataFacade;
 import de.historia_app.data.Mapstop;
 import de.historia_app.data.Tour;
@@ -158,6 +159,7 @@ public class MapPopupManager {
 
         // Connect the view to the list adapter
         final ArrayList<Area> areas = new ArrayList<>(data.getAreas());
+        AreaSortUtil.sortAreasByName(areas);
         final AreaArrayAdapter adapter = new AreaArrayAdapter(surface.getContext(), areas);
         listView.setAdapter(adapter);
 

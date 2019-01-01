@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Data object for an Area containing Tours (otherwise: a name connected to a geographic rectangle)
  */
-public class Area implements Serializable {
+public class Area implements Serializable, AreaSortUtil.ObjectWithName {
 
     // the server's id for this area
     @DatabaseField(columnName = "id", id = true)
