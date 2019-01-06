@@ -65,8 +65,8 @@ public class FileService {
     public boolean initializeExampleDataIfNeeded() {
         DataFacade data = new DataFacade(context);
         if (data.getDefaultTour() == null) {
-            boolean res1 = initializeExampleData("example-tour.zip", 105L, 1546376701L);
-            boolean res2 = initializeExampleData("example-indoor-tour.zip", 106L, 1546376718L);
+            boolean res1 = initializeExampleData("example-tour.zip", 105L, 1546518297L);
+            boolean res2 = initializeExampleData("example-indoor-tour.zip", 106L, 1546518273L);
             return (res1 && res2);
         } else {
             return true;

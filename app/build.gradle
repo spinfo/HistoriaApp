@@ -7,8 +7,9 @@ android {
         applicationId "de.historia_app"
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 12
-        versionName "1.1"
+        // builds 0.1 to 0.10 had version codes 1 to 10, build 1.0 was version code 11
+        versionCode 13
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
