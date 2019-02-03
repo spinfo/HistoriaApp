@@ -31,7 +31,7 @@ public class Tour implements Serializable {
             Tour.representation = "Spaziergang";
             PublicTransportTour.representation = "ÖPNV-Tour";
             BikeTour.representation = "Fahrrad-Tour";
-            IndoorTour.representation = "Indoor-Tour";
+            IndoorTour.representation = "Katalog-Tour";
         }
 
         public String getRepresentation() {
